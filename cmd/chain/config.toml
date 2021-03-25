@@ -1,0 +1,34 @@
+# testnet or mainnet
+TestNet = false
+
+# chain data directory
+Data = "data"
+
+# Logging switch
+Logging = true
+
+# P2P configuration
+#Externale ip (default = "0.0.0.0")
+ExternalIp = "0.0.0.0"
+
+# Custom boot
+
+
+# P2P port (default = "13561")
+P2PPort="13561"
+
+
+# RPC configuration, (default = 13562)
+RpcPort = "13562"
+# RPC password
+RpcPass = ""
+
+# TLS switch
+RpcTLS = false
+
+# If it is a block generating node, it needs to be configured
+# Json file address of the address private key
+KeyFile = ""
+# Password to decrypt the private key json file
+KeyPass = ""
+
