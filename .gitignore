@@ -19,3 +19,4 @@ cmd/wallet/keystore
 cmd/wallet/keystore.zip
 cmd/wallet/wallet
 cmd/chain/chain
+bin
