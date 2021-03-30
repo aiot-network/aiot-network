@@ -68,7 +68,7 @@ func LoadParam(private private.IPrivate) error {
 	}
 
 	if cfg.Version {
-		fmt.Print(version.StringifySingleLine(Param.App))
+		fmt.Println(version.StringifySingleLine(Param.App))
 		os.Exit(0)
 	}
 

@@ -45,6 +45,32 @@ func GenerateAddress(net string, pubKey string) (string, error) {
 	hashed2 := hash.Hash(hashed1.Bytes())
 	checkSum := hashed2[0:4]
 	hashedCheck1 := append(addNet, checkSum...)
+	fmt.Println(base58.Encode(hashedCheck1))
+	fmt.Println(len(base58.Encode(hashedCheck1)))
+	return arry.StringToAddress(base58.Encode(hashedCheck1)).String(), nil
+}
+
+func generateAddress(ver []byte, pubKey string) (string, error) {
+	pubBytes, err := hex.DecodeString(pubKey)
+	if err != nil {
+		return "", fmt.Errorf("wrong public key, error:%s", err.Error())
+	}
+	key, err := secp256k1.ParsePubKey(pubBytes)
+	if err != nil {
+		return "", fmt.Errorf("wrong public key, error:%s", err.Error())
+	}
+	hashed256 := hash.Hash(key.SerializeCompressed())
+	hashed160, err := hash.Hash160(hashed256.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	addNet := append(ver, hashed160...)
+	hashed1 := hash.Hash(addNet)
+	hashed2 := hash.Hash(hashed1.Bytes())
+	checkSum := hashed2[0:4]
+	hashedCheck1 := append(addNet, checkSum...)
+
 	return arry.StringToAddress(base58.Encode(hashedCheck1)).String(), nil
 }
 

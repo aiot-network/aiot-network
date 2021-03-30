@@ -117,8 +117,8 @@ var TestNetParam = &Param{
 	Data:              "data",
 	App:               "AIOT_NETWORK",
 	RollBack:          0,
-	PubKeyHashAddrID:  [2]byte{0xf7, 0x95},
-	PubKeyHashTokenID: [2]byte{0xf7, 0xae},
+	PubKeyHashAddrID:  [2]byte{0x12, 0xfb},
+	PubKeyHashTokenID: [2]byte{0x13, 0x14},
 	Logging:           true,
 	PeerRequestChan:   1000,
 	PrivateParam: &PrivateParam{
@@ -142,8 +142,8 @@ var TestNetParam = &Param{
 		NetWork:    TestNet + "AIOT_NETWORK",
 		P2pPort:    "13561",
 		ExternalIp: "0.0.0.0",
-		//aiVrBLugvcKoXCb3YTwYfbZe2WJ3nY8ftDG
-		CustomBoot: "/ip4/103.68.63.164/tcp/19563/ipfs/16Uiu2HAmKWBySkhEquPd1T2QweDYaeKHCxMfkmr7c1AoHpGSnh9x",
+		//aiVGSMj1W4w6o346WRRFUdtbFGSUnw1ZgmN
+		CustomBoot: "/ip4/103.68.63.164/tcp/19563/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
 	},
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
@@ -160,43 +160,43 @@ var TestNetParam = &Param{
 		DPosSize:         DPosSize,
 		GenesisTime:      1592268410,
 		GenesisCycle:     1592268410 / CycleInterval,
-		WorkProofAddress: "aiGqjoXAoStn7zSYY4cETR9m4trPEEQ7CTa",
+		WorkProofAddress: "aiE4Sz5beABbLgGxitzhyMFbYPzqkRHrcxX",
 		GenesisSuperList: []Super{
 			{
-				Address: "aiGJW3ZFuudsLeP4YjdZrmqCBJChJH1LBoB",
-				P2PId:   "16Uiu2HAm6xn4pcjJ6HviBgZeicQqVdEZMsa5uoQ1prA6o5LpAyJt",
+				Address: "aiNwLqMvfQp2bnBUCwRbSwAuooZpTYgttPh",
+				P2PId:   "16Uiu2HAmMH8yCqrRvzyjEdcJ817pNQpcgrgZn95d5kn4LF2xm66L",
 			},
 			{
-				Address: "aiMnamdZsAnWy5Kw4pK9HPtgfKt7cDfLMUi",
-				P2PId:   "16Uiu2HAm6xn4pcjJ6HviBgZeicQqVdEZMsa5uoQ1prA6o5LpAyJt",
+				Address: "aiC1ZfKjBVKE8dhsfvqhrZ9w3XoeMc1HaGZ",
+				P2PId:   "16Uiu2HAmF6rDNZBympeEsDfoVTPPwtjRiizxDNmLxt5B7JAZTwdg",
 			},
 			{
-				Address: "aiCY2y3im6MG1wTpJgAogS8NgscwLr66Ueu",
-				P2PId:   "16Uiu2HAmPeL1jafz9mpEkftBpfRZRFZGKackGEzaXd5Rh1pLQbvq",
+				Address: "aiFXk1v9foKgoJtSbAqRn8VT81MxMfvMFsN",
+				P2PId:   "16Uiu2HAm851T4cCfRM7BvjgRdeirn4zeim8QUNAkmNW9A4sjWr9o",
 			},
 			{
-				Address: "aiVCdvVT6nkRTPbSBoGswxWDf1tSfqk2KkG",
-				P2PId:   "16Uiu2HAm8jmcocgCELyFnuL5DGfBUn6WaCoCbs4kGwgbDpFNkM6h",
+				Address: "aiDQNruRJ2A3dV6Z28sbmotjrw42zgto9T8",
+				P2PId:   "16Uiu2HAmAPg4wy9xHnrVedzgG6pkEhhvKRBw5ouhUPLYLi1GteKs",
 			},
 			{
-				Address: "aiC3aWKDnLog5Df7r1tUcZsViRTzF1AYJ5U",
-				P2PId:   "16Uiu2HAmRxe38EUafwy2YqTwiRmc3CgSi6zW2kLAsQKUQgnoEB2A",
+				Address: "aiRhoqVbxprtkwFFLohVSE48UK2zRzVqW2J",
+				P2PId:   "16Uiu2HAm4po19Qm6gxVAQrP3ctmNgZdkgUYiLUtGXkKjAu1hzV9U",
 			},
 			{
-				Address: "aiGCRf7AHPLCjfE6VX1Zcz8RtJoXHYHe8Je",
-				P2PId:   "16Uiu2HAmRTvsT7HcZJGYncTBeefxBm6b5pnyuSCuYV6Hgcmj4VuW",
+				Address: "aiF5Ym7nXHbmY96TQsQd64tj4ebjZR8Uwb6",
+				P2PId:   "16Uiu2HAmLUKpbkYqWpFNDyxXwfaPg9BJ3AWP3gyidxhX6iGPw2dY",
 			},
 			{
-				Address: "aiRzwTSYXYCqLmA295x2gY4BMn7khBbzLr4",
-				P2PId:   "16Uiu2HAmDoWd5ioXVs6qrCmmJfwo9PctKfv4HWzmrP5Lnv3Jo5iP",
+				Address: "aiSdadQ8tpPzcjH8GjLPLJqt9yfrsDTGUML",
+				P2PId:   "16Uiu2HAmK5aMz7ah2edHnKHCnNFmkxPgJMgnrNBfgWgTLDtEtDbL",
 			},
 			{
-				Address: "aiVnGCRrVLr4ntrz7J11HkjDX9a9JHinRc1",
-				P2PId:   "16Uiu2HAkufPsFP4acpAMeKh6xQvLCzShpSuMFRaEFxTSE8Mjuk5i",
+				Address: "aiGKvSCKE6Qge3rhJSc1k1Pz3veJsqcA44o",
+				P2PId:   "16Uiu2HAky7uuaiGx9cV3CD9WWUbobqHNsD9F4viQFzaYb3oB3fxj",
 			},
 			{
-				Address: "aiQuA6VMPT4rdVZjKMWyucRY8jSdAF2dpvh",
-				P2PId:   "16Uiu2HAmHYLacSmfNQjUfew59SBo1pdqKjrgz8awgN3J4DwbkWSS",
+				Address: "aiEJixC4k2LS6TPBjj7GX7mvNaeggK5WmV2",
+				P2PId:   "16Uiu2HAmUEgz6fTzy7KNaecXq4bfvaLymHwoMJoJ47KxANvp4YMe",
 			},
 		},
 	},
@@ -213,7 +213,7 @@ var MainNetParam = &Param{
 	Data:              "data",
 	App:               APPName,
 	RollBack:          0,
-	PubKeyHashAddrID:  [2]byte{0xea, 0x12},
+	PubKeyHashAddrID:  [2]byte{0x5, 0x78},
 	PubKeyHashTokenID: [2]byte{0x5, 0x91},
 	Logging:           true,
 	PeerRequestChan:   1000,
