@@ -45,8 +45,6 @@ func GenerateAddress(net string, pubKey string) (string, error) {
 	hashed2 := hash.Hash(hashed1.Bytes())
 	checkSum := hashed2[0:4]
 	hashedCheck1 := append(addNet, checkSum...)
-	fmt.Println(base58.Encode(hashedCheck1))
-	fmt.Println(len(base58.Encode(hashedCheck1)))
 	return arry.StringToAddress(base58.Encode(hashedCheck1)).String(), nil
 }
 

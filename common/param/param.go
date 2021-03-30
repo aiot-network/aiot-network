@@ -142,8 +142,8 @@ var TestNetParam = &Param{
 		NetWork:    TestNet + "AIOT_NETWORK",
 		P2pPort:    "13561",
 		ExternalIp: "0.0.0.0",
-		//aiVGSMj1W4w6o346WRRFUdtbFGSUnw1ZgmN
-		CustomBoot: "/ip4/103.68.63.164/tcp/19563/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
+		//aiTewnyK73P3chNgp7LgC8FoCHUhTe9cijZ
+		CustomBoot: "/ip4/103.68.63.163/tcp/6008/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
 	},
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
@@ -160,42 +160,42 @@ var TestNetParam = &Param{
 		DPosSize:         DPosSize,
 		GenesisTime:      1592268410,
 		GenesisCycle:     1592268410 / CycleInterval,
-		WorkProofAddress: "aiE4Sz5beABbLgGxitzhyMFbYPzqkRHrcxX",
+		WorkProofAddress: "aiCSxRKuF8dYALbZ2av8gqcoVR34R4aecYX",
 		GenesisSuperList: []Super{
 			{
-				Address: "aiNwLqMvfQp2bnBUCwRbSwAuooZpTYgttPh",
+				Address: "aiMKrGcEGPFyRSW4WdM2ARY7kpc38EYpygy",
 				P2PId:   "16Uiu2HAmMH8yCqrRvzyjEdcJ817pNQpcgrgZn95d5kn4LF2xm66L",
 			},
 			{
-				Address: "aiC1ZfKjBVKE8dhsfvqhrZ9w3XoeMc1HaGZ",
+				Address: "aiAQ56a2nTmAxJ2Tycm8a3X8zYqs2NrDdUN",
 				P2PId:   "16Uiu2HAmF6rDNZBympeEsDfoVTPPwtjRiizxDNmLxt5B7JAZTwdg",
 			},
 			{
-				Address: "aiFXk1v9foKgoJtSbAqRn8VT81MxMfvMFsN",
+				Address: "aiDvFTATGmmdcyD2trkrVcrf52QB2SXSEQf",
 				P2PId:   "16Uiu2HAm851T4cCfRM7BvjgRdeirn4zeim8QUNAkmNW9A4sjWr9o",
 			},
 			{
-				Address: "aiDQNruRJ2A3dV6Z28sbmotjrw42zgto9T8",
+				Address: "aiBntJ9itzbzT9R9Kpo2VJFwox6FfQV6UyM",
 				P2PId:   "16Uiu2HAmAPg4wy9xHnrVedzgG6pkEhhvKRBw5ouhUPLYLi1GteKs",
 			},
 			{
-				Address: "aiRhoqVbxprtkwFFLohVSE48UK2zRzVqW2J",
+				Address: "aiQ6KGjuZoJqabZqeVcv9iRLRL5D6iRmu5R",
 				P2PId:   "16Uiu2HAm4po19Qm6gxVAQrP3ctmNgZdkgUYiLUtGXkKjAu1hzV9U",
 			},
 			{
-				Address: "aiF5Ym7nXHbmY96TQsQd64tj4ebjZR8Uwb6",
+				Address: "aiDU4CN68G3iMoR3iZL3oZFw1fdxE6sZYEg",
 				P2PId:   "16Uiu2HAmLUKpbkYqWpFNDyxXwfaPg9BJ3AWP3gyidxhX6iGPw2dY",
 			},
 			{
-				Address: "aiSdadQ8tpPzcjH8GjLPLJqt9yfrsDTGUML",
+				Address: "aiR264eSVnqwSPbiaRFp3oD66zi5Xu8MjzF",
 				P2PId:   "16Uiu2HAmK5aMz7ah2edHnKHCnNFmkxPgJMgnrNBfgWgTLDtEtDbL",
 			},
 			{
-				Address: "aiGKvSCKE6Qge3rhJSc1k1Pz3veJsqcA44o",
+				Address: "aiEiRsScq4rdTiBHc8XSTVmBzwgXYcFTZyS",
 				P2PId:   "16Uiu2HAky7uuaiGx9cV3CD9WWUbobqHNsD9F4viQFzaYb3oB3fxj",
 			},
 			{
-				Address: "aiEJixC4k2LS6TPBjj7GX7mvNaeggK5WmV2",
+				Address: "aiChEPSNLznNv7hn3R2hEc98KbguLzoQQW1",
 				P2PId:   "16Uiu2HAmUEgz6fTzy7KNaecXq4bfvaLymHwoMJoJ47KxANvp4YMe",
 			},
 		},

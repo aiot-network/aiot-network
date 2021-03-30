@@ -3,20 +3,19 @@ package kit
 import (
 	"fmt"
 	"github.com/aiot-network/aiot-network/common/param"
-	"os"
+	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
 	"testing"
 )
 
 func TestGenerateAddress(t *testing.T) {
-	e, _ := Entropy()
-	m, _ := Mnemonic(e)
-	key, _ := MnemonicToEc(m)
+	key, _ := secp256k1.ParseStringToPrivate("cbb838da3e01d02946afdf6d6394ca79cb07068048503ce5b0ff1c1e65de3eac")
+
 	addr, _ := GenerateAddress(param.TestNet, key.PubKey().SerializeCompressedString())
 	fmt.Println(addr)
-	if !CheckAddress(param.MainNet, addr) {
+	if !CheckAddress(param.TestNet, addr) {
 		t.Fatalf("failed")
 	}
-	fmt.Println(GenerateTokenAddress(param.MainNet, addr, "SA"))
+	fmt.Println(GenerateTokenAddress(param.TestNet, addr, "SA"))
 }
 
 func TestCheckAddress(t *testing.T) {
