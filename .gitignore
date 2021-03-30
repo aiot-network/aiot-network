@@ -22,3 +22,4 @@ cmd/chain/chain
 bin
 cmd/chain/data
 chain/common/kit/address
+cmd/chain/config.toml
