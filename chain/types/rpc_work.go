@@ -9,4 +9,5 @@ type RpcWorkBody struct {
 type RpcAddressWork struct {
 	Address  string `json:"address"`
 	Workload uint64 `json:"workload"`
+	EndTime  uint64 `json:"end"`
 }

@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aiot-network/aiot-network/common/config"
+	"github.com/aiot-network/aiot-network/common/param"
 	"github.com/aiot-network/aiot-network/tools/arry"
 	"github.com/aiot-network/aiot-network/tools/rlp"
 	"github.com/aiot-network/aiot-network/types"
+	"time"
 )
 
 type Account struct {
@@ -222,15 +224,17 @@ func (a *Account) ToMessage(msgType int, address, token arry.Address, amount, he
 	return nil
 }
 
-func (a *Account) WorkMessage(address arry.Address, workload, cycle uint64) {
+func (a *Account) WorkMessage(address arry.Address, workload, cycle, endTime uint64) {
 	if !a.Exist() {
 		a.Address = address
 	}
 	if a.Works.Cycle < cycle {
 		a.Works.Cycle = cycle
 		a.Works.WorkLoad = workload
+		a.Works.EndTime = endTime
 	} else if a.Works.Cycle == cycle {
 		a.Works.WorkLoad += workload
+		a.Works.EndTime = endTime
 	}
 }
 
@@ -320,6 +324,8 @@ func (a *Account) Check(msg types.IMessage, strict bool) error {
 		}
 	case Token:
 		return a.checkConsume(msg)
+	case Work:
+		return a.checkWork(msg)
 	default:
 		if msg.MsgBody().MsgAmount() != 0 {
 			return errors.New("wrong amount")
@@ -377,6 +383,27 @@ func (a *Account) checkFees(msg types.IMessage) error {
 		return fmt.Errorf("%s does not have enough balance to pay the handling fee", main)
 	} else if token.Balance < msg.Fee() {
 		return fmt.Errorf("%s does not have enough balance to pay the handling fee", main)
+	}
+	return nil
+}
+
+func (a *Account) checkWork(msg types.IMessage) error {
+	body, ok := msg.MsgBody().(*WorkBody)
+	if !ok {
+		return errors.New("incorrect message type and message body")
+	}
+	cycle := msg.Time() / param.CycleInterval
+	if cycle < a.Works.Cycle {
+		return errors.New("the work is overdue")
+	}
+	if body.StartTime < a.Works.EndTime {
+		return errors.New("work start time overlaps with previous work")
+	}
+	if body.EndTime > uint64(time.Now().Unix()) {
+		return errors.New("wong end time")
+	}
+	if body.EndTime <= body.StartTime {
+		return errors.New("wong end time")
 	}
 	return nil
 }
@@ -643,4 +670,5 @@ func (o *InList) Remove(height uint64, TokenAddress string) *InAmount {
 type Works struct {
 	Cycle    uint64 `json:"cycle"`
 	WorkLoad uint64 `json:"workload"`
+	EndTime  uint64 `json:"end"`
 }

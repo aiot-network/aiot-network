@@ -9,7 +9,7 @@ type IAccount interface {
 	UpdateLocked(confirmed uint64) error
 	FromMessage(msg IMessage, height uint64) error
 	ToMessage(msgType int, address, token arry.Address, amount, height uint64) error
-	WorkMessage(address arry.Address, workload, cycle uint64)
+	WorkMessage(address arry.Address, workload, cycle, endTime uint64)
 	EaterMessage(height uint64) error
 	Check(msg IMessage, strict bool) error
 	Bytes() []byte

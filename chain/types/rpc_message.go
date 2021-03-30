@@ -191,6 +191,7 @@ func MsgToRpcMsg(msg types.IMessage) (*RpcMessage, error) {
 			list = append(list, RpcAddressWork{
 				Address:  w.Address.String(),
 				Workload: w.Workload,
+				EndTime:  w.EndTime,
 			})
 		}
 		rpcMsg.MsgBody = &RpcWorkBody{
@@ -280,6 +281,7 @@ func RpcWorkBodyToBody(rpcBody *RpcWorkBody) (*WorkBody, error) {
 		list = append(list, AddressWork{
 			Address:  arry.StringToAddress(work.Address),
 			Workload: work.Workload,
+			EndTime:  work.EndTime,
 		})
 	}
 	return &WorkBody{

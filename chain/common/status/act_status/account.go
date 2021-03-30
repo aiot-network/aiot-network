@@ -74,7 +74,7 @@ func (a *ActStatus) WorkMessage(msg types.IMessage) error {
 	cycle := msg.Time() / param.CycleInterval
 	for _, work := range body.List {
 		addrAct := a.db.Account(work.Address)
-		addrAct.WorkMessage(work.Address, work.Workload, cycle)
+		addrAct.WorkMessage(work.Address, work.Workload, cycle, work.EndTime)
 		a.setAccount(addrAct)
 	}
 	return nil

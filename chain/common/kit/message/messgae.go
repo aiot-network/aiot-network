@@ -135,6 +135,7 @@ func NewWork(from string, nonce uint64, start uint64, end uint64, t uint64, work
 		list = append(list, types.AddressWork{
 			Address:  arry.StringToAddress(addr),
 			Workload: work,
+			EndTime:  end,
 		})
 	}
 	work := &types.Message{

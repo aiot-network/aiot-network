@@ -16,6 +16,7 @@ type Account struct {
 type RpcWorks struct {
 	Cycle    uint64 `json:"cycle"`
 	Workload uint64 `json:"workload"`
+	EndTime  uint64 `json:"end"`
 }
 
 type TokenAccount struct {
@@ -44,6 +45,7 @@ func ToRpcAccount(a *types.Account) *Account {
 		Works: &RpcWorks{
 			Cycle:    a.Works.Cycle,
 			Workload: a.Works.WorkLoad,
+			EndTime:  a.Works.EndTime,
 		},
 	}
 }

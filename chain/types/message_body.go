@@ -242,6 +242,7 @@ type WorkBody struct {
 type AddressWork struct {
 	Address  arry.Address
 	Workload uint64
+	EndTime  uint64
 }
 
 func (w *WorkBody) MsgTo() types.IReceiver {
@@ -252,6 +253,9 @@ func (w *WorkBody) MsgTo() types.IReceiver {
 func (w *WorkBody) CheckBody(from arry.Address) error {
 	if len(w.List) > config.Param.DPosSize {
 		return fmt.Errorf("it cannot exceed the maximum number of supernodes %d", config.Param.DPosSize)
+	}
+	if len(w.List) == 0 {
+		return fmt.Errorf("no wokrs")
 	}
 	for _, work := range w.List {
 		if !kit.CheckAddress(config.Param.Name, work.Address.String()) {
