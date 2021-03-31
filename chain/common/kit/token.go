@@ -29,8 +29,10 @@ func CalCoinBase(net string, allWorks, works uint64) uint64 {
 	if allWorks == 0 {
 		return 0
 	}
-	times := params.CycleInterval / params.BlockInterval / param.DPosSize
+	times := params.CycleInterval / params.BlockInterval / param.SuperSize
+
 	coinbase := works * params.CoinBaseOneDay / allWorks / times
+	//fmt.Printf("allWorks=%d, works=%d, times=%d, coinbase=%d\n", allWorks, works, times, coinbase)
 	return coinbase
 }
 
