@@ -40,7 +40,7 @@ func (c *Cycle) Elect(time uint64, preHash arry.Hash, chain blockchain.IChain) e
 	for _, candidate := range voters {
 		candidates = append(candidates, candidate)
 	}
-	if len(candidates) < config.Param.DPosSize {
+	if len(candidates) < config.Param.SuperSize {
 		return errors.New("too few candidate")
 	}
 

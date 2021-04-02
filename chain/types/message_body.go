@@ -251,8 +251,8 @@ func (w *WorkBody) MsgTo() types.IReceiver {
 }
 
 func (w *WorkBody) CheckBody(from arry.Address) error {
-	if len(w.List) > config.Param.DPosSize {
-		return fmt.Errorf("it cannot exceed the maximum number of supernodes %d", config.Param.DPosSize)
+	if len(w.List) > config.Param.SuperSize {
+		return fmt.Errorf("it cannot exceed the maximum number of supernodes %d", config.Param.SuperSize)
 	}
 	if len(w.List) == 0 {
 		return fmt.Errorf("no wokrs")
