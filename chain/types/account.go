@@ -25,6 +25,7 @@ func NewAccount() *Account {
 		Tokens:     make(Tokens, 0),
 		JournalOut: newJournalOut(),
 		JournalIn:  newJournalIn(),
+		Works:      &Works{},
 	}
 }
 
