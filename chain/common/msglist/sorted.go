@@ -27,7 +27,7 @@ func NewSorted(db ITxListDB) *Sorted {
 
 func (t *Sorted) Put(msg types.IMessage) {
 	t.msgs[msg.From().String()] = msg
-	t.cache[msg.From().String()] = msg
+	t.cache[msg.Hash().String()] = msg
 	heap.Push(t.index, &msgInfo{
 		address: msg.From().String(),
 		msgHash: msg.Hash().String(),
@@ -36,6 +36,11 @@ func (t *Sorted) Put(msg types.IMessage) {
 		time:    msg.Time(),
 	})
 	t.db.Save(msg)
+}
+
+func (t *Sorted) Get(msgHash string) (types.IMessage, bool) {
+	msg, ok := t.cache[msgHash]
+	return msg, ok
 }
 
 func (t *Sorted) All() []types.IMessage {
@@ -85,7 +90,7 @@ func (t *Sorted) PopMin(fees uint64) types.IMessage {
 			ti := heap.Remove(t.index, 0).(*msgInfo)
 			msg := t.msgs[ti.address]
 			delete(t.msgs, ti.address)
-			delete(t.cache, ti.address)
+			delete(t.cache, ti.msgHash)
 			t.db.Delete(msg)
 			return msg
 		}
@@ -95,12 +100,9 @@ func (t *Sorted) PopMin(fees uint64) types.IMessage {
 
 func (t *Sorted) Len() int { return len(t.msgs) }
 
-func (t *Sorted) Exist(from string, msgHash string) bool {
-	msg, ok := t.cache[from]
-	if ok {
-		return msg.Hash().String() == msgHash
-	}
-	return false
+func (t *Sorted) Exist(msgHash string) bool {
+	_, ok := t.cache[msgHash]
+	return ok
 }
 
 func (t *Sorted) Remove(msg types.IMessage) {
@@ -108,7 +110,7 @@ func (t *Sorted) Remove(msg types.IMessage) {
 		if ti.msgHash == msg.Hash().String() {
 			heap.Remove(t.index, i)
 			delete(t.msgs, msg.From().String())
-			delete(t.cache, msg.From().String())
+			delete(t.cache, msg.Hash().String())
 			t.db.Delete(msg)
 			return
 		}

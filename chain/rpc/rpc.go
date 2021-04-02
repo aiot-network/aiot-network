@@ -143,27 +143,40 @@ func (r *Rpc) SendMessageRaw(ctx context.Context, code *SendMessageCodeReq) (*Re
 }
 
 func (r *Rpc) GetMessage(ctx context.Context, hash *HashReq) (*Response, error) {
+	var msg types.IMessage
+	var exist bool
+	var err error
+	var height uint64
+	var confirmed bool
 	hashArry, err := arry.StringToHash(hash.Hash)
 	if err != nil {
 		return NewResponse(Err_Params, nil, "wrong hash "+err.Error()), nil
 	}
-	msg, err := r.chain.GetMessage(hashArry)
+	msg, err = r.chain.GetMessage(hashArry)
 	if err != nil {
-		return NewResponse(Err_Chain, nil, err.Error()), nil
+		msg, exist = r.msgPool.GetMessage(hashArry)
+		if !exist {
+			return NewResponse(Err_Chain, nil, fmt.Sprintf("Message hash %s does not exist", hash.Hash)), nil
+		}
+		height = 0
+		confirmed = false
+	} else {
+		index, err := r.chain.GetMessageIndex(hashArry)
+		if err != nil {
+			return NewResponse(Err_Chain, nil, fmt.Sprintf("%s is not exist", hash.Hash)), nil
+		}
+		confirmedHeight := r.chain.LastConfirmed()
+		height = index.GetHeight()
+		confirmed = confirmedHeight >= height
 	}
-	index, err := r.chain.GetMessageIndex(hashArry)
-	if err != nil {
-		return NewResponse(Err_Chain, nil, fmt.Sprintf("%s is not exist", hash.Hash)), nil
-	}
-	confirmed := r.chain.LastConfirmed()
-	height := index.GetHeight()
 	rpcMsg, _ := chaintypes.MsgToRpcMsg(msg.(*chaintypes.Message))
 	rsMsg := &chaintypes.RpcMessageWithHeight{
 		MsgHeader: rpcMsg.MsgHeader,
 		MsgBody:   rpcMsg.MsgBody,
 		Height:    height,
-		Confirmed: confirmed >= height,
+		Confirmed: confirmed,
 	}
+
 	bytes, _ := json.Marshal(rsMsg)
 
 	return NewResponse(Success, bytes, ""), nil

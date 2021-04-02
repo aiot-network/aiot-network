@@ -38,6 +38,11 @@ func (c *Cache) Put(msg types.IMessage) error {
 	return nil
 }
 
+func (c *Cache) Get(msgHash string) (types.IMessage, bool) {
+	msg, ok := c.msgs[msgHash]
+	return msg, ok
+}
+
 func (c *Cache) Remove(msg types.IMessage) {
 	delete(c.msgs, msg.Hash().String())
 	delete(c.nonceTxs, nonceKey(msg))

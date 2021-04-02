@@ -5,6 +5,7 @@ import (
 	"github.com/aiot-network/aiot-network/common/config"
 	"github.com/aiot-network/aiot-network/common/horn"
 	"github.com/aiot-network/aiot-network/common/msglist"
+	hasharry "github.com/aiot-network/aiot-network/tools/arry"
 	log "github.com/aiot-network/aiot-network/tools/log/log15"
 	"github.com/aiot-network/aiot-network/tools/utils"
 	"github.com/aiot-network/aiot-network/types"
@@ -91,6 +92,10 @@ func (p *Pool) startChan() {
 			p.msgMgt.Delete(msg)
 		}
 	}
+}
+
+func (p *Pool) GetMessage(hash hasharry.Hash) (types.IMessage, bool) {
+	return p.msgMgt.Get(hash.String())
 }
 
 func (p *Pool) ReceiveMsgFromPeer(msg types.IMessage) error {

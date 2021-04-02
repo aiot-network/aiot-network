@@ -139,11 +139,23 @@ func (t *MsgManagement) GetAll() ([]types.IMessage, []types.IMessage) {
 	return readyTxs, cacheTxs
 }
 
+func (t *MsgManagement) Get(msgHash string) (types.IMessage, bool) {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
+	msg, ok := t.ready.Get(msgHash)
+	if !ok {
+		msg, ok := t.cache.Get(msgHash)
+		return msg, ok
+	}
+	return msg, ok
+}
+
 func (t *MsgManagement) Exist(msg types.IMessage) bool {
 	t.mutex.RLock()
 	defer t.mutex.RUnlock()
 
-	if !t.ready.Exist(msg.From().String(), msg.Hash().String()) {
+	if !t.ready.Exist(msg.Hash().String()) {
 		return t.cache.Exist(msg.From().String())
 	}
 	return true

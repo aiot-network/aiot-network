@@ -14,5 +14,6 @@ type IMsgList interface {
 	NeedPackaged(count int) []types.IMessage
 	StagnantMsgs() []types.IMessage
 	GetAll() ([]types.IMessage, []types.IMessage)
+	Get(string) (types.IMessage, bool)
 	Count() int
 }
