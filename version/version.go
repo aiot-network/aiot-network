@@ -11,7 +11,7 @@ var (
 )
 
 func StringifySingleLine(appName string) string {
-	if len(GitCommitLog) <= 7 {
+	if len(GitCommitLog) < 7 {
 		return ""
 	}
 	if GitStatus != "" {
