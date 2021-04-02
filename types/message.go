@@ -10,3 +10,9 @@ type IMessage interface {
 type IMessageIndex interface {
 	GetHeight() uint64
 }
+
+type IWorks interface {
+	GetCycle() uint64
+	GetEndTime() uint64
+	GetWorkLoad() uint64
+}

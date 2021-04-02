@@ -15,7 +15,7 @@ type IAccount interface {
 	Bytes() []byte
 	GetAddress() arry.Address
 	GetBalance(tokenAddr arry.Address) uint64
-	GetWorks() (uint64, uint64)
+	GetWorks() IWorks
 }
 
 type IActStatus interface {

@@ -10,6 +10,7 @@ import (
 	"github.com/aiot-network/aiot-network/tools/utils"
 	"github.com/aiot-network/aiot-network/types"
 	"sync"
+	"time"
 )
 
 const account_db = "account_db"
@@ -34,12 +35,46 @@ func (a *ActStatus) SetTrieRoot(stateRoot arry.Hash) error {
 }
 
 func (a *ActStatus) CheckMessage(msg types.IMessage, strict bool) error {
+	a.mutex.RLock()
+	a.mutex.RUnlock()
+
 	if msg.Time() > uint64(utils.NowUnix()) {
 		return errors.New("incorrect transaction time")
 	}
 
 	account := a.Account(msg.From())
-	return account.Check(msg, strict)
+	if err := account.Check(msg, strict); err != nil {
+		return err
+	}
+	return a.checkBody(msg)
+}
+
+func (a *ActStatus) checkBody(msg types.IMessage) error {
+	switch fmtypes.MessageType(msg.Type()) {
+	case fmtypes.Work:
+		body, ok := msg.MsgBody().(*fmtypes.WorkBody)
+		if !ok {
+			return errors.New("wrong message")
+		}
+		cycle := msg.Time() / param.CycleInterval
+		for _, work := range body.List {
+			addrAct := a.db.Account(work.Address)
+			work := addrAct.GetWorks()
+			if cycle < work.GetCycle() {
+				return errors.New("the work is overdue")
+			}
+			if body.StartTime < work.GetEndTime() {
+				return errors.New("work start time overlaps with previous work")
+			}
+			if body.EndTime > uint64(time.Now().Unix()) {
+				return errors.New("wong end time")
+			}
+			if body.EndTime <= body.StartTime {
+				return errors.New("wong end time")
+			}
+		}
+	}
+	return nil
 }
 
 // Get account status, if the account status needs to be updated

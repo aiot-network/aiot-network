@@ -4,11 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/common/param"
 	"github.com/aiot-network/aiot-network/tools/arry"
 	"github.com/aiot-network/aiot-network/tools/rlp"
 	"github.com/aiot-network/aiot-network/types"
-	"time"
 )
 
 type Account struct {
@@ -19,7 +17,7 @@ type Account struct {
 	Confirmed   uint64       `json:"confirmed"`
 	JournalIn   *journalIn   `json:"-"`
 	JournalOut  *journalOut  `json:"-"`
-	Works       Works        `json:"works"`
+	Works       *Works       `json:"works"`
 }
 
 func NewAccount() *Account {
@@ -286,8 +284,8 @@ func (a *Account) GetBalance(tokenAddr arry.Address) uint64 {
 	return token.Balance
 }
 
-func (a *Account) GetWorks() (uint64, uint64) {
-	return a.Works.Cycle, a.Works.WorkLoad
+func (a *Account) GetWorks() types.IWorks {
+	return a.Works
 }
 
 func (a *Account) Check(msg types.IMessage, strict bool) error {
@@ -324,8 +322,6 @@ func (a *Account) Check(msg types.IMessage, strict bool) error {
 		}
 	case Token:
 		return a.checkConsume(msg)
-	case Work:
-		return a.checkWork(msg)
 	default:
 		if msg.MsgBody().MsgAmount() != 0 {
 			return errors.New("wrong amount")
@@ -383,27 +379,6 @@ func (a *Account) checkFees(msg types.IMessage) error {
 		return fmt.Errorf("%s does not have enough balance to pay the handling fee", main)
 	} else if token.Balance < msg.Fee() {
 		return fmt.Errorf("%s does not have enough balance to pay the handling fee", main)
-	}
-	return nil
-}
-
-func (a *Account) checkWork(msg types.IMessage) error {
-	body, ok := msg.MsgBody().(*WorkBody)
-	if !ok {
-		return errors.New("incorrect message type and message body")
-	}
-	cycle := msg.Time() / param.CycleInterval
-	if cycle < a.Works.Cycle {
-		return errors.New("the work is overdue")
-	}
-	if body.StartTime < a.Works.EndTime {
-		return errors.New("work start time overlaps with previous work")
-	}
-	if body.EndTime > uint64(time.Now().Unix()) {
-		return errors.New("wong end time")
-	}
-	if body.EndTime <= body.StartTime {
-		return errors.New("wong end time")
 	}
 	return nil
 }
@@ -671,4 +646,16 @@ type Works struct {
 	Cycle    uint64 `json:"cycle"`
 	WorkLoad uint64 `json:"workload"`
 	EndTime  uint64 `json:"end"`
+}
+
+func (w *Works) GetCycle() uint64 {
+	return w.Cycle
+}
+
+func (w *Works) GetEndTime() uint64 {
+	return w.EndTime
+}
+
+func (w *Works) GetWorkLoad() uint64 {
+	return w.Cycle
 }

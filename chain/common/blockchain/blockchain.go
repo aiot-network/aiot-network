@@ -574,7 +574,8 @@ func (c *Chain) getAllWorks(cycle uint64) uint64 {
 		list := supers.List()
 		for _, s := range list {
 			act := c.status.Account(s.GetSinger())
-			actCycle, actWorks := act.GetWorks()
+			work := act.GetWorks()
+			actCycle, actWorks := work.GetCycle(), work.GetWorkLoad()
 			if actCycle == cycle-1 {
 				allWorks += actWorks
 			}
@@ -586,7 +587,8 @@ func (c *Chain) getAllWorks(cycle uint64) uint64 {
 func (c *Chain) getWorks(cycle uint64, address arry.Address) uint64 {
 	var works uint64
 	act := c.status.Account(address)
-	actCycle, actWorks := act.GetWorks()
+	work := act.GetWorks()
+	actCycle, actWorks := work.GetCycle(), work.GetWorkLoad()
 	if actCycle == cycle-1 {
 		works = actWorks
 	}
