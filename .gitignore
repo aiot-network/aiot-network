@@ -24,3 +24,4 @@ cmd/chain/data
 chain/common/kit/address
 cmd/chain/config.toml
 cmd/boot/boot
+repleace.sh
