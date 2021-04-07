@@ -658,5 +658,5 @@ func (w *Works) GetEndTime() uint64 {
 }
 
 func (w *Works) GetWorkLoad() uint64 {
-	return w.Cycle
+	return w.WorkLoad
 }
