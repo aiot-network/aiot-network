@@ -25,6 +25,7 @@ func init() {
 		SendVoteCmd,
 		GetCandidatesCmd,
 		CycleSupersCmd,
+		CycleRewordCmd,
 	}
 	RootCmd.AddCommand(txCmds...)
 	RootSubCmdGroups["consensus"] = txCmds
@@ -458,6 +459,45 @@ func CycleSupers(cmd *cobra.Command, args []string) {
 	defer cancel()
 
 	resp, err := client.Gc.GetCycleSupers(ctx, &rpc.CycleReq{Cycle: term})
+	if err != nil {
+		log.Error(cmd.Use+" err: ", err)
+		return
+	}
+	if resp.Code == 0 {
+		output(string(resp.Result))
+		return
+	}
+	outputRespError(cmd.Use, resp)
+
+}
+
+var CycleRewordCmd = &cobra.Command{
+	Use:     "CycleReword {cycle}; Gets the current super nodes;",
+	Short:   "CycleReword {cycle}; Gets the current super nodes;",
+	Aliases: []string{"cyclereword", "CR", "cr"},
+	Example: `
+	CycleReword {8736163}
+	`,
+	Args: cobra.MinimumNArgs(1),
+	Run:  CycleReword,
+}
+
+func CycleReword(cmd *cobra.Command, args []string) {
+	term, err := strconv.ParseUint(args[0], 10, 64)
+	if err != nil {
+		log.Error(cmd.Use+" err: ", errors.New("[term] wrong"))
+		return
+	}
+	client, err := NewRpcClient()
+	if err != nil {
+		log.Error(cmd.Use+" err: ", err)
+		return
+	}
+	defer client.Close()
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*20)
+	defer cancel()
+
+	resp, err := client.Gc.GetSupersReward(ctx, &rpc.CycleReq{Cycle: term})
 	if err != nil {
 		log.Error(cmd.Use+" err: ", err)
 		return

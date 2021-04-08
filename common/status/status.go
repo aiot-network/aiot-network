@@ -15,4 +15,5 @@ type IStatus interface {
 	Token(address arry.Address) (types.IToken, error)
 	Candidates() types.ICandidates
 	CycleSupers(cycle uint64) types.ICandidates
+	CycleReword(cycle uint64) []types.IReword
 }

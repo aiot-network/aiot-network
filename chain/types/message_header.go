@@ -60,12 +60,12 @@ func (m *MsgHeader) checkType() error {
 		return nil
 	case Token:
 		return nil
-	case Candidate:
-		return nil
-	case Cancel:
-		return nil
-	case Vote:
-		return nil
+		//case Candidate:
+		//return nil
+		//case Cancel:
+		//return nil
+		//case Vote:
+		//return nil
 	case Work:
 		return nil
 	}

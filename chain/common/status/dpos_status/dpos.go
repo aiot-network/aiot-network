@@ -5,6 +5,7 @@ import (
 	"github.com/aiot-network/aiot-network/chain/db/status/dpos_db"
 	chaintypes "github.com/aiot-network/aiot-network/chain/types"
 	"github.com/aiot-network/aiot-network/common/config"
+	"github.com/aiot-network/aiot-network/common/param"
 	"github.com/aiot-network/aiot-network/tools/arry"
 	"github.com/aiot-network/aiot-network/types"
 )
@@ -20,6 +21,7 @@ func NewDPosStatus() (*DPosStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &DPosStatus{db: db}, nil
 }
 
@@ -43,6 +45,22 @@ func (d *DPosStatus) CheckMessage(msg types.IMessage) error {
 		if d.db.CandidatesCount() <= config.Param.SuperSize {
 			return fmt.Errorf("candidate nodes are already in the minimum number. Cannot cancel the candidate status now, please wait")
 		}
+	}
+	return nil
+}
+
+func (d *DPosStatus) UpdateWork(msg types.IMessage) error {
+	body, ok := msg.MsgBody().(*chaintypes.WorkBody)
+	if !ok {
+		return fmt.Errorf("incrrect message type")
+	}
+	cycle := msg.Time() / param.CycleInterval
+	for _, work := range body.List {
+		d.db.AddSuperWork(cycle, work.Address, &chaintypes.Works{
+			Cycle:    cycle,
+			WorkLoad: work.Workload,
+			EndTime:  work.EndTime,
+		})
 	}
 	return nil
 }
@@ -104,4 +122,10 @@ func (d *DPosStatus) AddSuperBlockCount(cycle uint64, signer arry.Address) {
 
 func (d *DPosStatus) SuperBlockCount(cycle uint64, signer arry.Address) uint32 {
 	return d.db.SuperBlockCount(cycle, signer)
+}
+func (d *DPosStatus) AddSuperWork(cycle uint64, super arry.Address, works types.IWorks) {
+	d.db.AddSuperWork(cycle, super, works.(*chaintypes.Works))
+}
+func (d *DPosStatus) SuperWork(cycle uint64, super arry.Address) (types.IWorks, error) {
+	return d.db.SuperWork(cycle, super)
 }

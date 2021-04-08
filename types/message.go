@@ -16,3 +16,12 @@ type IWorks interface {
 	GetEndTime() uint64
 	GetWorkLoad() uint64
 }
+
+type IReword interface {
+	GetCycle() uint64
+	GetEndTime() uint64
+	GetReword() uint64
+	GetAddress() string
+	GetWorkLoad() uint64
+	GetBlocks() uint64
+}

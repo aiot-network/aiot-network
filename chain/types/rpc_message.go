@@ -144,14 +144,14 @@ func MsgToRpcMsg(msg types.IMessage) (*RpcMessage, error) {
 	}
 	switch MessageType(msg.Type()) {
 	case Transaction:
-		rpcRecis := []*RpcReceiver{}
+		rpcRecis := []RpcReceiver{}
 		for _, re := range msg.MsgBody().MsgTo().ReceiverList() {
-			rpcRecis = append(rpcRecis, &RpcReceiver{
+			rpcRecis = append(rpcRecis, RpcReceiver{
 				Address: re.Address.String(),
 				Amount:  re.Amount,
 			})
 		}
-		rpcMsg.MsgBody = &RpcTransactionBody{
+		rpcMsg.MsgBody = RpcTransactionBody{
 			Token:     msg.MsgBody().MsgToken().String(),
 			Receivers: rpcRecis,
 		}

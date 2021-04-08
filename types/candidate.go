@@ -12,4 +12,5 @@ type ICandidates interface {
 type ICandidate interface {
 	GetPeerId() string
 	GetSinger() arry.Address
+	GetMntCount() uint32
 }

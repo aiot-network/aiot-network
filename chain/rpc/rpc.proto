@@ -29,6 +29,7 @@ service Greeter {
     rpc GetMsgPool(NullReq)returns (Response) {}
     rpc Candidates(NullReq)returns (Response) {}
     rpc GetCycleSupers(CycleReq)returns (Response) {}
+    rpc GetSupersReward(CycleReq)returns (Response) {}
     rpc Token(TokenAddressReq)returns (Response) {}
     rpc PeersInfo(NullReq)returns (Response) {}
     rpc LocalInfo(NullReq)returns (Response) {}

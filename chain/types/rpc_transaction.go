@@ -6,6 +6,6 @@ type RpcReceiver struct {
 }
 
 type RpcTransactionBody struct {
-	Token     string         `json:"token"`
-	Receivers []*RpcReceiver `json:"receivers"`
+	Token     string        `json:"token"`
+	Receivers []RpcReceiver `json:"receivers"`
 }

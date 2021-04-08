@@ -15,10 +15,13 @@ type IDPosStatus interface {
 	CycleSupers(cycle uint64) (types.ICandidates, error)
 	SaveCycle(cycle uint64, supers types.ICandidates)
 	CheckMessage(msg types.IMessage) error
+	UpdateWork(msg types.IMessage) error
 	AddCandidate(msg types.IMessage) error
 	CancelCandidate(msg types.IMessage) error
 	Voter(msg types.IMessage) error
 	AddSuperBlockCount(cycle uint64, signer arry.Address)
 	SuperBlockCount(cycle uint64, signer arry.Address) uint32
+	AddSuperWork(cycle uint64, super arry.Address, works types.IWorks)
+	SuperWork(cycle uint64, super arry.Address) (types.IWorks, error)
 	Commit() (arry.Hash, error)
 }

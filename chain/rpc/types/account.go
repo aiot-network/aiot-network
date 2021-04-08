@@ -3,6 +3,7 @@ package types
 import (
 	"github.com/aiot-network/aiot-network/chain/types"
 	"github.com/aiot-network/aiot-network/tools/amount"
+	types2 "github.com/aiot-network/aiot-network/types"
 )
 
 type Account struct {
@@ -48,4 +49,26 @@ func ToRpcAccount(a *types.Account) *Account {
 			EndTime:  a.Works.EndTime,
 		},
 	}
+}
+
+type RpcReword struct {
+	Address string  `json:"address"`
+	EndTime uint64  `json:"end"`
+	Amount  float64 `json:"amount"`
+	Cycle   uint64  `json:"cycle"`
+	Blocks  uint64  `json:"blocks"`
+}
+
+func ToRpcReword(reword []types2.IReword) []RpcReword {
+	rpcReword := make([]RpcReword, 0)
+	for _, r := range reword {
+		rpcReword = append(rpcReword, RpcReword{
+			Address: r.GetAddress(),
+			EndTime: r.GetEndTime(),
+			Amount:  amount.Amount(r.GetReword()).ToCoin(),
+			Cycle:   r.GetCycle(),
+			Blocks:  r.GetBlocks(),
+		})
+	}
+	return rpcReword
 }

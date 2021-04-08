@@ -660,3 +660,36 @@ func (w *Works) GetEndTime() uint64 {
 func (w *Works) GetWorkLoad() uint64 {
 	return w.WorkLoad
 }
+
+type Reword struct {
+	Cycle    uint64 `json:"cycle"`
+	Amount   uint64 `json:"amount"`
+	EndTime  uint64 `json:"end"`
+	Address  string `json:"address"`
+	WorkLoad uint64 `json:"workload"`
+	Blocks   uint64 `json:"blocks"`
+}
+
+func (r *Reword) GetCycle() uint64 {
+	return r.Cycle
+}
+
+func (r *Reword) GetEndTime() uint64 {
+	return r.EndTime
+}
+
+func (r *Reword) GetReword() uint64 {
+	return r.Amount
+}
+
+func (r *Reword) GetAddress() string {
+	return r.Address
+}
+
+func (r *Reword) GetWorkLoad() uint64 {
+	return r.WorkLoad
+}
+
+func (r *Reword) GetBlocks() uint64 {
+	return r.Blocks
+}

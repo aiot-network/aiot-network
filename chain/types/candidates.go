@@ -57,6 +57,10 @@ func (m *Member) GetSinger() arry.Address {
 	return m.Signer
 }
 
+func (m *Member) GetMntCount() uint32 {
+	return m.MntCount
+}
+
 func DecodeMember(bytes []byte) (*Member, error) {
 	var mem *Member
 	err := rlp.DecodeBytes(bytes, &mem)

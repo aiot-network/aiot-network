@@ -2,7 +2,9 @@ package status
 
 import (
 	"errors"
+	"github.com/aiot-network/aiot-network/chain/common/kit"
 	chaintypes "github.com/aiot-network/aiot-network/chain/types"
+	"github.com/aiot-network/aiot-network/common/config"
 	"github.com/aiot-network/aiot-network/common/dpos"
 	"github.com/aiot-network/aiot-network/tools/arry"
 	"github.com/aiot-network/aiot-network/types"
@@ -94,6 +96,9 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 			if err := f.actStatus.WorkMessage(msg); err != nil {
 				return nil
 			}
+			if err := f.dPosStatus.UpdateWork(msg); err != nil {
+				return err
+			}
 		default:
 			return errors.New("wrong message type")
 		}
@@ -145,6 +150,35 @@ func (f *Status) CycleSupers(cycle uint64) types.ICandidates {
 		supers.Candidates[i].MntCount = f.dPosStatus.SuperBlockCount(cycle, s.Signer)
 	}
 	return supers
+}
+
+func (f *Status) CycleReword(cycle uint64) []types.IReword {
+	rewords := make([]*chaintypes.Reword, 0)
+	candidates := f.CycleSupers(cycle)
+	var allWork uint64
+	for _, can := range candidates.List() {
+		work, err := f.dPosStatus.SuperWork(cycle-1, can.GetSinger())
+		if err != nil {
+			continue
+		}
+		allWork += work.GetWorkLoad()
+		rewords = append(rewords, &chaintypes.Reword{
+			Cycle:    cycle,
+			EndTime:  work.GetEndTime(),
+			Address:  can.GetSinger().String(),
+			WorkLoad: work.GetWorkLoad(),
+			Blocks:   uint64(can.GetMntCount()),
+		})
+	}
+	for i, reword := range rewords {
+		amount := kit.CalCoinBase(config.Param.NetWork, allWork, reword.GetWorkLoad()) * reword.Blocks
+		rewords[i].Amount = amount
+	}
+	iReword := make([]types.IReword, len(rewords))
+	for i, r := range rewords {
+		iReword[i] = r
+	}
+	return iReword
 }
 
 func (f *Status) Token(address arry.Address) (types.IToken, error) {

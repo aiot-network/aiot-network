@@ -17,6 +17,7 @@ const (
 	_voters      = "voters"
 	_confirmed   = "confirmed"
 	_blockCount  = "blockCount"
+	_superWork   = "superWork"
 )
 
 type DPosDB struct {
@@ -158,4 +159,25 @@ func (d *DPosDB) SuperBlockCount(cycle uint64, signer arry.Address) uint32 {
 func cycleSuperCountKey(cycle uint64, signer arry.Address) arry.Hash {
 	bytes := bytes.Join([][]byte{[]byte(strconv.FormatUint(cycle, 10)), signer.Bytes()}, []byte{})
 	return hash.Hash(bytes)
+}
+
+func (d *DPosDB) AddSuperWork(cycle uint64, super arry.Address, works *types.Works) {
+	hash := cycleSuperCountKey(cycle, super)
+	workLast, err := d.SuperWork(cycle, super)
+	if err == nil {
+		works.WorkLoad += workLast.WorkLoad
+	}
+	bytes, _ := rlp.EncodeToBytes(works)
+	d.trie.Update(base.Key(_superWork, hash.Bytes()), bytes)
+}
+
+func (d *DPosDB) SuperWork(cycle uint64, super arry.Address) (*types.Works, error) {
+	hash := cycleSuperCountKey(cycle, super)
+	bytes := d.trie.Get(base.Key(_superWork, hash.Bytes()))
+	var work *types.Works
+	err := rlp.DecodeBytes(bytes, &work)
+	if err != nil {
+		return nil, err
+	}
+	return work, nil
 }

@@ -255,6 +255,16 @@ func (r *Rpc) GetCycleSupers(ctx context.Context, cycle *CycleReq) (*Response, e
 	return NewResponse(Success, bytes, ""), nil
 }
 
+func (r *Rpc) GetSupersReward(ctx context.Context, in *CycleReq) (*Response, error) {
+	reword := r.status.CycleReword(in.Cycle)
+	if reword == nil {
+		return NewResponse(Err_DPos, nil, "no reword"), nil
+	}
+	bytes, _ := json.Marshal(rpctypes.ToRpcReword(reword))
+
+	return NewResponse(Success, bytes, ""), nil
+}
+
 func (r *Rpc) Token(ctx context.Context, token *TokenAddressReq) (*Response, error) {
 	iToken, err := r.status.Token(arry.StringToAddress(token.Token))
 	if err != nil {
