@@ -66,6 +66,7 @@ type TokenParam struct {
 	MaximumReceiver       int
 	MainToken             arry.Address
 	EaterAddress          arry.Address
+	PreCirculations       []PreCirculation
 }
 
 type PrivateParam struct {
@@ -128,7 +129,7 @@ var TestNetParam = &Param{
 		PrivatePass: APPName,
 	},
 	TokenParam: &TokenParam{
-		PreCirculation:  0,
+		PreCirculation:  100000 * AtomsPerCoin,
 		Circulation:     1 * 1e8 * AtomsPerCoin,
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
@@ -139,6 +140,10 @@ var TestNetParam = &Param{
 		MaximumReceiver: 1 * 1e4,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("aiCoinEaterAddressDontSend000000000"),
+		PreCirculations: []PreCirculation{{
+			Address: "aiCSxRKuF8dYALbZ2av8gqcoVR34R4aecYX",
+			Amount:  100000 * AtomsPerCoin,
+		}},
 	},
 	P2pParam: &P2pParam{
 		NetWork:    TestNet + "AIOT_NETWORK",
@@ -226,7 +231,7 @@ var MainNetParam = &Param{
 		PrivatePass: "AIOT_NETWORK",
 	},
 	TokenParam: &TokenParam{
-		PreCirculation:  0,
+		PreCirculation:  100000 * AtomsPerCoin,
 		Circulation:     1 * 1e8 * AtomsPerCoin,
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
@@ -237,6 +242,10 @@ var MainNetParam = &Param{
 		MaximumReceiver: 1 * 1e4,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("AiCoinEaterAddressDontSend000000000"),
+		PreCirculations: []PreCirculation{{
+			Address: "AifLkzE8iMPEUy7mHwJ89YbsEDesVkRZ8Fn",
+			Amount:  100000 * AtomsPerCoin,
+		}},
 	},
 	P2pParam: &P2pParam{
 		NetWork:    MainNet + "AIOT_NETWORK",
@@ -314,11 +323,4 @@ type PreCirculation struct {
 	Address string
 	Note    string
 	Amount  uint64
-}
-
-var PreCirculations = []PreCirculation{
-	{
-		Address: "aiCSxRKuF8dYALbZ2av8gqcoVR34R4aecYX",
-		Amount:  100000 * AtomsPerCoin,
-	},
 }

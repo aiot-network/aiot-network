@@ -51,7 +51,9 @@ func NewChain(status status.IStatus, dPos dpos.IDPos) (*Chain, error) {
 
 	// Initialize chain height
 	if c.lastHeight, err = c.db.LastHeight(); err != nil {
-		c.saveGenesisBlock(c.dPos.GenesisBlock())
+		if err := c.saveGenesisBlock(c.dPos.GenesisBlock()); err != nil {
+			return nil, err
+		}
 	}
 	c.UpdateConfirmed(c.dPos.Confirmed())
 
