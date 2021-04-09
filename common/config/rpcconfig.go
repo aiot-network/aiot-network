@@ -7,5 +7,6 @@ type RpcConfig struct {
 	RpcTLS     bool
 	RpcCert    string
 	RpcCertKey string
+	RpcUser    string
 	RpcPass    string
 }

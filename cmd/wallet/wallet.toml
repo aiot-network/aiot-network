@@ -19,6 +19,9 @@ RpcTLS = false
 #If RpcTLS is on, you need to configure RpcCert
 RpcCert = ""
 
+#RPC username
+RpcUser = ""
+
 #RPC password
 RpcPass = ""
 

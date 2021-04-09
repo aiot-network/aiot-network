@@ -33,7 +33,12 @@ func (c *Client) Connect() error {
 	} else {
 		opts = append(opts, grpc.WithInsecure())
 	}
-	opts = append(opts, grpc.WithPerRPCCredentials(&customCredential{Password: c.cfg.RpcPass, OpenTLS: c.cfg.RpcTLS}))
+	opts = append(opts, grpc.WithPerRPCCredentials(
+		&customCredential{
+			Username: c.cfg.RpcUser,
+			Password: c.cfg.RpcPass,
+			OpenTLS:  c.cfg.RpcTLS,
+		}))
 
 	conn, err = grpc.Dial(c.cfg.RpcIp+":"+c.cfg.RpcPort, opts...)
 	if err != nil {
@@ -52,11 +57,13 @@ func (c *Client) Close() {
 type customCredential struct {
 	OpenTLS  bool
 	Password string
+	Username string
 }
 
 func (c *customCredential) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
 	return map[string]string{
 		"password": c.Password,
+		"username": c.Username,
 	}, nil
 }
 

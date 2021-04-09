@@ -18,9 +18,15 @@ ExternalIp = "0.0.0.0"
 P2PPort="13561"
 
 
-# RPC configuration, (default = 13562)
+# RPC configuration
+# (default = 13562)
 RpcPort = "13562"
+
+# (default = 13563)
+HttpPort = "13563"
+
 # RPC password
+RpcUser = ""
 RpcPass = ""
 
 # TLS switch

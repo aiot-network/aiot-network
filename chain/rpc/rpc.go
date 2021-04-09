@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -21,19 +22,25 @@ import (
 	log "github.com/aiot-network/aiot-network/tools/log/log15"
 	"github.com/aiot-network/aiot-network/tools/utils"
 	"github.com/aiot-network/aiot-network/types"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"golang.org/x/net/http2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const module = "rpc"
 
 type Rpc struct {
 	grpcServer *grpc.Server
+	httpServer *http.Server
 	status     status.IStatus
 	msgPool    *pool.Pool
 	chain      blockchain.IChain
@@ -50,6 +57,13 @@ func (r *Rpc) Name() string {
 }
 
 func (r *Rpc) Start() error {
+	var err error
+	var tlsConfig *tls.Config
+	httpListen, err := net.Listen("tcp", ":"+config.Param.HttpPort)
+	if err != nil {
+		return err
+	}
+	endPoint := "127.0.0.1:" + config.Param.RpcPort
 	lis, err := net.Listen("tcp", ":"+config.Param.RpcPort)
 	if err != nil {
 		return err
@@ -58,16 +72,42 @@ func (r *Rpc) Start() error {
 	if err != nil {
 		return err
 	}
-
-	RegisterGreeterServer(r.grpcServer, r)
-	reflection.Register(r.grpcServer)
 	go func() {
 		if err := r.grpcServer.Serve(lis); err != nil {
 			log.Info("Rpc startup failed!", "module", module, "err", err)
 			os.Exit(1)
 			return
 		}
+	}()
 
+	getWay, err := r.NewGetWay(endPoint)
+	if err != nil {
+		return err
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/", getWay)
+	if config.Param.RpcTLS {
+		tlsConfig, err = getTLSConfig(config.Param.RpcCert, config.Param.RpcCertKey)
+		if err != nil {
+			return err
+		}
+		httpListen = tls.NewListener(httpListen, tlsConfig)
+	}
+
+	r.httpServer = &http.Server{
+		Addr:      ":" + config.Param.HttpPort,
+		Handler:   GrpcHandlerFunc(r.grpcServer, mux),
+		TLSConfig: tlsConfig,
+	}
+
+	go func() {
+		if err := r.httpServer.Serve(httpListen); err != nil {
+			log.Info("Rpc startup failed!", "module", module, "err", err)
+			os.Exit(1)
+			return
+		}
+		log.Info("http startup", "module", module, "port", config.Param.HttpPort)
 	}()
 	if config.Param.RpcTLS {
 		log.Info("Rpc startup", "module", module, "port", config.Param.RpcPort, "pem", config.Param.RpcCert)
@@ -75,6 +115,45 @@ func (r *Rpc) Start() error {
 		log.Info("Rpc startup", "module", module, "port", config.Param.RpcPort)
 	}
 	return nil
+}
+
+func getTLSConfig(certPemPath, certKeyPath string) (*tls.Config, error) {
+	var certKeyPair *tls.Certificate
+	cert, _ := ioutil.ReadFile(certPemPath)
+	key, _ := ioutil.ReadFile(certKeyPath)
+
+	pair, err := tls.X509KeyPair(cert, key)
+	if err != nil {
+		return nil, err
+	}
+
+	certKeyPair = &pair
+
+	return &tls.Config{
+		Certificates: []tls.Certificate{*certKeyPair},
+		NextProtos:   []string{http2.NextProtoTLS},
+	}, nil
+}
+
+func GrpcHandlerFunc(grpcServer *grpc.Server, otherHandler http.Handler) http.Handler {
+	if otherHandler == nil {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			grpcServer.ServeHTTP(w, r)
+		})
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, pass, _ := r.BasicAuth()
+		if user != config.Param.RpcUser || pass != config.Param.RpcPass {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(fmt.Sprintf("the token authentication information is invalid: username=%s, password=%s\n", user, pass)))
+			return
+		}
+		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+			grpcServer.ServeHTTP(w, r)
+		} else {
+			otherHandler.ServeHTTP(w, r)
+		}
+	})
 }
 
 func (r *Rpc) Stop() error {
@@ -89,9 +168,7 @@ func (r *Rpc) Info() map[string]interface{} {
 
 func (r *Rpc) NewGRpcServer() (*grpc.Server, error) {
 	var opts []grpc.ServerOption
-	var interceptor grpc.UnaryServerInterceptor
-	interceptor = r.interceptor
-	opts = append(opts, grpc.UnaryInterceptor(interceptor))
+	opts = append(opts, grpc.UnaryInterceptor(r.interceptor))
 
 	// If tls is configured, generate tls certificate
 	if config.Param.RpcTLS {
@@ -109,7 +186,36 @@ func (r *Rpc) NewGRpcServer() (*grpc.Server, error) {
 	// Set the maximum number of bytes received and sent
 	opts = append(opts, grpc.MaxRecvMsgSize(param.MaxReqBytes))
 	opts = append(opts, grpc.MaxSendMsgSize(param.MaxReqBytes))
-	return grpc.NewServer(opts...), nil
+	server := grpc.NewServer(opts...)
+	RegisterGreeterServer(server, r)
+	reflection.Register(server)
+	return server, nil
+}
+
+func (r *Rpc) NewGetWay(endPoint string) (*runtime.ServeMux, error) {
+	dopts := []grpc.DialOption{}
+	dopts = append(dopts, grpc.WithPerRPCCredentials(&customCredential{
+		Username: config.Param.RpcUser,
+		Password: config.Param.RpcPass,
+		OpenTLS:  config.Param.RpcTLS,
+	}))
+	ctx := context.Background()
+	if config.Param.RpcTLS {
+		creds, err := credentials.NewClientTLSFromFile(config.Param.RpcCert, "")
+		if err != nil {
+			return nil, err
+		}
+		dopts = append(dopts, grpc.WithTransportCredentials(creds))
+	} else {
+		dopts = append(dopts, grpc.WithInsecure())
+	}
+
+	gwmux := runtime.NewServeMux()
+	if err := RegisterGreeterHandlerFromEndpoint(ctx, gwmux, endPoint, dopts); err != nil {
+		return nil, err
+	}
+	gwmux.GetForwardResponseOptions()
+	return gwmux, nil
 }
 
 func (r *Rpc) RegisterLocalInfo(f func() *types.Local) {
@@ -358,7 +464,7 @@ func (r *Rpc) SendTransaction(ctx context.Context, req *TransactionReq) (*Respon
 	if err := r.msgPool.Put(message, false); err != nil {
 		return NewResponse(Err_MsgPool, nil, err.Error()), nil
 	}
-	return NewResponse(Success, []byte(fmt.Sprintf("send message %s success", message.Hash().String())), ""), nil
+	return NewResponse(Success, []byte(message.Hash().String()), ""), nil
 }
 
 func (r *Rpc) SendToken(ctx context.Context, req *TokenReq) (*Response, error) {
@@ -381,7 +487,7 @@ func (r *Rpc) SendToken(ctx context.Context, req *TokenReq) (*Response, error) {
 	if err := r.msgPool.Put(message, false); err != nil {
 		return NewResponse(Err_MsgPool, nil, err.Error()), nil
 	}
-	return NewResponse(Success, []byte(fmt.Sprintf("send message %s success", message.Hash().String())), ""), nil
+	return NewResponse(Success, []byte(message.Hash().String()), ""), nil
 }
 
 func (r *Rpc) SendCandidate(ctx context.Context, req *CandidateReq) (*Response, error) {
@@ -400,7 +506,7 @@ func (r *Rpc) SendCandidate(ctx context.Context, req *CandidateReq) (*Response, 
 	if err := r.msgPool.Put(message, false); err != nil {
 		return NewResponse(Err_MsgPool, nil, err.Error()), nil
 	}
-	return NewResponse(Success, []byte(fmt.Sprintf("send message %s success", message.Hash().String())), ""), nil
+	return NewResponse(Success, []byte(message.Hash().String()), ""), nil
 }
 
 func (r *Rpc) SendCancel(ctx context.Context, req *CancelReq) (*Response, error) {
@@ -419,7 +525,7 @@ func (r *Rpc) SendCancel(ctx context.Context, req *CancelReq) (*Response, error)
 	if err := r.msgPool.Put(message, false); err != nil {
 		return NewResponse(Err_MsgPool, nil, err.Error()), nil
 	}
-	return NewResponse(Success, []byte(fmt.Sprintf("send message %s success", message.Hash().String())), ""), nil
+	return NewResponse(Success, []byte(message.Hash().String()), ""), nil
 }
 
 func (r *Rpc) SendVote(ctx context.Context, req *VoteReq) (*Response, error) {
@@ -438,7 +544,7 @@ func (r *Rpc) SendVote(ctx context.Context, req *VoteReq) (*Response, error) {
 	if err := r.msgPool.Put(message, false); err != nil {
 		return NewResponse(Err_MsgPool, nil, err.Error()), nil
 	}
-	return NewResponse(Success, []byte(fmt.Sprintf("send message %s success", message.Hash().String())), ""), nil
+	return NewResponse(Success, []byte(message.Hash().String()), ""), nil
 }
 
 func NewResponse(code int32, result []byte, err string) *Response {
@@ -453,14 +559,22 @@ func (r *Rpc) auth(ctx context.Context) error {
 	}
 	var (
 		password string
+		username string
 	)
+
+	if val, ok := md["username"]; ok {
+		username = val[0]
+	}
 
 	if val, ok := md["password"]; ok {
 		password = val[0]
 	}
 
+	if username != config.Param.RpcUser {
+		return fmt.Errorf("the token authentication information is invalid: username=%s, password=%s", username, password)
+	}
 	if password != config.Param.RpcPass {
-		return fmt.Errorf("the token authentication information is invalid: password=%s", password)
+		return fmt.Errorf("the token authentication information is invalid: username=%s, password=%s", username, password)
 	}
 	return nil
 }

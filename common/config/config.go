@@ -30,7 +30,9 @@ type Config struct {
 	RpcTLS     bool   `long:"rpctls" description:"Open TLS for the RPC server -- NOTE: This is only allowed if the RPC server is bound to localhost"`
 	RpcCert    string `long:"rpccert" description:"File containing the certificate file"`
 	RpcKey     string `long:"rpckey" description:"File containing the certificate key"`
+	RpcUser    string `long:"rpcuser" description:"Username for RPC connections"`
 	RpcPass    string `long:"rpcpass" description:"Password for RPC connections"`
+	HttpPort   string `long:"httpport" description:"Add an interface/port to listen for http connections"`
 	TestNet    bool   `long:"testnet" description:"Use the test network"`
 	KeyFile    string `long:"keyfile" description:"If you participate in mining, you need to configure the mining address key file"`
 	KeyPass    string `long:"keypass" description:"The decryption password for key file"`
@@ -81,6 +83,9 @@ func LoadParam(private private.IPrivate) error {
 	if cfg.P2PPort != "" {
 		Param.P2pParam.P2pPort = cfg.P2PPort
 	}
+	if cfg.HttpPort != "" {
+		Param.RpcParam.HttpPort = cfg.HttpPort
+	}
 	if cfg.Boot != "" {
 		Param.P2pParam.CustomBoot = cfg.Boot
 	}
@@ -93,6 +98,9 @@ func LoadParam(private private.IPrivate) error {
 
 	if cfg.RpcPort != "" {
 		Param.RpcParam.RpcPort = cfg.RpcPort
+	}
+	if cfg.RpcUser != "" {
+		Param.RpcParam.RpcUser = cfg.RpcUser
 	}
 	if cfg.RpcPass != "" {
 		Param.RpcParam.RpcPass = cfg.RpcPass

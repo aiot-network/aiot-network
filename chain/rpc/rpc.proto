@@ -16,36 +16,168 @@ syntax = "proto3";
 
 package rpc;
 
+import "google/api/annotations.proto";
+
 // The greeting service definition.
 service Greeter {
     // Sends a greeting
-    rpc GetAccount(AddressReq)returns (Response) {}
-    rpc SendMessageRaw(SendMessageCodeReq)returns (Response) {}
-    rpc GetMessage(HashReq)returns (Response) {}
-    rpc GetBlockHash(HashReq)returns (Response) {}
-    rpc GetBlockHeight(HeightReq)returns (Response) {}
-    rpc LastHeight(NullReq)returns (Response) {}
-    rpc Confirmed(NullReq)returns (Response) {}
-    rpc GetMsgPool(NullReq)returns (Response) {}
-    rpc Candidates(NullReq)returns (Response) {}
-    rpc GetCycleSupers(CycleReq)returns (Response) {}
-    rpc GetSupersReward(CycleReq)returns (Response) {}
-    rpc Token(TokenAddressReq)returns (Response) {}
-    rpc PeersInfo(NullReq)returns (Response) {}
-    rpc LocalInfo(NullReq)returns (Response) {}
+    rpc GetAccount(AddressReq)returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/GetAccount"
+            body: "*"
+        };
+    }
+    rpc SendMessageRaw(SendMessageCodeReq)returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/SendMessageRaw"
+            body: "*"
+        };
+    }
+    rpc GetMessage(HashReq)returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/GetMessage"
+            body: "*"
+        };
+    }
+    rpc GetBlockHash(HashReq)returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/GetBlockHash"
+            body: "*"
+        };
+    }
+    rpc GetBlockHeight(HeightReq)returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/GetBlockHeight"
+            body: "*"
+        };
+    }
+    rpc LastHeight(NullReq)returns (Response) {
+        option (google.api.http) = {
+          post: "/v1/LastHeight"
+          body: "*"
+        };
+    }
+    rpc Confirmed(NullReq)returns (Response) {
+        option (google.api.http) = {
+          post: "/v1/Confirmed"
+          body: "*"
+        };
+    }
+    rpc GetMsgPool(NullReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/GetMsgPool"
+        body: "*"
+      };
+    }
+    rpc Candidates(NullReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/Candidates"
+        body: "*"
+      };
+    }
+    rpc GetCycleSupers(CycleReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/GetCycleSupers"
+        body: "*"
+      };
+    }
+    rpc GetSupersReward(CycleReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/GetSupersReward"
+        body: "*"
+      };
+    }
+    rpc Token(TokenAddressReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/Token"
+        body: "*"
+      };
+    }
+    rpc PeersInfo(NullReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/PeersInfo"
+        body: "*"
+      };
+    }
+    rpc LocalInfo(NullReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/LocalInfo"
+        body: "*"
+      };
+    }
 
-    rpc GenerateAddress(GenerateReq)returns (Response) {}
-    rpc GenerateTokenAddress(GenerateTokenReq)returns (Response) {}
-    rpc CreateTransaction(TransactionReq)returns (Response) {}
-    rpc CreateToken(TokenReq)returns (Response) {}
-    rpc CreateCandidate(CandidateReq)returns (Response) {}
-    rpc CreateCancel(CancelReq)returns (Response) {}
-    rpc CreateVote(VoteReq)returns (Response) {}
-    rpc SendTransaction(TransactionReq)returns (Response) {}
-    rpc SendToken(TokenReq)returns (Response) {}
-    rpc SendCandidate(CandidateReq)returns (Response) {}
-    rpc SendCancel(CancelReq)returns (Response) {}
-    rpc SendVote(VoteReq)returns (Response) {}
+    rpc GenerateAddress(GenerateReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/GenerateAddress"
+        body: "*"
+      };
+    }
+    rpc GenerateTokenAddress(GenerateTokenReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/GenerateTokenAddress"
+        body: "*"
+      };
+    }
+    rpc CreateTransaction(TransactionReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/CreateTransaction"
+        body: "*"
+      };
+    }
+    rpc CreateToken(TokenReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/CreateToken"
+        body: "*"
+      };
+    }
+    rpc CreateCandidate(CandidateReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/CreateCandidate"
+        body: "*"
+      };
+    }
+    rpc CreateCancel(CancelReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/CreateCancel"
+        body: "*"
+      };
+    }
+    rpc CreateVote(VoteReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/CreateVote"
+        body: "*"
+      };
+    }
+    rpc SendTransaction(TransactionReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/SendTransaction"
+        body: "*"
+      };
+    }
+    rpc SendToken(TokenReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/SendToken"
+        body: "*"
+      };
+    }
+    rpc SendCandidate(CandidateReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/SendCandidate"
+        body: "*"
+      };
+    }
+    rpc SendCancel(CancelReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/SendCancel"
+        body: "*"
+      };
+    }
+    rpc SendVote(VoteReq)returns (Response) {
+      option (google.api.http) = {
+        post: "/v1/SendVote"
+        body: "*"
+      };
+    }
 }
 
 message NullReq {

@@ -86,7 +86,9 @@ type RpcParam struct {
 	RpcTLS     bool
 	RpcCert    string
 	RpcCertKey string
+	RpcUser    string
 	RpcPass    string
+	HttpPort   string
 }
 
 type Super struct {
@@ -148,9 +150,11 @@ var TestNetParam = &Param{
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
 		RpcPort:    "13562",
+		HttpPort:   "13563",
 		RpcTLS:     false,
 		RpcCert:    "",
 		RpcCertKey: "",
+		RpcUser:    "",
 		RpcPass:    "",
 	},
 	DPosParam: &DPosParam{
@@ -244,9 +248,11 @@ var MainNetParam = &Param{
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
 		RpcPort:    "23562",
+		HttpPort:   "23563",
 		RpcTLS:     false,
 		RpcCert:    "",
 		RpcCertKey: "",
+		RpcUser:    "",
 		RpcPass:    "",
 	},
 	DPosParam: &DPosParam{
@@ -310,4 +316,9 @@ type PreCirculation struct {
 	Amount  uint64
 }
 
-var PreCirculations = []PreCirculation{}
+var PreCirculations = []PreCirculation{
+	{
+		Address: "aiCSxRKuF8dYALbZ2av8gqcoVR34R4aecYX",
+		Amount:  100000 * AtomsPerCoin,
+	},
+}
