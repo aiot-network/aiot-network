@@ -25,3 +25,4 @@ chain/common/kit/address
 cmd/chain/config.toml
 cmd/boot/boot
 repleace.sh
+.idea

@@ -57,6 +57,7 @@ type RpcReword struct {
 	Amount  float64 `json:"amount"`
 	Cycle   uint64  `json:"cycle"`
 	Blocks  uint64  `json:"blocks"`
+	Workload uint64 `json:"workload"`
 }
 
 func ToRpcReword(reword []types2.IReword) []RpcReword {
@@ -68,6 +69,7 @@ func ToRpcReword(reword []types2.IReword) []RpcReword {
 			Amount:  amount.Amount(r.GetReword()).ToCoin(),
 			Cycle:   r.GetCycle(),
 			Blocks:  r.GetBlocks(),
+			Workload: r.GetWorkLoad(),
 		})
 	}
 	return rpcReword
