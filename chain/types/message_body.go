@@ -85,7 +85,7 @@ func (t *TransactionBody) MsgTo() types.IReceiver {
 
 func (t *TransactionBody) CheckBody(from arry.Address) error {
 	if len(t.Receivers.List) > config.Param.MaximumReceiver {
-		fmt.Errorf("the maximum number of receive addresses is %d", config.Param.MaximumReceiver)
+		return fmt.Errorf("the maximum number of receive addresses is %d", config.Param.MaximumReceiver)
 	}
 	if len(t.Receivers.List) == 0 {
 		return fmt.Errorf("no receivers")

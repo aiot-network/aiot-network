@@ -19,5 +19,5 @@ func TestGenerateAddress(t *testing.T) {
 }
 
 func TestCheckAddress(t *testing.T) {
-	fmt.Println(CheckAddress("testnet", "FmcoinEaterAddressDontSend000000000"))
+	fmt.Println(CheckAddress("testnet", "AicoinEaterAddressDontSend000000000"))
 }
