@@ -9,6 +9,7 @@ import (
 	"github.com/aiot-network/aiot-network/service/request"
 	log "github.com/aiot-network/aiot-network/tools/log/log15"
 	"github.com/aiot-network/aiot-network/types"
+	"sync"
 	"time"
 )
 
@@ -26,6 +27,7 @@ type Sync struct {
 	dPos    dpos.IDPosStatus
 	stop    chan bool
 	stopped chan bool
+	mutex sync.RWMutex
 }
 
 func NewSync(peers *peers.Peers, dPos dpos.IDPosStatus, request request.IRequestHandler, chain blockchain.IChain) *Sync {
@@ -62,6 +64,20 @@ func (s *Sync) Info() map[string]interface{} {
 		"height":    s.chain.LastHeight(),
 		"confirmed": s.chain.LastConfirmed(),
 	}
+}
+
+func (s *Sync)getCurPeer()*types.Peer{
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	return s.curPeer
+}
+
+func (s *Sync)setCurPeer(peer *types.Peer){
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	s.curPeer = peer
 }
 
 // Start sync block
@@ -104,11 +120,9 @@ func (s *Sync) findSyncPeer() {
 		case _, _ = <-s.stop:
 			return
 		case _ = <-t.C:
-			s.curPeer = s.peers.RandomPeer()
-			if s.curPeer == nil {
-				//log.Warn("No available peers were found， wait...")
-			} else {
-				//log.Info("Find an available peer", "peer", bm.syncPeer)
+			peer := s.peers.RandomPeer()
+			if peer != nil{
+				s.setCurPeer(peer)
 				return
 			}
 		}
@@ -122,7 +136,8 @@ func (s *Sync) syncFromConn() error {
 		case _, _ = <-s.stop:
 			return nil
 		default:
-			if s.curPeer == nil {
+			curPeer := s.getCurPeer()
+			if curPeer == nil {
 				return errors.New("no current peer")
 			}
 			localHeight := s.chain.LastHeight()
@@ -133,14 +148,14 @@ func (s *Sync) syncFromConn() error {
 			// is performed, the verification proves that the local block
 			// is wrong, and the local chain is rolled back to the valid block.
 
-			blocks, err := s.request.GetBlocks(s.curPeer.Conn, localHeight+1, s.curPeer.Speed)
+			blocks, err := s.request.GetBlocks(curPeer.Conn, localHeight+1, curPeer.Speed)
 			if err != nil {
 				if err == request.Err_PeerClosed {
-					s.reducePeerSpeed()
+					s.reducePeerSpeed(curPeer)
 				}
 				return err
 			}
-			if err := s.insert(blocks); err != nil {
+			if err := s.insert(blocks, curPeer); err != nil {
 				return err
 			}
 		}
@@ -148,16 +163,16 @@ func (s *Sync) syncFromConn() error {
 	return nil
 }
 
-func (s *Sync) reducePeerSpeed() {
-	if s.curPeer.Speed == 1 {
-		s.peers.RemovePeer(s.curPeer.Address.ID.String())
+func (s *Sync) reducePeerSpeed(peer *types.Peer) {
+	if peer.Speed == 1 {
+		s.peers.RemovePeer(peer.Address.ID.String())
 		return
 	}
-	speed := s.curPeer.Speed - 1
-	s.peers.SetSpeed(s.curPeer.Address.ID.String(), speed)
+	speed := peer.Speed - 1
+	s.peers.SetSpeed(peer.Address.ID.String(), speed)
 }
 
-func (s *Sync) insert(blocks []types.IBlock) error {
+func (s *Sync) insert(blocks []types.IBlock, peer *types.Peer) error {
 	for _, block := range blocks {
 		select {
 		case _, _ = <-s.stop:
@@ -169,17 +184,15 @@ func (s *Sync) insert(blocks []types.IBlock) error {
 					block.GetHeight(),
 					"signer", block.GetSigner())
 				if s.NeedValidation(err) {
-					if s.headerValidation(block.BlockHeader()) {
+					if roll, peerId := s.isRollBack(block.BlockHeader());roll {
 						s.fallBack()
-						return err
-					} else {
-						localPreHeader, _ := s.chain.GetHeaderHeight(block.GetHeight() - 1)
-						if !s.headerValidation(localPreHeader) {
-							s.fallBack()
+						if peerInfo := s.peers.Peer(peerId); peerInfo == nil {
 							return err
+						} else {
+							s.setCurPeer(peerInfo)
+							return nil
 						}
 					}
-					s.peers.RemovePeer(s.curPeer.Address.ID.String())
 				}
 				return err
 			}
@@ -187,7 +200,7 @@ func (s *Sync) insert(blocks []types.IBlock) error {
 	}
 	if len(blocks) > 0 {
 		log.Info("Sync blocks complete", "module", module, "start", blocks[0].GetHeight(),
-			"end", blocks[len(blocks)-1].GetHeight(), "peer", s.curPeer.Address.String(), "speed", s.curPeer.Speed)
+			"end", blocks[len(blocks)-1].GetHeight(), "peer", peer.Address.String(), "speed", peer.Speed)
 	}
 
 	return nil
@@ -198,16 +211,12 @@ func (s *Sync) insert(blocks []types.IBlock) error {
 // block occupies the majority of the currently started super
 // nodes, it means that the block is more likely to be correct,
 // and the block verification is successful.
-func (s *Sync) headerValidation(header types.IHeader) bool {
-	localEqual := false
+func (s *Sync) isRollBack(header types.IHeader) (bool, string) {
 	if header.GetHeight() <= s.chain.LastConfirmed() {
-		return false
+		return false, ""
 	}
-	localHeader, err := s.chain.GetHeaderHeight(header.GetHeight())
-	if err == nil && localHeader.GetHash().IsEqual(header.GetHash()) {
-		localEqual = true
-	}
-	return s.validation(header, localEqual)
+	localHeight := s.chain.LastHeight()
+	return s.isRoll(header, localHeight)
 
 }
 
@@ -236,6 +245,45 @@ func (s *Sync) validation(header types.IHeader, localEqual bool) bool {
 	return false
 }
 
+func (s *Sync) isRoll(header types.IHeader, localHeight uint64) (bool, string) {
+	supers, err := s.dPos.CycleSupers(header.GetCycle())
+	if err != nil {
+		return false, ""
+	}
+	var maxHeight uint64
+	var maxHeightPeer string
+	for _, candidate := range supers.List() {
+		if candidate.GetPeerId() != s.peers.Local().Address.ID.String() {
+			peer := s.peers.Peer(candidate.GetPeerId())
+			if peer != nil {
+				height, err := s.request.LastHeight(peer.Conn)
+				if err == nil {
+					if height > maxHeight{
+						maxHeight = height
+						maxHeightPeer = candidate.GetPeerId()
+					}
+				}
+			}
+		}
+	}
+	if maxHeight > localHeight{
+		log.Info("Find the highest node", "remote height", maxHeight, "local height", localHeight, "remote peer", maxHeightPeer)
+		peer := s.peers.Peer(maxHeightPeer)
+		if peer != nil{
+			ok, err := s.request.IsEqual(peer.Conn, header)
+			if ok {
+				return true, maxHeightPeer
+			} else if err != nil {
+				log.Error("Failed to validation block hash!", "hash", header.GetHash(), "err", err.Error(), "remote peer", maxHeightPeer)
+				return false, ""
+			} else {
+				return false, ""
+			}
+		}
+	}
+	return false, ""
+}
+
 // Block chain rolls back to a valid block
 func (s *Sync) fallBack() {
 	s.chain.Roll()
@@ -257,16 +305,11 @@ func (s *Sync) ReceivedBlockFromPeer(block types.IBlock) error {
 	} else if block.GetHeight() <= localHeight {
 		if localHeader, err := s.chain.GetBlockHeight(block.GetHeight()); err == nil {
 			if !localHeader.GetHash().IsEqual(block.GetHash()) {
-				if s.headerValidation(block.BlockHeader()) {
+				if roll, peerId := s.isRollBack(block.BlockHeader());roll {
 					s.fallBack()
-					return err
-				} else {
-					if !s.headerValidation(localHeader) {
-						s.fallBack()
-						return err
-					} else {
-						log.Warn("Remote validation failed!", "height", block.GetHeight(), "signer", block.GetSigner().String())
-						return err
+					if peerInfo := s.peers.Peer(peerId); peerInfo != nil {
+						s.setCurPeer(peerInfo)
+						return nil
 					}
 				}
 			}

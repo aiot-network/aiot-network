@@ -5,7 +5,7 @@ const (
 	Failed
 )
 
-const timeOut = 30
+const timeOut = 15
 
 type Code int
 

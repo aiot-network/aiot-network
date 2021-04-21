@@ -137,7 +137,7 @@ var TestNetParam = &Param{
 		MaxCoinCount:    9 * 1e10,
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
-		MaximumReceiver: 1 * 1e4,
+		MaximumReceiver: 1 * 1e3,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("aiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{
@@ -239,7 +239,7 @@ var MainNetParam = &Param{
 		MaxCoinCount:    9 * 1e10,
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
-		MaximumReceiver: 1 * 1e4,
+		MaximumReceiver: 1 * 1e3,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("AiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{
