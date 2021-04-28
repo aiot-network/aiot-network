@@ -2,7 +2,7 @@ package msglist
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/types"
 	"strconv"
 )
 

@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/amount"
+	"github.com/aiot-network/aiotchain/tools/amount"
 	"testing"
 )
 

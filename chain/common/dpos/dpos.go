@@ -3,15 +3,15 @@ package dpos
 import (
 	"errors"
 	"fmt"
-	"github.com/aiot-network/aiot-network/chain/common/kit/message"
-	chaintypes "github.com/aiot-network/aiot-network/chain/types"
-	"github.com/aiot-network/aiot-network/common/blockchain"
-	"github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/common/dpos"
-	"github.com/aiot-network/aiot-network/common/param"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/utils"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/chain/common/kit/message"
+	chaintypes "github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/common/blockchain"
+	"github.com/aiot-network/aiotchain/common/config"
+	"github.com/aiot-network/aiotchain/common/dpos"
+	"github.com/aiot-network/aiotchain/common/param"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/utils"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 type DPos struct {

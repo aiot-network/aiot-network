@@ -7,8 +7,8 @@ GitCommitLog=${GitCommitLog//\'/\"}
 GitStatus=`git status -s`
 
 LDFlags=" \
-    -X 'github.com/aiot-network/aiot-network/version.GitCommitLog=${GitCommitLog}' \
-    -X 'github.com/aiot-network/aiot-network/version.GitStatus=${GitStatus}' \
+    -X 'github.com/aiot-network/aiotchain/version.GitCommitLog=${GitCommitLog}' \
+    -X 'github.com/aiot-network/aiotchain/version.GitStatus=${GitStatus}' \
 "
 
 ROOT_DIR=`pwd`

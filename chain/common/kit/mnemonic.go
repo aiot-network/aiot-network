@@ -2,10 +2,10 @@ package kit
 
 import (
 	"encoding/hex"
-	"github.com/aiot-network/aiot-network/tools/crypto/bip32"
-	"github.com/aiot-network/aiot-network/tools/crypto/bip39"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
-	"github.com/aiot-network/aiot-network/tools/crypto/seed"
+	"github.com/aiot-network/aiotchain/tools/crypto/bip32"
+	"github.com/aiot-network/aiotchain/tools/crypto/bip39"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/tools/crypto/seed"
 )
 
 func Entropy() (string, error) {

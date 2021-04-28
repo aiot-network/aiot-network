@@ -1,9 +1,9 @@
 package types
 
 import (
-	"github.com/aiot-network/aiot-network/chain/types"
-	"github.com/aiot-network/aiot-network/tools/amount"
-	types2 "github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/tools/amount"
+	types2 "github.com/aiot-network/aiotchain/types"
 )
 
 type Account struct {

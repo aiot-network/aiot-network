@@ -4,8 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/aiot-network/aiot-network/chain/common/private"
-	"github.com/aiot-network/aiot-network/service/p2p"
+	"github.com/aiot-network/aiotchain/chain/common/private"
+	"github.com/aiot-network/aiotchain/service/p2p"
 	"os"
 	"sync"
 )

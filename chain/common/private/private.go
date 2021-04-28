@@ -3,12 +3,12 @@ package private
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/aiot-network/aiot-network/chain/common/keystore"
-	"github.com/aiot-network/aiot-network/chain/common/kit"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
-	"github.com/aiot-network/aiot-network/tools/crypto/mnemonic"
-	"github.com/aiot-network/aiot-network/tools/utils"
+	"github.com/aiot-network/aiotchain/chain/common/keystore"
+	"github.com/aiot-network/aiotchain/chain/common/kit"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/tools/crypto/mnemonic"
+	"github.com/aiot-network/aiotchain/tools/utils"
 	"io/ioutil"
 )
 

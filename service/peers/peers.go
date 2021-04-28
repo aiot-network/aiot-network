@@ -1,9 +1,9 @@
 package peers
 
 import (
-	request2 "github.com/aiot-network/aiot-network/service/request"
-	log "github.com/aiot-network/aiot-network/tools/log/log15"
-	"github.com/aiot-network/aiot-network/types"
+	request2 "github.com/aiot-network/aiotchain/service/request"
+	log "github.com/aiot-network/aiotchain/tools/log/log15"
+	"github.com/aiot-network/aiotchain/types"
 	"github.com/libp2p/go-libp2p-core/peer"
 	"math/rand"
 	"sync"

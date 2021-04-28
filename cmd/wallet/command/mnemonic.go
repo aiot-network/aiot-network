@@ -2,7 +2,7 @@ package command
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/chain/common/kit"
+	"github.com/aiot-network/aiotchain/chain/common/kit"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

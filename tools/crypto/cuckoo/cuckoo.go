@@ -2,7 +2,7 @@ package cuckoo
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/crypto/cuckoo/siphash"
+	"github.com/aiot-network/aiotchain/tools/crypto/cuckoo/siphash"
 	"github.com/pkg/errors"
 	"runtime"
 	"sort"

@@ -6,7 +6,7 @@ package schnorr
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
 	"math/big"
 
 	chainhash "github.com/Qitmeer/qitmeer-lib/common/hash"

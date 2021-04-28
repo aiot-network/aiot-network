@@ -1,10 +1,10 @@
 package token_db
 
 import (
-	"github.com/aiot-network/aiot-network/chain/types"
-	"github.com/aiot-network/aiot-network/common/db/base"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/trie"
+	"github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/common/db/base"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/trie"
 )
 
 type TokenDB struct {

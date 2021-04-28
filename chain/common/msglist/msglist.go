@@ -2,10 +2,10 @@ package msglist
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/chain/db/msglist"
-	"github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/common/validator"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/chain/db/msglist"
+	"github.com/aiot-network/aiotchain/common/config"
+	"github.com/aiot-network/aiotchain/common/validator"
+	"github.com/aiot-network/aiotchain/types"
 	"sync"
 )
 

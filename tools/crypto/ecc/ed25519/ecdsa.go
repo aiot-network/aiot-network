@@ -12,7 +12,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/ed25519/internal/edwards25519"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/ed25519/internal/edwards25519"
 	"hash"
 	"io"
 	"math/big"

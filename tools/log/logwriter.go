@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/aiot-network/aiot-network/tools/log/log15/term"
+	"github.com/aiot-network/aiotchain/tools/log/log15/term"
 	"github.com/jrick/logrotate/rotator"
 	"github.com/mattn/go-colorable"
 	"io"

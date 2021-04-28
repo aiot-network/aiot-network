@@ -2,13 +2,13 @@ package sync
 
 import (
 	"errors"
-	"github.com/aiot-network/aiot-network/common/blockchain"
-	"github.com/aiot-network/aiot-network/common/dpos"
-	"github.com/aiot-network/aiot-network/common/param"
-	"github.com/aiot-network/aiot-network/service/peers"
-	"github.com/aiot-network/aiot-network/service/request"
-	log "github.com/aiot-network/aiot-network/tools/log/log15"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/common/blockchain"
+	"github.com/aiot-network/aiotchain/common/dpos"
+	"github.com/aiot-network/aiotchain/common/param"
+	"github.com/aiot-network/aiotchain/service/peers"
+	"github.com/aiot-network/aiotchain/service/request"
+	log "github.com/aiot-network/aiotchain/tools/log/log15"
+	"github.com/aiot-network/aiotchain/types"
 	"sync"
 	"time"
 )

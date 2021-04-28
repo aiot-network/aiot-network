@@ -2,8 +2,8 @@ package request
 
 import (
 	"errors"
-	"github.com/aiot-network/aiot-network/server"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/server"
+	"github.com/aiot-network/aiotchain/types"
 	"github.com/libp2p/go-libp2p-core/network"
 )
 

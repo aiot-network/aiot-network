@@ -1,7 +1,7 @@
 package types
 
 import (
-	chaintypes "github.com/aiot-network/aiot-network/chain/types"
+	chaintypes "github.com/aiot-network/aiotchain/chain/types"
 )
 
 type RpcBlock struct {

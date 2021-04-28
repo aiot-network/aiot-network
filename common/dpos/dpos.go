@@ -1,8 +1,8 @@
 package dpos
 
 import (
-	"github.com/aiot-network/aiot-network/common/blockchain"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/common/blockchain"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 type IDPos interface {

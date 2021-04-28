@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/BurntSushi/toml"
-	"github.com/aiot-network/aiot-network/cmd/wallet/command"
-	"github.com/aiot-network/aiot-network/cmd/wallet/config"
-	config2 "github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/common/param"
-	"github.com/aiot-network/aiot-network/tools/utils"
+	"github.com/aiot-network/aiotchain/cmd/wallet/command"
+	"github.com/aiot-network/aiotchain/cmd/wallet/config"
+	config2 "github.com/aiot-network/aiotchain/common/config"
+	"github.com/aiot-network/aiotchain/common/param"
+	"github.com/aiot-network/aiotchain/tools/utils"
 	"github.com/spf13/cobra"
 	"os"
 )

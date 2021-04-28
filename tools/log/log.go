@@ -2,7 +2,7 @@ package log
 
 import (
 	"fmt"
-	log "github.com/aiot-network/aiot-network/tools/log/log15"
+	log "github.com/aiot-network/aiotchain/tools/log/log15"
 	"github.com/jrick/logrotate/rotator"
 	"os"
 	"path/filepath"

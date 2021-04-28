@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/aiot-network/aiot-network/chain/types"
+	"github.com/aiot-network/aiotchain/chain/types"
 	"time"
 )
 

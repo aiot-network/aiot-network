@@ -2,11 +2,11 @@ package token_status
 
 import (
 	"errors"
-	"github.com/aiot-network/aiot-network/chain/db/status/token_db"
-	chaintypes "github.com/aiot-network/aiot-network/chain/types"
-	"github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/chain/db/status/token_db"
+	chaintypes "github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/common/config"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/types"
 	"sync"
 )
 

@@ -19,8 +19,8 @@ package trie
 import (
 	"bytes"
 	"crypto/sha256"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/rlp"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/rlp"
 	"hash"
 	"sync"
 )

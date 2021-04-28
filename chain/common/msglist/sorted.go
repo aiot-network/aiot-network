@@ -2,9 +2,9 @@ package msglist
 
 import (
 	"container/heap"
-	"github.com/aiot-network/aiot-network/common/validator"
-	"github.com/aiot-network/aiot-network/tools/utils"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/common/validator"
+	"github.com/aiot-network/aiotchain/tools/utils"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 const maxStagnantTime uint64 = 60

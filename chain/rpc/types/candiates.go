@@ -1,8 +1,8 @@
 package types
 
 import (
-	chaintypes "github.com/aiot-network/aiot-network/chain/types"
-	"github.com/aiot-network/aiot-network/types"
+	chaintypes "github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 type RpcMember struct {

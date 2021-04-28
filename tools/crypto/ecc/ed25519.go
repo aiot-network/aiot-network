@@ -7,7 +7,7 @@ package ecc
 
 import (
 	"errors"
-	edwards "github.com/aiot-network/aiot-network/tools/crypto/ecc/ed25519"
+	edwards "github.com/aiot-network/aiotchain/tools/crypto/ecc/ed25519"
 	"io"
 	"math/big"
 )

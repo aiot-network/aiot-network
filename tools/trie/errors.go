@@ -18,7 +18,7 @@ package trie
 
 import (
 	"fmt"
-	hasharry "github.com/aiot-network/aiot-network/tools/arry"
+	hasharry "github.com/aiot-network/aiotchain/tools/arry"
 )
 
 // MissingNodeError is returned by the trie functions (TryGet, TryUpdate, TryDelete)

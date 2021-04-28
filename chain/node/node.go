@@ -2,11 +2,11 @@ package node
 
 import (
 	"encoding/json"
-	"github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/server"
-	log "github.com/aiot-network/aiot-network/tools/log/log15"
-	"github.com/aiot-network/aiot-network/types"
-	"github.com/aiot-network/aiot-network/version"
+	"github.com/aiot-network/aiotchain/common/config"
+	"github.com/aiot-network/aiotchain/server"
+	log "github.com/aiot-network/aiotchain/tools/log/log15"
+	"github.com/aiot-network/aiotchain/types"
+	"github.com/aiot-network/aiotchain/version"
 )
 
 const module = "aiot_node"

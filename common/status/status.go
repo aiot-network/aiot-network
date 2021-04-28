@@ -1,8 +1,8 @@
 package status
 
 import (
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 type IStatus interface {

@@ -2,10 +2,10 @@ package types
 
 import (
 	"encoding/hex"
-	"github.com/aiot-network/aiot-network/chain/common/kit"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/chain/common/kit"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 // Signature information, including the result of the

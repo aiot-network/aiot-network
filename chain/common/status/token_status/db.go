@@ -1,8 +1,8 @@
 package token_status
 
 import (
-	"github.com/aiot-network/aiot-network/chain/types"
-	"github.com/aiot-network/aiot-network/tools/arry"
+	"github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/tools/arry"
 )
 
 type ITokenDB interface {

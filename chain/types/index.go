@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/rlp"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/rlp"
 )
 
 type MsgIndex struct {

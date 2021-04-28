@@ -2,7 +2,7 @@ package hash
 
 import (
 	"crypto/sha256"
-	"github.com/aiot-network/aiot-network/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/arry"
 	"golang.org/x/crypto/ripemd160"
 	"io"
 )

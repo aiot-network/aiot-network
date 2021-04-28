@@ -7,7 +7,7 @@ package edwards
 
 import (
 	"crypto/elliptic"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/ed25519/internal/edwards25519"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/ed25519/internal/edwards25519"
 	"math/big"
 )
 

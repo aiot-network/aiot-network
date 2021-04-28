@@ -1,6 +1,6 @@
 package types
 
-import "github.com/aiot-network/aiot-network/tools/rlp"
+import "github.com/aiot-network/aiotchain/tools/rlp"
 
 type RlpHeader Header
 

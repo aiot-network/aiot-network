@@ -1,6 +1,6 @@
 package types
 
-import "github.com/aiot-network/aiot-network/tools/arry"
+import "github.com/aiot-network/aiotchain/tools/arry"
 
 type IMessageBody interface {
 	MsgTo() IReceiver

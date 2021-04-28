@@ -3,7 +3,7 @@ package rpc
 import (
 	"context"
 	"fmt"
-	"github.com/aiot-network/aiot-network/common/config"
+	"github.com/aiot-network/aiotchain/common/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

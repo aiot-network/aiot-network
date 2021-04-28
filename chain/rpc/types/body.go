@@ -1,6 +1,6 @@
 package types
 
-import "github.com/aiot-network/aiot-network/chain/types"
+import "github.com/aiot-network/aiotchain/chain/types"
 
 type RpcBody struct {
 	Messages []*types.RpcMessage `json:"transactions"`

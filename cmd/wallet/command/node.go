@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"github.com/aiot-network/aiot-network/chain/rpc"
+	"github.com/aiot-network/aiotchain/chain/rpc"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"time"

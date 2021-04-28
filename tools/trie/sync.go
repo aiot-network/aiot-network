@@ -19,7 +19,7 @@ package trie
 import (
 	"errors"
 	"fmt"
-	hasharry "github.com/aiot-network/aiot-network/tools/arry"
+	hasharry "github.com/aiot-network/aiotchain/tools/arry"
 
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 )

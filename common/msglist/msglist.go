@@ -1,6 +1,6 @@
 package msglist
 
-import "github.com/aiot-network/aiot-network/types"
+import "github.com/aiot-network/aiotchain/types"
 
 type IMsgList interface {
 	DeleteExpired(int64)

@@ -7,7 +7,7 @@ package schnorr
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
 )
 
 // These constants define the lengths of serialized public keys.

@@ -8,7 +8,7 @@ package ecc
 import (
 	"errors"
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
 	"io"
 	"math/big"
 )

@@ -1,4 +1,4 @@
-# aiot-network
+# aiotchain
 
 ### How to build
 

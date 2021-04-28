@@ -11,7 +11,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/crypto/bip39/wordlists"
+	"github.com/aiot-network/aiotchain/tools/crypto/bip39/wordlists"
 	"math/big"
 	"strings"
 

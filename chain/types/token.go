@@ -3,11 +3,11 @@ package types
 import (
 	"errors"
 	"fmt"
-	"github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/tools/amount"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/rlp"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/common/config"
+	"github.com/aiot-network/aiotchain/tools/amount"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/rlp"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 // token structure, issuing a contract with the same

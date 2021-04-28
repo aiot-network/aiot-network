@@ -19,10 +19,10 @@ package trie
 import (
 	"bytes"
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	cypHash "github.com/aiot-network/aiot-network/tools/crypto/hash"
-	log "github.com/aiot-network/aiot-network/tools/log/log15"
-	"github.com/aiot-network/aiot-network/tools/rlp"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	cypHash "github.com/aiot-network/aiotchain/tools/crypto/hash"
+	log "github.com/aiot-network/aiotchain/tools/log/log15"
+	"github.com/aiot-network/aiotchain/tools/rlp"
 )
 
 // Prove constructs a merkle proof for key. The result contains all

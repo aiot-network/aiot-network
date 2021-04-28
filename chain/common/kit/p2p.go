@@ -3,7 +3,7 @@ package kit
 import (
 	"context"
 	"fmt"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/peer"

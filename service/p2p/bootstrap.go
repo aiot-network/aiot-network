@@ -2,8 +2,8 @@ package p2p
 
 import (
 	"context"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
-	log "github.com/aiot-network/aiot-network/tools/log/log15"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
+	log "github.com/aiot-network/aiotchain/tools/log/log15"
 	"github.com/libp2p/go-libp2p-core/peer"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/multiformats/go-multiaddr"

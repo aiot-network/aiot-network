@@ -2,9 +2,9 @@ package types
 
 import (
 	"bytes"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/tools/crypto/hash"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/crypto/hash"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 type Messages []types.IMessage

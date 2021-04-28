@@ -9,7 +9,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	chainhash "github.com/Qitmeer/qitmeer-lib/common/hash"
-	"github.com/aiot-network/aiot-network/tools/crypto/ecc/secp256k1"
+	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
 	"math/big"
 )
 

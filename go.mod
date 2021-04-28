@@ -1,4 +1,4 @@
-module github.com/aiot-network/aiot-network
+module github.com/aiot-network/aiotchain
 
 go 1.15
 

@@ -2,12 +2,12 @@ package dpos_status
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiot-network/chain/db/status/dpos_db"
-	chaintypes "github.com/aiot-network/aiot-network/chain/types"
-	"github.com/aiot-network/aiot-network/common/config"
-	"github.com/aiot-network/aiot-network/common/param"
-	"github.com/aiot-network/aiot-network/tools/arry"
-	"github.com/aiot-network/aiot-network/types"
+	"github.com/aiot-network/aiotchain/chain/db/status/dpos_db"
+	chaintypes "github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/common/config"
+	"github.com/aiot-network/aiotchain/common/param"
+	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/types"
 )
 
 const dPosDB = "dpos_db"

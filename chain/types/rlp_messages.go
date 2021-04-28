@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/aiot-network/aiot-network/tools/rlp"
+	"github.com/aiot-network/aiotchain/tools/rlp"
 )
 
 func DecodeRlpMessages(bytes []byte) ([]*RlpMessage, error) {

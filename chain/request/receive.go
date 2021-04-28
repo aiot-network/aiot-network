@@ -1,9 +1,9 @@
 package request
 
 import (
-	"github.com/aiot-network/aiot-network/chain/types"
-	request2 "github.com/aiot-network/aiot-network/service/request"
-	"github.com/aiot-network/aiot-network/tools/rlp"
+	"github.com/aiot-network/aiotchain/chain/types"
+	request2 "github.com/aiot-network/aiotchain/service/request"
+	"github.com/aiot-network/aiotchain/tools/rlp"
 )
 
 const (

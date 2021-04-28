@@ -19,8 +19,8 @@ package trie
 import (
 	"fmt"
 
-	hasharry "github.com/aiot-network/aiot-network/tools/arry"
-	log "github.com/aiot-network/aiot-network/tools/log/log15"
+	hasharry "github.com/aiot-network/aiotchain/tools/arry"
+	log "github.com/aiot-network/aiotchain/tools/log/log15"
 )
 
 var secureKeyPrefix = []byte("secure-key-")
