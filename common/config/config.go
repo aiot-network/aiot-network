@@ -175,7 +175,7 @@ func LoadParam(private private.IPrivate) error {
 		}
 		utils.CleanAndExpandPath(logDir)
 		logDir = filepath.Join(logDir, Param.Name)
-		log2.InitLogRotator(filepath.Join(logDir, "future_mine.log"))
+		log2.InitLogRotator(filepath.Join(logDir, "aiot.log"))
 	}
 	log.Info("Data storage directory", "module", "config", "path", Param.Data)
 	return nil
