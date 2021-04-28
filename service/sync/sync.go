@@ -185,6 +185,7 @@ func (s *Sync) insert(blocks []types.IBlock, peer *types.Peer) error {
 					"signer", block.GetSigner())
 				if s.NeedValidation(err) {
 					if roll, peerId := s.isRollBack(block.BlockHeader());roll {
+						log.Info("Start roll back")
 						s.fallBack()
 						if peerInfo := s.peers.Peer(peerId); peerInfo == nil {
 							return err
@@ -246,6 +247,7 @@ func (s *Sync) validation(header types.IHeader, localEqual bool) bool {
 }
 
 func (s *Sync) isRoll(header types.IHeader, localHeight uint64) (bool, string) {
+	log.Info("Is need to roll back")
 	supers, err := s.dPos.CycleSupers(header.GetCycle())
 	if err != nil {
 		return false, ""
@@ -257,6 +259,7 @@ func (s *Sync) isRoll(header types.IHeader, localHeight uint64) (bool, string) {
 			peer := s.peers.Peer(candidate.GetPeerId())
 			if peer != nil {
 				height, err := s.request.LastHeight(peer.Conn)
+				log.Info("Get peer last height", "peer", peer.Address.String(), "height", height, "err", err.Error())
 				if err == nil {
 					if height > maxHeight{
 						maxHeight = height
@@ -306,6 +309,7 @@ func (s *Sync) ReceivedBlockFromPeer(block types.IBlock) error {
 		if localHeader, err := s.chain.GetBlockHeight(block.GetHeight()); err == nil {
 			if !localHeader.GetHash().IsEqual(block.GetHash()) {
 				if roll, peerId := s.isRollBack(block.BlockHeader());roll {
+					log.Info("Start roll back")
 					s.fallBack()
 					if peerInfo := s.peers.Peer(peerId); peerInfo != nil {
 						s.setCurPeer(peerInfo)

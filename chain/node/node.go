@@ -9,7 +9,7 @@ import (
 	"github.com/aiot-network/aiot-network/version"
 )
 
-const module = "fc_node"
+const module = "aiot_node"
 
 type Node struct {
 	services []server.IService

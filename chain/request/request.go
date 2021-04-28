@@ -92,6 +92,8 @@ func (r *RequestHandler) dealRequest() {
 			h = r.respLocalInfo
 		case sendMsg:
 			h = r.respSendMsg
+		case lastHeight:
+			h = r.respLastHeight
 		default:
 			reqStream.Close()
 			continue
