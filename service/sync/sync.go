@@ -260,7 +260,7 @@ func (s *Sync) isRoll(header types.IHeader, localHeight uint64) (bool, string) {
 			if peer != nil {
 				height, err := s.request.LastHeight(peer.Conn)
 				if err == nil {
-					log.Info("Get peer last height", "peer", peer.Address.String(), "height")
+					log.Info("Get peer last height", "peer", peer.Address.String(), "height", height)
 					if height > maxHeight{
 						maxHeight = height
 						maxHeightPeer = candidate.GetPeerId()
