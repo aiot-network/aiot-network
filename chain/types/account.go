@@ -101,15 +101,21 @@ func (a *Account) FromMessage(msg types.IMessage, height uint64) error {
 		return fmt.Errorf("wrong nonce value")
 	}
 
-	if MessageType(msg.Type()) == Token {
+	switch MessageType(msg.Type()) {
+	case Token:
 		return a.addToken(msg, height)
-	}
-	body := msg.MsgBody()
-	tokenAddr := body.MsgToken()
-	if tokenAddr == config.Param.MainToken {
-		return a.changeMain(msg, height)
-	} else {
-		return a.changeToken(msg, height)
+	case TokenV2:
+		return a.addTokenV2(msg, height)
+	case Redemption:
+		return a.addRedemption(msg, height)
+	default:
+		body := msg.MsgBody()
+		tokenAddr := body.MsgToken()
+		if tokenAddr == config.Param.MainToken {
+			return a.changeMain(msg, height)
+		} else {
+			return a.changeToken(msg, height)
+		}
 	}
 }
 
@@ -135,7 +141,72 @@ func (a *Account) addToken(msg types.IMessage, height uint64) error {
 
 	a.Tokens.Set(mainAccount)
 	a.Nonce = msg.Nonce()
-	a.JournalOut.Add(msg, height)
+	a.JournalOut.Add(config.Param.MainToken, 0, fees, msg.Nonce(), msg.Time(), height)
+	return nil
+}
+
+// Change of contract information
+func (a *Account) addTokenV2(msg types.IMessage, height uint64) error {
+	fees := msg.Fee()
+	mainAccount, ok := a.Tokens.Get(config.Param.MainToken.String())
+	if !ok {
+		return errors.New("account is not exist")
+	}
+	if mainAccount.Balance < fees {
+		return fmt.Errorf("balance %d is not enough to pay the fee %d", mainAccount.Balance, fees)
+	}
+	mainAccount.Balance -= fees
+	mainAccount.LockedOut += fees
+
+	body, _ := msg.MsgBody().(*TokenV2Body)
+	pledgeAmount := body.PledgeAmount()
+	if mainAccount.Balance < pledgeAmount {
+		return fmt.Errorf("insufficient balance,a pledge of %d%s is required to generate the token", pledgeAmount, config.Param.MainToken.String())
+	}
+	mainAccount.Balance -= pledgeAmount
+	mainAccount.LockedOut += pledgeAmount
+	mainAccount.Pledge += pledgeAmount
+
+	a.Tokens.Set(mainAccount)
+	a.Nonce = msg.Nonce()
+	a.JournalOut.Add(config.Param.MainToken, pledgeAmount, fees, msg.Nonce(), msg.Time(), height)
+	return nil
+}
+
+// Change of contract information
+func (a *Account) addRedemption(msg types.IMessage, height uint64) error {
+	fees := msg.Fee()
+	body, _ := msg.MsgBody().(*RedemptionBody)
+	mainAccount, ok := a.Tokens.Get(config.Param.MainToken.String())
+	if !ok {
+		return errors.New("account is not exist")
+	}
+	if mainAccount.Balance < fees {
+		return fmt.Errorf("balance %d is not enough to pay the fee %d", mainAccount.Balance, fees)
+	}
+	mainAccount.Balance -= fees
+	mainAccount.LockedOut += fees
+
+	token, ok := a.Tokens.Get(body.TokenAddress.String())
+	if !ok {
+		return fmt.Errorf("token %s is not exist", body.TokenAddress.String())
+	}
+	if token.Balance < body.MsgAmount() {
+		return fmt.Errorf("insufficient redemption amount")
+	}
+	token.Balance -= body.MsgAmount()
+	token.LockedOut += body.MsgAmount()
+
+	reAmount := body.RedemptionAmount()
+	if mainAccount.Pledge < reAmount {
+		return fmt.Errorf("the redeemable amount is insufficient")
+	}
+	mainAccount.Pledge -= reAmount
+
+	a.Tokens.Set(token)
+	a.Tokens.Set(mainAccount)
+	a.Nonce = msg.Nonce()
+	a.JournalOut.Add(body.TokenAddress, body.MsgAmount(), fees, msg.Nonce(), msg.Time(), height)
 	return nil
 }
 
@@ -161,7 +232,7 @@ func (a *Account) changeMain(msg types.IMessage, height uint64) error {
 	mainAccount.LockedOut += amount
 	a.Tokens.Set(mainAccount)
 	a.Nonce = msg.Nonce()
-	a.JournalOut.Add(msg, height)
+	a.JournalOut.Add(config.Param.MainToken, msg.MsgBody().MsgAmount(), msg.Fee(), msg.Nonce(), msg.Time(), height)
 	return nil
 }
 
@@ -196,7 +267,7 @@ func (a *Account) changeToken(msg types.IMessage, height uint64) error {
 	a.Tokens.Set(mainAccount)
 	a.Tokens.Set(coinAccount)
 	a.Nonce = msg.Nonce()
-	a.JournalOut.Add(msg, height)
+	a.JournalOut.Add(tokenAddr, amount, fees, msg.Nonce(), msg.Time(), height)
 	return nil
 }
 
@@ -204,23 +275,7 @@ func (a *Account) ToMessage(msgType int, address, token arry.Address, amount, he
 	if !a.Exist() {
 		a.Address = address
 	}
-	if MessageType(msgType) == Token {
-		return a.toTokenChange(token, amount, height)
-	}
-	tokenAccount, ok := a.Tokens.Get(token.String())
-	if ok {
-		tokenAccount.LockedIn += amount
-	} else {
-		tokenAccount = &TokenAccount{
-			Address:   token.String(),
-			Balance:   0,
-			LockedIn:  amount,
-			LockedOut: 0,
-		}
-	}
-	a.Tokens.Set(tokenAccount)
-	a.JournalIn.Add(amount, height, token.String())
-	return nil
+	return a.toTokenChange(token, amount, height)
 }
 
 func (a *Account) WorkMessage(address arry.Address, workload, cycle, endTime uint64) {
@@ -323,6 +378,10 @@ func (a *Account) Check(msg types.IMessage, strict bool) error {
 		}
 	case Token:
 		return a.checkConsume(msg)
+	case TokenV2:
+		return a.checkPledge(msg)
+	case Redemption:
+		return a.checkRedemption(msg)
 	default:
 		if msg.MsgBody().MsgAmount() != 0 {
 			return errors.New("wrong amount")
@@ -339,6 +398,36 @@ func (a *Account) checkConsume(msg types.IMessage) error {
 		return fmt.Errorf("insufficient balance, %d %s is required to publish tokens", consume, main)
 	} else if token.Balance < consume {
 		return fmt.Errorf("insufficient balance, %d %s is required to publish tokens", consume, main)
+	}
+	return nil
+}
+
+func (a *Account) checkPledge(msg types.IMessage) error {
+	main := config.Param.MainToken.String()
+	body, _ := msg.MsgBody().(*TokenV2Body)
+	amount := body.PledgeAmount()
+	consume := msg.Fee() + amount
+	token, ok := a.Tokens.Get(main)
+	if !ok {
+		return fmt.Errorf("insufficient balance, need to pledge %s %d to generate tokens", main, amount)
+	} else if token.Balance < consume {
+		return fmt.Errorf("insufficient balance, need to pledge %s %d to generate tokens", main, amount)
+	}
+	return nil
+}
+
+func (a *Account) checkRedemption(msg types.IMessage) error {
+	body, _ := msg.MsgBody().(*RedemptionBody)
+	token, ok := a.Tokens.Get(body.TokenAddress.String())
+	if !ok {
+		return fmt.Errorf("insufficient balance, it's not enough to redeem %d", body.MsgAmount())
+	} else if token.Balance < body.MsgAmount() {
+		return fmt.Errorf("insufficient balance, it's not enough to redeem %d", body.MsgAmount())
+	}
+	main, ok := a.Tokens.Get(config.Param.MainToken.String())
+	reAmount := body.RedemptionAmount()
+	if reAmount > main.Pledge {
+		return fmt.Errorf("the redeemable amount is insufficient")
 	}
 	return nil
 }
@@ -399,6 +488,7 @@ func (a *Account) GetAddress() arry.Address {
 
 type TokenAccount struct {
 	Address   string `json:"address"`
+	Pledge    uint64 `json:"pledge"`
 	Balance   uint64 `json:"balance"`
 	LockedIn  uint64 `json:"locked"`
 	LockedOut uint64 `json:"-"`
@@ -435,20 +525,13 @@ func newJournalOut() *journalOut {
 	return &journalOut{Outs: &TxOutList{}}
 }
 
-func (j *journalOut) Add(msg types.IMessage, height uint64) {
-	body := msg.MsgBody()
-	TokenAddress := body.MsgToken()
-	amount := body.MsgAmount()
-	if MessageType(msg.Type()) == Token {
-		TokenAddress = config.Param.MainToken
-		amount = 0
-	}
+func (j *journalOut) Add(token arry.Address, amount, fees, nonce, time, height uint64) {
 	j.Outs.Set(&txOut{
-		TokenAddress: TokenAddress.String(),
+		TokenAddress: token.String(),
 		Amount:       amount,
-		Fees:         msg.Fee(),
-		Nonce:        msg.Nonce(),
-		Time:         uint64(msg.Time()),
+		Fees:         fees,
+		Nonce:        nonce,
+		Time:         time,
 		Height:       height,
 	})
 }

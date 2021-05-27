@@ -22,6 +22,14 @@ func (r *RlpMessage) ToMessage() types.IMessage {
 		var body *TokenBody
 		rlp.DecodeBytes(r.MsgBody, &body)
 		msg.Body = body
+	case TokenV2:
+		var body *TokenV2Body
+		rlp.DecodeBytes(r.MsgBody, &body)
+		msg.Body = body
+	case Redemption:
+		var body *RedemptionBody
+		rlp.DecodeBytes(r.MsgBody, &body)
+		msg.Body = body
 	case Candidate:
 		var body *CandidateBody
 		rlp.DecodeBytes(r.MsgBody, &body)

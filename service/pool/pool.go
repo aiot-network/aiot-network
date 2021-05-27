@@ -76,8 +76,8 @@ func (p *Pool) Put(msg types.IMessage, isPeer bool) error {
 	return nil
 }
 
-func (p *Pool) NeedPackaged(count int) []types.IMessage {
-	msgs := p.msgMgt.NeedPackaged(count)
+func (p *Pool) NeedPackaged(maxSize uint32) []types.IMessage {
+	msgs := p.msgMgt.NeedPackaged(maxSize)
 	return msgs
 }
 

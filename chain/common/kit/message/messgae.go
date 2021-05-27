@@ -126,6 +126,57 @@ func NewToken(from, to, tokenAddr string, amount, fee, nonce, t uint64, name, sh
 	return token
 }
 
+func NewTokenV2(from, to, tokenAddr string, amount, fee, nonce, t uint64, pledgeRate types.PledgeRate, name, shorthand string) *types.Message {
+	if t == 0 {
+		t = uint64(time.Now().Unix())
+	}
+	token := &types.Message{
+		Header: &types.MsgHeader{
+			Type:      types.TokenV2,
+			Hash:      arry.Hash{},
+			From:      arry.StringToAddress(from),
+			Nonce:     nonce,
+			Fee:       fee,
+			Time:      t,
+			Signature: &types.Signature{},
+		},
+		Body: &types.TokenV2Body{
+			TokenAddress: arry.StringToAddress(tokenAddr),
+			Receiver:     arry.StringToAddress(to),
+			Name:         name,
+			Shorthand:    shorthand,
+			Amount:       amount,
+			PledgeRate:   pledgeRate,
+		},
+	}
+	token.SetHash()
+	return token
+}
+
+func NewRedemption(from, tokenAddr string, amount, fee, nonce, t uint64, pledgeRate types.PledgeRate) *types.Message {
+	if t == 0 {
+		t = uint64(time.Now().Unix())
+	}
+	redemption := &types.Message{
+		Header: &types.MsgHeader{
+			Type:      types.Redemption,
+			Hash:      arry.Hash{},
+			From:      arry.StringToAddress(from),
+			Nonce:     nonce,
+			Fee:       fee,
+			Time:      t,
+			Signature: &types.Signature{},
+		},
+		Body: &types.RedemptionBody{
+			TokenAddress: arry.StringToAddress(tokenAddr),
+			Amount:       amount,
+			PledgeRate:   pledgeRate,
+		},
+	}
+	redemption.SetHash()
+	return redemption
+}
+
 func NewWork(from string, nonce uint64, start uint64, end uint64, t uint64, works map[string]uint64) *types.Message {
 	if t == 0 {
 		t = uint64(time.Now().Unix())

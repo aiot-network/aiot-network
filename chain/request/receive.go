@@ -9,6 +9,7 @@ import (
 const (
 	maxSyncCount = 1000
 	minSyncCount = 1
+	maxSyncBytes = 1024 * 1024 * 2
 )
 
 func (r *RequestHandler) respLastHeight(req *ReqStream) (*Response, error) {
@@ -70,13 +71,14 @@ func (r *RequestHandler) respGetBlocks(req *ReqStream) (*Response, error) {
 	} else if len(params) == 2 {
 		height = params[0]
 		count = params[1]
+		var sumBytes int
 		if count < minSyncCount {
 			count = minSyncCount
 		} else if count > maxSyncCount {
 			count = maxSyncCount
 		}
 		if lastHeight >= height {
-			for lastHeight >= height && index < count {
+			for lastHeight >= height && index < count && maxSyncBytes > sumBytes {
 				block, err := r.chain.GetRlpBlockHeight(height)
 				if err != nil {
 					code = Failed
@@ -84,7 +86,12 @@ func (r *RequestHandler) respGetBlocks(req *ReqStream) (*Response, error) {
 					response := NewResponse(code, message, body)
 					return response, nil
 				} else {
-					rlpBlocks = append(rlpBlocks, block.(*types.RlpBlock))
+					rlpBlock := block.(*types.RlpBlock)
+					sumBytes += len(rlpBlock.Bytes())
+					if sumBytes >= maxSyncBytes {
+						break
+					}
+					rlpBlocks = append(rlpBlocks, rlpBlock)
 					height++
 					index++
 				}

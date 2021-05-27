@@ -14,7 +14,7 @@ import (
 
 const (
 	PeerLength = 53
-	MaxName    = 100
+	MaxName    = 50
 )
 
 type Peer [PeerLength]byte
@@ -277,4 +277,115 @@ func (w *WorkBody) MsgToken() arry.Address {
 
 func (w *WorkBody) MsgAmount() uint64 {
 	return 0
+}
+
+type PledgeRate uint
+
+const (
+	Hundred     PledgeRate = 100
+	Thousand               = 1000
+	TenThousand            = 10000
+)
+
+type TokenV2Body struct {
+	TokenAddress arry.Address
+	Receiver     arry.Address
+	Name         string
+	Shorthand    string
+	Amount       uint64
+	PledgeRate   PledgeRate
+}
+
+func (t *TokenV2Body) MsgTo() types.IReceiver {
+	recis := NewReceivers()
+	recis.Add(t.Receiver, t.Amount)
+	return recis
+}
+
+func (t *TokenV2Body) CheckBody(from arry.Address) error {
+	if !kit.CheckAddress(config.Param.Name, t.Receiver.String()) {
+		return errors.New("receive address verification failed")
+	}
+	if !kit.CheckTokenAddress(config.Param.Name, t.TokenAddress.String()) {
+		return errors.New("token address verification failed")
+	}
+	toKenAddr, err := kit.GenerateTokenAddress(config.Param.Name, from.String(), t.Shorthand)
+	if err != nil {
+		return errors.New("token address verification failed")
+	}
+	if toKenAddr != t.TokenAddress.String() {
+		return errors.New("token address verification failed")
+	}
+	if err := kit.CheckShorthand(t.Shorthand); err != nil {
+		return fmt.Errorf("shorthand verification failed, %s", err.Error())
+	}
+	if len(t.Name) > MaxName {
+		return fmt.Errorf("the maximum length of the token name is %d", MaxName)
+	}
+	if t.Amount > math.MaxInt64 {
+		return fmt.Errorf("amount cannot be greater than %.8f", amount.Amount(math.MaxInt64).ToCoin())
+	}
+	fAmount := amount.Amount(t.Amount).ToCoin()
+	if fAmount < config.Param.MinCoinCount || fAmount > config.Param.MaxCoinCount {
+		return fmt.Errorf("the quantity of coins must be between %.8f and %.8f", config.Param.MinCoinCount, config.Param.MaxCoinCount)
+	}
+	switch t.PledgeRate {
+	case Hundred:
+		return nil
+	case Thousand:
+		return nil
+	case TenThousand:
+		return nil
+	default:
+		return fmt.Errorf("the pledge rate must be %d, %d or %d", Hundred, Thousand, TenThousand)
+	}
+	return nil
+}
+
+func (t *TokenV2Body) MsgAmount() uint64 {
+	return t.Amount
+}
+
+func (t *TokenV2Body) MsgToken() arry.Address {
+	return t.TokenAddress
+}
+
+func (t *TokenV2Body) PledgeAmount() uint64 {
+	return t.Amount / uint64(t.PledgeRate)
+}
+
+type RedemptionBody struct {
+	TokenAddress arry.Address
+	Amount       uint64
+	PledgeRate   PledgeRate
+}
+
+func (r *RedemptionBody) MsgTo() types.IReceiver {
+	return NewReceivers()
+}
+
+func (r *RedemptionBody) CheckBody(from arry.Address) error {
+	if !kit.CheckTokenAddress(config.Param.Name, r.TokenAddress.String()) {
+		return errors.New("token address verification failed")
+	}
+	if r.Amount > math.MaxInt64 {
+		return fmt.Errorf("amount cannot be greater than %.8f", amount.Amount(math.MaxInt64).ToCoin())
+	}
+	fAmount := amount.Amount(r.Amount).ToCoin()
+	if fAmount < config.Param.MinCoinCount || fAmount > config.Param.MaxCoinCount {
+		return fmt.Errorf("the quantity of coins must be between %.8f and %.8f", config.Param.MinCoinCount, config.Param.MaxCoinCount)
+	}
+	return nil
+}
+
+func (r *RedemptionBody) MsgAmount() uint64 {
+	return r.Amount
+}
+
+func (r *RedemptionBody) MsgToken() arry.Address {
+	return r.TokenAddress
+}
+
+func (r *RedemptionBody) RedemptionAmount() uint64 {
+	return r.Amount / uint64(r.PledgeRate) * config.Param.RedemptionRate / 100
 }

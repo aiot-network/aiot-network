@@ -18,6 +18,8 @@ type TokenRecord struct {
 	Name           string
 	Shorthand      string
 	IncreaseIssues bool
+	PledgeRate     PledgeRate
+	PledgeAmount   uint64
 	Records        *RecordList
 }
 
@@ -47,7 +49,7 @@ func (t *TokenRecord) IsExist(msgHash arry.Hash) bool {
 	return false
 }
 
-func (t *TokenRecord) Check(msg types.IMessage) error {
+func (t *TokenRecord) CheckToken(msg types.IMessage) error {
 	body := msg.MsgBody().(*TokenBody)
 	if !t.IncreaseIssues {
 		return errors.New("token does not allow increase issuance")
@@ -70,6 +72,27 @@ func (t *TokenRecord) Check(msg types.IMessage) error {
 	}
 	if fAmount > config.Param.MaxCoinCount {
 		return fmt.Errorf("the total number of coins must not exceed %.8f", config.Param.MaxCoinCount)
+	}
+	return nil
+}
+
+func (t *TokenRecord) CheckRedemption(msg types.IMessage) error {
+	body := msg.MsgBody().(*RedemptionBody)
+	if !t.Address.IsEqual(body.TokenAddress) {
+		return errors.New("token address is not consistent")
+	}
+	if t.IsExist(msg.Hash()) {
+		return errors.New("duplicate message hash")
+	}
+	fAmount := amount.Amount(t.amount() + body.Amount).ToCoin()
+	if fAmount < 0 {
+		return fmt.Errorf("the total number of coins must not exceed %.8f", config.Param.MaxCoinCount)
+	}
+	if fAmount > config.Param.MaxCoinCount {
+		return fmt.Errorf("the total number of coins must not exceed %.8f", config.Param.MaxCoinCount)
+	}
+	if body.PledgeRate != t.PledgeRate {
+		return fmt.Errorf("the redemption ratio of %d is not the same as the pledge ratio of %d", body.PledgeRate, t.PledgeRate)
 	}
 	return nil
 }
@@ -97,6 +120,7 @@ func (t *TokenRecord) amount() uint64 {
 
 type Record struct {
 	Height   uint64
+	Type     string
 	MsgHash  arry.Hash
 	Receiver arry.Address
 	Time     uint64

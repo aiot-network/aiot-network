@@ -26,3 +26,4 @@ cmd/chain/config.toml
 cmd/boot/boot
 repleace.sh
 .idea
+cmd/wallet/testaddress/aiFMEX1cdpAe7G8jMKLua5EY9GW6NgUXvvi.json

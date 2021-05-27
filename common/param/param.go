@@ -8,12 +8,12 @@ import (
 
 const (
 	// Block interval period
-	BlockInterval = uint64(15)
+	BlockInterval = uint64(5)
 	// Re-election interval
 	CycleInterval = 60 * 60 * 24
 	//CycleInterval = 60
 	// Maximum number of super nodes
-	SuperSize = 9
+	SuperSize = 3
 
 	DPosSize = SuperSize*2/3 + 1
 )
@@ -64,6 +64,7 @@ type TokenParam struct {
 	MaximumTransfer       uint64
 	Consume               uint64
 	MaximumReceiver       int
+	RedemptionRate        uint64
 	MainToken             arry.Address
 	EaterAddress          arry.Address
 	PreCirculations       []PreCirculation
@@ -138,6 +139,7 @@ var TestNetParam = &Param{
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
 		MaximumReceiver: 1 * 1e3,
+		RedemptionRate:  80,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("aiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{
@@ -150,7 +152,8 @@ var TestNetParam = &Param{
 		P2pPort:    "13561",
 		ExternalIp: "0.0.0.0",
 		//aiTewnyK73P3chNgp7LgC8FoCHUhTe9cijZ
-		CustomBoot: "/ip4/103.68.63.163/tcp/6008/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
+		//CustomBoot: "/ip4/103.68.63.163/tcp/6008/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
+		CustomBoot: "/ip4/127.0.0.1/tcp/19564/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
 	},
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
@@ -183,7 +186,7 @@ var TestNetParam = &Param{
 				Address: "aiDvFTATGmmdcyD2trkrVcrf52QB2SXSEQf",
 				P2PId:   "16Uiu2HAm851T4cCfRM7BvjgRdeirn4zeim8QUNAkmNW9A4sjWr9o",
 			},
-			{
+			/*{
 				Address: "aiBntJ9itzbzT9R9Kpo2VJFwox6FfQV6UyM",
 				P2PId:   "16Uiu2HAmAPg4wy9xHnrVedzgG6pkEhhvKRBw5ouhUPLYLi1GteKs",
 			},
@@ -206,7 +209,7 @@ var TestNetParam = &Param{
 			{
 				Address: "aiChEPSNLznNv7hn3R2hEc98KbguLzoQQW1",
 				P2PId:   "16Uiu2HAmUEgz6fTzy7KNaecXq4bfvaLymHwoMJoJ47KxANvp4YMe",
-			},
+			},*/
 		},
 	},
 	PoolParam: &PoolParam{
@@ -240,6 +243,7 @@ var MainNetParam = &Param{
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
 		MaximumReceiver: 1 * 1e3,
+		RedemptionRate:  80,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("AiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{

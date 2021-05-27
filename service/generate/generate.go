@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	module           = "generate"
-	maxPackedTxCount = 1999
+	module         = "generate"
+	maxPackedBytes = 1024 * 1024 * 1
 )
 
 type Generate struct {
@@ -82,7 +82,7 @@ func (g *Generate) generateBlock(now time.Time) {
 		//.Warn("check winner failed!", "height", header.Height, "error", err)
 		return
 	}
-	txs := g.pool.NeedPackaged(maxPackedTxCount)
+	txs := g.pool.NeedPackaged(maxPackedBytes)
 	nextBlock, err := g.chain.NextBlock(txs, uint64(now.Unix()))
 	if err != nil {
 		log.Error("Failed to generate block", "module", module, "error", err)
