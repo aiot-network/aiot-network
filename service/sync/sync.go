@@ -305,7 +305,7 @@ func (s *Sync) ReceivedBlockFromPeer(block types.IBlock) error {
 			return err
 		}
 		log.Info("Received block insert success", "module", module, "height", block.GetHeight(), "signer", block.GetSigner())
-	} else if block.GetHeight() <= localHeight {
+	} /*else if block.GetHeight() <= localHeight {
 		if localHeader, err := s.chain.GetBlockHeight(block.GetHeight()); err == nil {
 			if !localHeader.GetHash().IsEqual(block.GetHash()) {
 				if roll, peerId := s.isRollBack(block.BlockHeader());roll {
@@ -323,7 +323,7 @@ func (s *Sync) ReceivedBlockFromPeer(block types.IBlock) error {
 				return err
 			}
 		}
-	}
+	}*/
 	return nil
 }
 

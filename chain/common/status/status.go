@@ -80,6 +80,20 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 			if err := f.tokenStatus.UpdateToken(msg, block.GetHeight()); err != nil {
 				return err
 			}
+		case chaintypes.TokenV2:
+			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
+				return err
+			}
+			if err := f.tokenStatus.UpdateToken(msg, block.GetHeight()); err != nil {
+				return err
+			}
+		case chaintypes.Redemption:
+			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
+				return err
+			}
+			if err := f.tokenStatus.UpdateToken(msg, block.GetHeight()); err != nil {
+				return err
+			}
 		case chaintypes.Vote:
 			if err := f.dPosStatus.Voter(msg); err != nil {
 				return nil

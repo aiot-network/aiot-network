@@ -16,6 +16,7 @@
 
 cmd/wallet/.idea
 cmd/wallet/keystore
+cmd/wallet/testaddress
 cmd/wallet/keystore.zip
 cmd/wallet/wallet
 cmd/chain/chain
@@ -26,3 +27,4 @@ cmd/chain/config.toml
 cmd/boot/boot
 repleace.sh
 .idea
+cmd/wallet/testaddress/aiFMEX1cdpAe7G8jMKLua5EY9GW6NgUXvvi.json

@@ -51,15 +51,20 @@ func (t *Sorted) All() []types.IMessage {
 	return all
 }
 
-func (t *Sorted) NeedPackaged(count int) []types.IMessage {
+func (t *Sorted) NeedPackaged(maxSize uint32) []types.IMessage {
 	msgs := make([]types.IMessage, 0)
 	rIndex := t.index.CopySelf()
 
-	for rIndex.Len() > 0 && count > 0 {
+	var sumBytes uint32
+	for rIndex.Len() > 0 && maxSize > sumBytes {
 		ti := heap.Pop(rIndex).(*msgInfo)
 		msg := t.msgs[ti.address]
+		length := uint32(len(msg.ToRlp().Bytes()))
+		sumBytes += length
+		if sumBytes >= maxSize {
+			return msgs
+		}
 		msgs = append(msgs, msg)
-		count--
 	}
 	return msgs
 }

@@ -18,6 +18,8 @@ const (
 	Cancel
 	Vote
 	Work
+	TokenV2
+	Redemption
 )
 
 const (
@@ -58,15 +60,15 @@ func (m *MsgHeader) checkType() error {
 	switch m.Type {
 	case Transaction:
 		return nil
-	case Token:
-		return nil
+		//case Token:
 		//case Candidate:
-		//return nil
 		//case Cancel:
-		//return nil
 		//case Vote:
-		//return nil
 	case Work:
+		return nil
+	case TokenV2:
+		return nil
+	case Redemption:
 		return nil
 	}
 	return fmt.Errorf("there are no messages of type %d", m.Type)

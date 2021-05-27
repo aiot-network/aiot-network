@@ -7,4 +7,5 @@ type RpcTokenBody struct {
 	Shorthand      string `json:"shorthand"`
 	Amount         uint64 `json:"amount"`
 	IncreaseIssues bool   `json:"allowedincrease"`
+	PledgeRate     int    `json:"pledgerate"`
 }

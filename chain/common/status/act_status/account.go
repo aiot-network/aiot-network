@@ -146,31 +146,64 @@ func (a *ActStatus) ToMessage(msg types.IMessage, height uint64) error {
 
 	msgBody := msg.MsgBody()
 	receivers := msgBody.MsgTo().ReceiverList()
-	for _, re := range receivers {
+
+	switch fmtypes.MessageType(msg.Type()) {
+	case fmtypes.Token:
+		eater := a.db.Account(config.Param.EaterAddress)
+		err := eater.UpdateLocked(a.confirmed)
+		if err != nil {
+			return err
+		}
+		err = eater.EaterMessage(height)
+		if err != nil {
+			return err
+		}
+		a.setAccount(eater)
+		for _, re := range receivers {
+			var toAct types.IAccount
+			toAct = a.db.Account(re.Address)
+			err := toAct.UpdateLocked(a.confirmed)
+			if err != nil {
+				return err
+			}
+			err = toAct.ToMessage(msg.Type(), re.Address, msgBody.MsgToken(), re.Amount, height)
+			if err != nil {
+				return err
+			}
+			// publish token need consume
+			a.setAccount(toAct)
+		}
+	case fmtypes.Redemption:
 		var toAct types.IAccount
-		toAct = a.db.Account(re.Address)
+		toAct = a.db.Account(msg.From())
 		err := toAct.UpdateLocked(a.confirmed)
 		if err != nil {
 			return err
 		}
-		err = toAct.ToMessage(msg.Type(), re.Address, msgBody.MsgToken(), re.Amount, height)
+		body, _ := msg.MsgBody().(*fmtypes.RedemptionBody)
+		amount := body.RedemptionAmount()
+		err = toAct.ToMessage(msg.Type(), msg.From(), config.Param.MainToken, amount, height)
 		if err != nil {
 			return err
 		}
 		// publish token need consume
-		if fmtypes.MessageType(msg.Type()) == fmtypes.Token {
-			eater := a.db.Account(config.Param.EaterAddress)
-			err := eater.UpdateLocked(a.confirmed)
-			if err != nil {
-				return err
-			}
-			err = eater.EaterMessage(height)
-			if err != nil {
-				return err
-			}
-			a.setAccount(eater)
-		}
 		a.setAccount(toAct)
+	default:
+		for _, re := range receivers {
+			var toAct types.IAccount
+			toAct = a.db.Account(re.Address)
+			err := toAct.UpdateLocked(a.confirmed)
+			if err != nil {
+				return err
+			}
+			err = toAct.ToMessage(msg.Type(), re.Address, msgBody.MsgToken(), re.Amount, height)
+			if err != nil {
+				return err
+			}
+			// publish token need consume
+
+			a.setAccount(toAct)
+		}
 	}
 
 	return nil

@@ -22,6 +22,7 @@ type RpcWorks struct {
 
 type TokenAccount struct {
 	Address  string  `json:"address"`
+	Pledge   float64 `json:"pledge"`
 	Balance  float64 `json:"balance"`
 	LockedIn float64 `json:"locked"`
 }
@@ -33,6 +34,7 @@ func ToRpcAccount(a *types.Account) *Account {
 	tokens := make(Tokens, len(a.Tokens))
 	for i, t := range a.Tokens {
 		tokens[i] = &TokenAccount{
+			Pledge:   amount.Amount(t.Pledge).ToCoin(),
 			Address:  t.Address,
 			Balance:  amount.Amount(t.Balance).ToCoin(),
 			LockedIn: amount.Amount(t.LockedIn).ToCoin(),
@@ -52,23 +54,23 @@ func ToRpcAccount(a *types.Account) *Account {
 }
 
 type RpcReword struct {
-	Address string  `json:"address"`
-	EndTime uint64  `json:"end"`
-	Amount  float64 `json:"amount"`
-	Cycle   uint64  `json:"cycle"`
-	Blocks  uint64  `json:"blocks"`
-	Workload uint64 `json:"workload"`
+	Address  string  `json:"address"`
+	EndTime  uint64  `json:"end"`
+	Amount   float64 `json:"amount"`
+	Cycle    uint64  `json:"cycle"`
+	Blocks   uint64  `json:"blocks"`
+	Workload uint64  `json:"workload"`
 }
 
 func ToRpcReword(reword []types2.IReword) []RpcReword {
 	rpcReword := make([]RpcReword, 0)
 	for _, r := range reword {
 		rpcReword = append(rpcReword, RpcReword{
-			Address: r.GetAddress(),
-			EndTime: r.GetEndTime(),
-			Amount:  amount.Amount(r.GetReword()).ToCoin(),
-			Cycle:   r.GetCycle(),
-			Blocks:  r.GetBlocks(),
+			Address:  r.GetAddress(),
+			EndTime:  r.GetEndTime(),
+			Amount:   amount.Amount(r.GetReword()).ToCoin(),
+			Cycle:    r.GetCycle(),
+			Blocks:   r.GetBlocks(),
 			Workload: r.GetWorkLoad(),
 		})
 	}

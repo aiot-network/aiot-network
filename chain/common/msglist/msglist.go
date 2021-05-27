@@ -116,11 +116,11 @@ func (t *MsgManagement) DeleteEnd(newTx types.IMessage) {
 	t.ready.PopMin(newTx.Fee())
 }
 
-func (t *MsgManagement) NeedPackaged(count int) []types.IMessage {
+func (t *MsgManagement) NeedPackaged(maxSize uint32) []types.IMessage {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	return t.ready.NeedPackaged(count)
+	return t.ready.NeedPackaged(maxSize)
 }
 
 func (t *MsgManagement) StagnantMsgs() []types.IMessage {

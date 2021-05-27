@@ -72,6 +72,28 @@ func RpcMsgToMsg(rpcMsg *RpcMessage) (*Message, error) {
 			return nil, err
 		}
 		msgBody, err = RpcTokenBodyToBody(body)
+	case TokenV2:
+		body := &RpcTokenBody{}
+		bytes, err := json.Marshal(rpcMsg.MsgBody)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(bytes, body)
+		if err != nil {
+			return nil, err
+		}
+		msgBody, err = RpcTokenBodyToV2Body(body)
+	case Redemption:
+		body := &RpcRedemptionBody{}
+		bytes, err := json.Marshal(rpcMsg.MsgBody)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(bytes, body)
+		if err != nil {
+			return nil, err
+		}
+		msgBody, err = RpcRedemptionBodyToBody(body)
 	case Candidate:
 		body := &RpcCandidateBody{}
 		bytes, err := json.Marshal(rpcMsg.MsgBody)
@@ -169,6 +191,32 @@ func MsgToRpcMsg(msg types.IMessage) (*RpcMessage, error) {
 			IncreaseIssues: body.IncreaseIssues,
 			Amount:         msg.MsgBody().MsgAmount(),
 		}
+	case TokenV2:
+		body, ok := msg.MsgBody().(*TokenV2Body)
+		if !ok {
+			return nil, errors.New("message type error")
+		}
+
+		rpcMsg.MsgBody = &RpcTokenBody{
+			Address:        msg.MsgBody().MsgToken().String(),
+			Receiver:       msg.MsgBody().MsgTo().ReceiverList()[0].Address.String(),
+			Name:           body.Name,
+			Shorthand:      body.Shorthand,
+			Amount:         msg.MsgBody().MsgAmount(),
+			PledgeRate:     int(body.PledgeRate),
+			IncreaseIssues: false,
+		}
+	case Redemption:
+		body, ok := msg.MsgBody().(*RedemptionBody)
+		if !ok {
+			return nil, errors.New("message type error")
+		}
+
+		rpcMsg.MsgBody = &RpcRedemptionBody{
+			Address:    msg.MsgBody().MsgToken().String(),
+			PledgeRate: int(body.PledgeRate),
+			Amount:     body.Amount,
+		}
 	case Candidate:
 		body, ok := msg.MsgBody().(*CandidateBody)
 		if !ok {
@@ -243,7 +291,6 @@ func RpcTokenBodyToBody(rpcBody *RpcTokenBody) (*TokenBody, error) {
 	if rpcBody == nil {
 		return nil, errors.New("wrong token body")
 	}
-
 	return &TokenBody{
 		TokenAddress:   arry.StringToAddress(rpcBody.Address),
 		Receiver:       arry.StringToAddress(rpcBody.Receiver),
@@ -251,6 +298,31 @@ func RpcTokenBodyToBody(rpcBody *RpcTokenBody) (*TokenBody, error) {
 		Shorthand:      rpcBody.Shorthand,
 		IncreaseIssues: rpcBody.IncreaseIssues,
 		Amount:         rpcBody.Amount,
+	}, nil
+}
+
+func RpcTokenBodyToV2Body(rpcBody *RpcTokenBody) (*TokenV2Body, error) {
+	if rpcBody == nil {
+		return nil, errors.New("wrong token body")
+	}
+	return &TokenV2Body{
+		TokenAddress: arry.StringToAddress(rpcBody.Address),
+		Receiver:     arry.StringToAddress(rpcBody.Receiver),
+		Name:         rpcBody.Name,
+		Shorthand:    rpcBody.Shorthand,
+		Amount:       rpcBody.Amount,
+		PledgeRate:   PledgeRate(rpcBody.PledgeRate),
+	}, nil
+}
+
+func RpcRedemptionBodyToBody(rpcBody *RpcRedemptionBody) (*RedemptionBody, error) {
+	if rpcBody == nil {
+		return nil, errors.New("wrong redemption body")
+	}
+	return &RedemptionBody{
+		TokenAddress: arry.StringToAddress(rpcBody.Address),
+		PledgeRate:   PledgeRate(rpcBody.PledgeRate),
+		Amount:       rpcBody.Amount,
 	}, nil
 }
 
