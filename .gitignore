@@ -16,6 +16,7 @@
 
 cmd/wallet/.idea
 cmd/wallet/keystore
+cmd/wallet/testaddress
 cmd/wallet/keystore.zip
 cmd/wallet/wallet
 cmd/chain/chain

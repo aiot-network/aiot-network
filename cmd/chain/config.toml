@@ -14,18 +14,17 @@ ExternalIp = "0.0.0.0"
 # Custom boot
 
 
-# P2P port (default = "13561")
-P2PPort="13561"
+# P2P port (default testnet = "13561", mainnet = "23561" )
+P2PPort="23561"
 
 
 # RPC configuration
-# (default = 13562)
-RpcPort = "13562"
+# (default testnet = 13562, mainnet = 13562)
+RpcPort = "23562"
 
-# (default = 13563)
-HttpPort = "13563"
+# (default testnet = 23563, mainnet = 13562)
+HttpPort = "23563"
 
-# RPC password
 RpcUser = ""
 RpcPass = ""
 

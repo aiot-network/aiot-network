@@ -12,11 +12,12 @@ import (
 
 func main() {
 	var (
-		port     = flag.String("port", "19564", "the port of start a bootstrap")
+		port     = flag.String("port", "29564", "the port of start a bootstrap")
 		keyFile  = flag.String("k", "", "bootstrap node key file")
 		password = flag.String("p", "", "the decryption password for key file")
 	)
 	flag.Parse()
+
 	StartBootStrap(*port, *keyFile, *password)
 }
 

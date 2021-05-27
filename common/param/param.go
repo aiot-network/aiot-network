@@ -135,7 +135,7 @@ var TestNetParam = &Param{
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
 		MinCoinCount:    1 * 1e4,
-		MaxCoinCount:    9 * 1e10,
+		MaxCoinCount:    9 * 1e9,
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
 		MaximumReceiver: 1 * 1e3,
@@ -239,7 +239,7 @@ var MainNetParam = &Param{
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
 		MinCoinCount:    1 * 1e4,
-		MaxCoinCount:    9 * 1e10,
+		MaxCoinCount:    9 * 1e9,
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
 		MaximumReceiver: 1 * 1e3,
@@ -247,7 +247,7 @@ var MainNetParam = &Param{
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("AiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{
-			Address: "AifLkzE8iMPEUy7mHwJ89YbsEDesVkRZ8Fn",
+			Address: "AiUwKckHzgieNw5MaaW1eg5RWBbUBDV8LbL",
 			Amount:  100000 * AtomsPerCoin,
 		}},
 	},
@@ -255,8 +255,9 @@ var MainNetParam = &Param{
 		NetWork:    MainNet + "AIOT_NETWORK",
 		P2pPort:    "23561",
 		ExternalIp: "0.0.0.0",
-		//AihsVKMf6WdmUAyhin2FH7itHiqbCcTZEsj
-		CustomBoot: "/ip4/103.68.63.164/tcp/19563/ipfs/16Uiu2HAm1WsqwXYH3mvFk46zejvewcQ6wAbVBj5qniAgFYiYwKd4",
+		//AiM7fxa2dz6xQFhSiLWE3o49Pw4959BHWyK
+		//CustomBoot: "/ip4/103.68.63.164/tcp/19563/ipfs/16Uiu2HAmKXZq23yKNKnJmr4kpyiDgDnKNERzcFJZAVeKt3CU8fDE",
+		CustomBoot: "/ip4/127.0.0.1/tcp/29564/ipfs/16Uiu2HAmKXZq23yKNKnJmr4kpyiDgDnKNERzcFJZAVeKt3CU8fDE",
 	},
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
@@ -275,44 +276,44 @@ var MainNetParam = &Param{
 		DPosSize:         DPosSize,
 		GenesisTime:      1592268410,
 		GenesisCycle:     1592268410 / CycleInterval,
-		WorkProofAddress: "AifLkzE8iMPEUy7mHwJ89YbsEDesVkRZ8Fn",
+		WorkProofAddress: "AiMAfYUWmcRZ8Q56n1wHDR6Z9p8NHeay5S5",
 		GenesisSuperList: []Super{
 			{
-				Address: "AiXAojSN3EKMCkkeKQSTzqiACw37siM8CSF",
+				Address: "AiVK2sAy4w4kaUHduKtmezNw3TthjA5u7nD",
 				P2PId:   "16Uiu2HAmNDdZbFgXvmqWRK65LjqxMWwExJercSL4H4Yb9zHgrHEf",
 			},
 			{
-				Address: "Aif7s4vj1fdCf2d3bGFHwqxXSTHFLcHbhSz",
+				Address: "AibWGRXWpxzszB1zR5wQeNxnDsvqPidPMJE",
 				P2PId:   "16Uiu2HAmTbWamkjotQbRdt8PdxuGq4kXCHUi33bVG4TMR7v5Vz7q",
 			},
 			{
-				Address: "AiWPzrPd7XvzmBCD3WjM9NmUVAoYUsmcp9d",
+				Address: "AiYeEHbt39A2Z9MPbJ8Kz6cqFvbtUzkGV9S",
 				P2PId:   "16Uiu2HAm66iJEEDxS1t7q5Jp7R7deGFGn6B1QLX2KepHVXX2ksW4",
 			},
-			{
-				Address: "AiSMfPthT5Uj9KmGHXFd4arSDL3mGsAF4Gu",
+			/*{
+				Address: "Aij8qANKRfvaKdxGaxABjWBVAKxBQg7w4zW",
 				P2PId:   "16Uiu2HAm5a7zJ87ZSdWr255Ez9s9am2DJFNHRQCKLkBDRp8H5APY",
 			},
 			{
-				Address: "AiYAG3ZzeVx8Gi7fXFsprGmRQ6g2sx5vQvL",
+				Address: "AiSk99vgP7rpw7h5ykQQT39b11wb1xsTZPZ",
 				P2PId:   "16Uiu2HAmC6pHkE18pkRKagv1zm7HcQD5yza8qXeRTRqLBFxBpMHX",
 			},
 			{
-				Address: "AiNP7ExrY4S8Hi6ZL9SMPKRiVwpSWUJ9L5t",
+				Address: "AiUxnpuh7YdqSgTFQjJECVwgCYdBY93W29M",
 				P2PId:   "16Uiu2HAmBZqLmUptUPYDHGKiHaCNKSVezggZvAY9YvU9DdvAfDNb",
 			},
 			{
-				Address: "AiV8UBrEJdYNVqa6bM1iXQVezwX98eUs3Dm",
+				Address: "Aic7weJQN5fSgupVmfKUTsW6ANwh1rYvfwj",
 				P2PId:   "16Uiu2HAmCmHMcteRpdCSYHPcWSPbdxdZwFYZzEQQ1EQNy4bsj9jp",
 			},
 			{
-				Address: "AiU1DGBim4tNEWDwJwmHG5uEE9kMu53U7MZ",
+				Address: "AiiWrtR5r1bP2x7TX7CD67Wm4Wyy2iDNfBU",
 				P2PId:   "16Uiu2HAmPtAsrpBRw26GptVxZcfKcREdqu81H5LRCVKWvtgJJhXp",
 			},
 			{
-				Address: "AijYeC9MEF1VABWnBqra6S6j9JRjjZfFUiv",
+				Address: "AiYHoCct4cHs1PLuQEuCi73G91shvsd9nnG",
 				P2PId:   "16Uiu2HAmP9BS5UCn7rq6UXgwvJ1UeFGsodwLamSMo2KBwCoVhvwT",
-			},
+			},*/
 		},
 	},
 	PoolParam: &PoolParam{
