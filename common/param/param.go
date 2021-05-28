@@ -8,12 +8,12 @@ import (
 
 const (
 	// Block interval period
-	BlockInterval = uint64(5)
+	BlockInterval = uint64(15)
 	// Re-election interval
-	CycleInterval = 60 * 60 * 24
+	CycleInterval = 60 * 60 *24
 	//CycleInterval = 60
 	// Maximum number of super nodes
-	SuperSize = 3
+	SuperSize = 9
 
 	DPosSize = SuperSize*2/3 + 1
 )
@@ -62,9 +62,9 @@ type TokenParam struct {
 	MaxCoinCount          float64
 	MinimumTransfer       uint64
 	MaximumTransfer       uint64
+	RedemptionRate        uint64
 	Consume               uint64
 	MaximumReceiver       int
-	RedemptionRate        uint64
 	MainToken             arry.Address
 	EaterAddress          arry.Address
 	PreCirculations       []PreCirculation
@@ -93,7 +93,7 @@ type RpcParam struct {
 	HttpPort   string
 }
 
-type Super struct {
+type AddressInfo struct {
 	Address string
 	P2PId   string
 }
@@ -106,7 +106,8 @@ type DPosParam struct {
 	GenesisTime      uint64
 	GenesisCycle     uint64
 	WorkProofAddress string
-	GenesisSuperList []Super
+	GenesisSuperList []AddressInfo
+	CoinBaseAddressList *CoinBaseAddress
 }
 
 type PoolParam struct {
@@ -135,10 +136,10 @@ var TestNetParam = &Param{
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
 		MinCoinCount:    1 * 1e4,
-		MaxCoinCount:    9 * 1e9,
+		MaxCoinCount:    9 * 1e10,
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
-		MaximumReceiver: 1 * 1e3,
+		MaximumReceiver: 1 * 1e4,
 		RedemptionRate:  80,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("aiCoinEaterAddressDontSend000000000"),
@@ -152,8 +153,7 @@ var TestNetParam = &Param{
 		P2pPort:    "13561",
 		ExternalIp: "0.0.0.0",
 		//aiTewnyK73P3chNgp7LgC8FoCHUhTe9cijZ
-		//CustomBoot: "/ip4/103.68.63.163/tcp/6008/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
-		CustomBoot: "/ip4/127.0.0.1/tcp/19564/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
+		CustomBoot: "/ip4/103.68.63.163/tcp/6008/ipfs/16Uiu2HAmJRKJkBvTxFEoSpQmvPaHZuVRrHBYVVKKetCMMBZ938ty",
 	},
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
@@ -173,7 +173,7 @@ var TestNetParam = &Param{
 		GenesisTime:      1592268410,
 		GenesisCycle:     1592268410 / CycleInterval,
 		WorkProofAddress: "aiCSxRKuF8dYALbZ2av8gqcoVR34R4aecYX",
-		GenesisSuperList: []Super{
+		GenesisSuperList: []AddressInfo{
 			{
 				Address: "aiMKrGcEGPFyRSW4WdM2ARY7kpc38EYpygy",
 				P2PId:   "16Uiu2HAmMH8yCqrRvzyjEdcJ817pNQpcgrgZn95d5kn4LF2xm66L",
@@ -186,7 +186,7 @@ var TestNetParam = &Param{
 				Address: "aiDvFTATGmmdcyD2trkrVcrf52QB2SXSEQf",
 				P2PId:   "16Uiu2HAm851T4cCfRM7BvjgRdeirn4zeim8QUNAkmNW9A4sjWr9o",
 			},
-			/*{
+			{
 				Address: "aiBntJ9itzbzT9R9Kpo2VJFwox6FfQV6UyM",
 				P2PId:   "16Uiu2HAmAPg4wy9xHnrVedzgG6pkEhhvKRBw5ouhUPLYLi1GteKs",
 			},
@@ -209,7 +209,45 @@ var TestNetParam = &Param{
 			{
 				Address: "aiChEPSNLznNv7hn3R2hEc98KbguLzoQQW1",
 				P2PId:   "16Uiu2HAmUEgz6fTzy7KNaecXq4bfvaLymHwoMJoJ47KxANvp4YMe",
-			},*/
+			},
+		},
+		CoinBaseAddressList: &CoinBaseAddress{
+			{
+				Address: "aiMKrGcEGPFyRSW4WdM2ARY7kpc38EYpygy",
+				P2PId:   "16Uiu2HAmMH8yCqrRvzyjEdcJ817pNQpcgrgZn95d5kn4LF2xm66L",
+			},
+			{
+				Address: "aiAQ56a2nTmAxJ2Tycm8a3X8zYqs2NrDdUN",
+				P2PId:   "16Uiu2HAmF6rDNZBympeEsDfoVTPPwtjRiizxDNmLxt5B7JAZTwdg",
+			},
+			{
+				Address: "aiDvFTATGmmdcyD2trkrVcrf52QB2SXSEQf",
+				P2PId:   "16Uiu2HAm851T4cCfRM7BvjgRdeirn4zeim8QUNAkmNW9A4sjWr9o",
+			},
+			{
+				Address: "aiBntJ9itzbzT9R9Kpo2VJFwox6FfQV6UyM",
+				P2PId:   "16Uiu2HAmAPg4wy9xHnrVedzgG6pkEhhvKRBw5ouhUPLYLi1GteKs",
+			},
+			{
+				Address: "aiQ6KGjuZoJqabZqeVcv9iRLRL5D6iRmu5R",
+				P2PId:   "16Uiu2HAm4po19Qm6gxVAQrP3ctmNgZdkgUYiLUtGXkKjAu1hzV9U",
+			},
+			{
+				Address: "aiDU4CN68G3iMoR3iZL3oZFw1fdxE6sZYEg",
+				P2PId:   "16Uiu2HAmLUKpbkYqWpFNDyxXwfaPg9BJ3AWP3gyidxhX6iGPw2dY",
+			},
+			{
+				Address: "aiR264eSVnqwSPbiaRFp3oD66zi5Xu8MjzF",
+				P2PId:   "16Uiu2HAmK5aMz7ah2edHnKHCnNFmkxPgJMgnrNBfgWgTLDtEtDbL",
+			},
+			{
+				Address: "aiEiRsScq4rdTiBHc8XSTVmBzwgXYcFTZyS",
+				P2PId:   "16Uiu2HAky7uuaiGx9cV3CD9WWUbobqHNsD9F4viQFzaYb3oB3fxj",
+			},
+			{
+				Address: "aiChEPSNLznNv7hn3R2hEc98KbguLzoQQW1",
+				P2PId:   "16Uiu2HAmUEgz6fTzy7KNaecXq4bfvaLymHwoMJoJ47KxANvp4YMe",
+			},
 		},
 	},
 	PoolParam: &PoolParam{
@@ -239,15 +277,15 @@ var MainNetParam = &Param{
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
 		MinCoinCount:    1 * 1e4,
-		MaxCoinCount:    9 * 1e9,
+		MaxCoinCount:    9 * 1e10,
 		MinimumTransfer: 0.0001 * AtomsPerCoin,
 		MaximumTransfer: 1 * 1e7 * AtomsPerCoin,
-		MaximumReceiver: 1 * 1e3,
+		MaximumReceiver: 1 * 1e4,
 		RedemptionRate:  80,
 		MainToken:       arry.StringToAddress("AIOT"),
 		EaterAddress:    arry.StringToAddress("AiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{
-			Address: "AiUwKckHzgieNw5MaaW1eg5RWBbUBDV8LbL",
+			Address: "AifLkzE8iMPEUy7mHwJ89YbsEDesVkRZ8Fn",
 			Amount:  100000 * AtomsPerCoin,
 		}},
 	},
@@ -255,9 +293,9 @@ var MainNetParam = &Param{
 		NetWork:    MainNet + "AIOT_NETWORK",
 		P2pPort:    "23561",
 		ExternalIp: "0.0.0.0",
-		//AiM7fxa2dz6xQFhSiLWE3o49Pw4959BHWyK
-		//CustomBoot: "/ip4/103.68.63.164/tcp/19563/ipfs/16Uiu2HAmKXZq23yKNKnJmr4kpyiDgDnKNERzcFJZAVeKt3CU8fDE",
-		CustomBoot: "/ip4/127.0.0.1/tcp/29564/ipfs/16Uiu2HAmKXZq23yKNKnJmr4kpyiDgDnKNERzcFJZAVeKt3CU8fDE",
+		//Aig3Jsg1yZHmsQ17Gfu3rcYnTuWEL3XYvg1
+		//CustomBoot: "/ip4/103.68.63.164/tcp/29564/ipfs/16Uiu2HAm3HfpZk6hMPpLVp7q5uiBBece2c9L9BVoD3hTXJAsnHDi",
+		CustomBoot: "/ip4/127.0.0.1/tcp/29564/ipfs/16Uiu2HAm3HfpZk6hMPpLVp7q5uiBBece2c9L9BVoD3hTXJAsnHDi",
 	},
 	RpcParam: &RpcParam{
 		RpcIp:      "127.0.0.1",
@@ -276,44 +314,82 @@ var MainNetParam = &Param{
 		DPosSize:         DPosSize,
 		GenesisTime:      1592268410,
 		GenesisCycle:     1592268410 / CycleInterval,
-		WorkProofAddress: "AiMAfYUWmcRZ8Q56n1wHDR6Z9p8NHeay5S5",
-		GenesisSuperList: []Super{
+		WorkProofAddress: "Aig3Jsg1yZHmsQ17Gfu3rcYnTuWEL3XYvg1",
+		GenesisSuperList: []AddressInfo{
 			{
-				Address: "AiVK2sAy4w4kaUHduKtmezNw3TthjA5u7nD",
+				Address: "Aib2RoswoRootd7F4MqJ7uqKu84J94PLdPp",
 				P2PId:   "16Uiu2HAmNDdZbFgXvmqWRK65LjqxMWwExJercSL4H4Yb9zHgrHEf",
 			},
 			{
-				Address: "AibWGRXWpxzszB1zR5wQeNxnDsvqPidPMJE",
+				Address: "AiSY6z5HVrrGqGxnjDTuGemQvY5W3o79zBz",
 				P2PId:   "16Uiu2HAmTbWamkjotQbRdt8PdxuGq4kXCHUi33bVG4TMR7v5Vz7q",
 			},
 			{
-				Address: "AiYeEHbt39A2Z9MPbJ8Kz6cqFvbtUzkGV9S",
+				Address: "AifJKB291mBSrj5Boj5vZdBQ29DCYzcSLaY",
 				P2PId:   "16Uiu2HAm66iJEEDxS1t7q5Jp7R7deGFGn6B1QLX2KepHVXX2ksW4",
 			},
-			/*{
-				Address: "Aij8qANKRfvaKdxGaxABjWBVAKxBQg7w4zW",
+			{
+				Address: "AiSMfPthT5Uj9KmGHXFd4arSDL3mGsAF4Gu",
 				P2PId:   "16Uiu2HAm5a7zJ87ZSdWr255Ez9s9am2DJFNHRQCKLkBDRp8H5APY",
 			},
 			{
-				Address: "AiSk99vgP7rpw7h5ykQQT39b11wb1xsTZPZ",
+				Address: "AiYAG3ZzeVx8Gi7fXFsprGmRQ6g2sx5vQvL",
 				P2PId:   "16Uiu2HAmC6pHkE18pkRKagv1zm7HcQD5yza8qXeRTRqLBFxBpMHX",
 			},
 			{
-				Address: "AiUxnpuh7YdqSgTFQjJECVwgCYdBY93W29M",
+				Address: "AiNP7ExrY4S8Hi6ZL9SMPKRiVwpSWUJ9L5t",
 				P2PId:   "16Uiu2HAmBZqLmUptUPYDHGKiHaCNKSVezggZvAY9YvU9DdvAfDNb",
 			},
 			{
-				Address: "Aic7weJQN5fSgupVmfKUTsW6ANwh1rYvfwj",
+				Address: "AiV8UBrEJdYNVqa6bM1iXQVezwX98eUs3Dm",
 				P2PId:   "16Uiu2HAmCmHMcteRpdCSYHPcWSPbdxdZwFYZzEQQ1EQNy4bsj9jp",
 			},
 			{
-				Address: "AiiWrtR5r1bP2x7TX7CD67Wm4Wyy2iDNfBU",
+				Address: "AiU1DGBim4tNEWDwJwmHG5uEE9kMu53U7MZ",
 				P2PId:   "16Uiu2HAmPtAsrpBRw26GptVxZcfKcREdqu81H5LRCVKWvtgJJhXp",
 			},
 			{
-				Address: "AiYHoCct4cHs1PLuQEuCi73G91shvsd9nnG",
+				Address: "AijYeC9MEF1VABWnBqra6S6j9JRjjZfFUiv",
 				P2PId:   "16Uiu2HAmP9BS5UCn7rq6UXgwvJ1UeFGsodwLamSMo2KBwCoVhvwT",
-			},*/
+			},
+		},
+		CoinBaseAddressList: &CoinBaseAddress{
+			{
+				Address: "Aib2RoswoRootd7F4MqJ7uqKu84J94PLdPp",
+				P2PId:   "16Uiu2HAmNDdZbFgXvmqWRK65LjqxMWwExJercSL4H4Yb9zHgrHEf",
+			},
+			{
+				Address: "AiSY6z5HVrrGqGxnjDTuGemQvY5W3o79zBz",
+				P2PId:   "16Uiu2HAmTbWamkjotQbRdt8PdxuGq4kXCHUi33bVG4TMR7v5Vz7q",
+			},
+			{
+				Address: "AifJKB291mBSrj5Boj5vZdBQ29DCYzcSLaY",
+				P2PId:   "16Uiu2HAm66iJEEDxS1t7q5Jp7R7deGFGn6B1QLX2KepHVXX2ksW4",
+			},
+			{
+				Address: "AiSMfPthT5Uj9KmGHXFd4arSDL3mGsAF4Gu",
+				P2PId:   "16Uiu2HAm5a7zJ87ZSdWr255Ez9s9am2DJFNHRQCKLkBDRp8H5APY",
+			},
+			{
+				Address: "AiYAG3ZzeVx8Gi7fXFsprGmRQ6g2sx5vQvL",
+				P2PId:   "16Uiu2HAmC6pHkE18pkRKagv1zm7HcQD5yza8qXeRTRqLBFxBpMHX",
+			},
+			{
+				Address: "AiNP7ExrY4S8Hi6ZL9SMPKRiVwpSWUJ9L5t",
+				P2PId:   "16Uiu2HAmBZqLmUptUPYDHGKiHaCNKSVezggZvAY9YvU9DdvAfDNb",
+			},
+			{
+				Address: "AiV8UBrEJdYNVqa6bM1iXQVezwX98eUs3Dm",
+				P2PId:   "16Uiu2HAmCmHMcteRpdCSYHPcWSPbdxdZwFYZzEQQ1EQNy4bsj9jp",
+			},
+			{
+				Address: "AiU1DGBim4tNEWDwJwmHG5uEE9kMu53U7MZ",
+				P2PId:   "16Uiu2HAmPtAsrpBRw26GptVxZcfKcREdqu81H5LRCVKWvtgJJhXp",
+			},
+			{
+				Address: "AijYeC9MEF1VABWnBqra6S6j9JRjjZfFUiv",
+				P2PId:   "16Uiu2HAmP9BS5UCn7rq6UXgwvJ1UeFGsodwLamSMo2KBwCoVhvwT",
+			},
 		},
 	},
 	PoolParam: &PoolParam{
@@ -329,3 +405,19 @@ type PreCirculation struct {
 	Note    string
 	Amount  uint64
 }
+
+type CoinBaseAddress []AddressInfo
+
+func (s *CoinBaseAddress)CurrentAddress(height uint64)arry.Address{
+	if len(*s) == 0 || height == 0{
+		return arry.Address{}
+	}
+
+	index := height % uint64(len(*s))
+	if index == 0{
+		return arry.StringToAddress((*s)[len(*s)-1].Address)
+	}else{
+		return arry.StringToAddress((*s)[index-1].Address)
+	}
+}
+
