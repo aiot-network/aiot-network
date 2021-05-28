@@ -21,6 +21,8 @@ type IDPosDB interface {
 	Voter(from, to arry.Address)
 	AddSuperBlockCount(cycle uint64, signer arry.Address)
 	SuperBlockCount(cycle uint64, signer arry.Address) uint32
+	AddCoinBaseCount(cycle uint64, signer arry.Address)
+	CoinBaseCount(cycle uint64, signer arry.Address) uint32
 	AddSuperWork(cycle uint64, super arry.Address, works *types.Works)
 	SuperWork(cycle uint64, super arry.Address) (*types.Works, error)
 }

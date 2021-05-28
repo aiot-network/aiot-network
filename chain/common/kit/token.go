@@ -3,6 +3,7 @@ package kit
 import (
 	"bytes"
 	"errors"
+	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/common/param"
 	"github.com/aiot-network/aiotchain/tools/arry"
 	"github.com/aiot-network/aiotchain/tools/crypto/base58"
@@ -29,7 +30,7 @@ func CalCoinBase(net string, allWorks, works uint64) uint64 {
 	if allWorks == 0 {
 		return 0
 	}
-	times := params.CycleInterval / params.BlockInterval / param.SuperSize
+	times := params.CycleInterval / params.BlockInterval / uint64(len(*config.Param.CoinBaseAddressList))
 
 	coinbase := works * params.CoinBaseOneDay / allWorks / times
 	//fmt.Printf("allWorks=%d, works=%d, times=%d, coinbase=%d\n", allWorks, works, times, coinbase)

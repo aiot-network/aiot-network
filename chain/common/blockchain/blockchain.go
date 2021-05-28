@@ -93,16 +93,23 @@ func (c *Chain) NextHeader(time uint64) (types.IHeader, error) {
 func (c *Chain) NextBlock(msgs []types.IMessage, blockTime uint64) (types.IBlock, error) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
+
 	height := c.lastHeight + 1
 
+	var coinBaseAddr  = config.Param.CoinBaseAddressList.CurrentAddress(height)
+	var feeAddr = config.Param.IPrivate.Address()
+	if coinBaseAddr.IsEqual(arry.Address{}){
+		return nil, errors.New("wrong coinbase address")
+	}
 	cycle := blockTime / uint64(param.CycleInterval)
 
 	allWorks := c.getAllWorks(cycle)
-	works := c.getWorks(cycle, config.Param.IPrivate.Address())
+	works := c.getWorks(cycle, coinBaseAddr)
 
 	coinbase := kit.CalCoinBase(config.Param.Name, allWorks, works)
 	to := chaintypes.NewReceivers()
-	to.Add(config.Param.IPrivate.Address(), coinbase+chaintypes.CalculateFee(msgs))
+	to.Add(coinBaseAddr, coinbase)
+	to.Add(feeAddr, chaintypes.CalculateFee(msgs))
 	coinBase := &chaintypes.Message{
 		Header: &chaintypes.MsgHeader{
 			Type: chaintypes.Transaction,
@@ -199,7 +206,7 @@ func (c *Chain) GetHeaderHeight(height uint64) (types.IHeader, error) {
 }
 
 func (c *Chain) getHeaderHeight(height uint64) (*chaintypes.Header, error) {
-	if height > c.LastHeight() {
+	if height > c.lastHeight {
 		return nil, fmt.Errorf("%d block header is not exist", height)
 	}
 	return c.db.GetHeaderHeight(height)
@@ -452,6 +459,11 @@ func (c *Chain) checkCoinBase(coinBase types.IMessage, fee, height uint64) error
 	rei := coinBase.MsgBody().MsgTo().ReceiverList()
 
 	allWorks := c.getAllWorks(cycle)
+
+	address := config.Param.CoinBaseAddressList.CurrentAddress(height)
+	if !rei[0].Address.IsEqual(address){
+		return errors.New("the Coinbase address is inconsistent")
+	}
 	works := c.getWorks(cycle, rei[0].Address)
 	coinbase := kit.CalCoinBase(config.Param.Name, allWorks, works)
 	if err := msg.CheckCoinBase(fee, coinbase); err != nil {

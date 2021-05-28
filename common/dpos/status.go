@@ -21,6 +21,8 @@ type IDPosStatus interface {
 	Voter(msg types.IMessage) error
 	AddSuperBlockCount(cycle uint64, signer arry.Address)
 	SuperBlockCount(cycle uint64, signer arry.Address) uint32
+	AddCoinBaseCount(cycle uint64, signer arry.Address)
+	CoinBaseCount(cycle uint64, signer arry.Address) uint32
 	AddSuperWork(cycle uint64, super arry.Address, works types.IWorks)
 	SuperWork(cycle uint64, super arry.Address) (types.IWorks, error)
 	Commit() (arry.Hash, error)
