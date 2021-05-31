@@ -16,6 +16,7 @@ type Status struct {
 	actStatus   types.IActStatus
 	dPosStatus  dpos.IDPosStatus
 	tokenStatus types.ITokenStatus
+	x int
 }
 
 func NewStatus(actStatus types.IActStatus, dPosStatus dpos.IDPosStatus, tokenStatus types.ITokenStatus) *Status {
@@ -175,7 +176,7 @@ func (f *Status) CycleReword(cycle uint64) []types.IReword {
 	rewords := make([]*chaintypes.Reword, 0)
 	var allWork uint64
 	for _, info := range *config.Param.CoinBaseAddressList {
-		work, err := f.dPosStatus.SuperWork(cycle-1, arry.StringToAddress(info.Address))
+		work, err := f.dPosStatus.AddressWork(cycle-1, arry.StringToAddress(info.Address))
 		if err != nil {
 			continue
 		}
@@ -197,6 +198,10 @@ func (f *Status) CycleReword(cycle uint64) []types.IReword {
 		iReword[i] = r
 	}
 	return iReword
+}
+
+func (f *Status)CycleWork(cycle uint64, address arry.Address) (types.IWorks, error){
+	return  f.dPosStatus.AddressWork(cycle, address)
 }
 
 func (f *Status) Token(address arry.Address) (types.IToken, error) {

@@ -23,6 +23,6 @@ type IDPosDB interface {
 	SuperBlockCount(cycle uint64, signer arry.Address) uint32
 	AddCoinBaseCount(cycle uint64, signer arry.Address)
 	CoinBaseCount(cycle uint64, signer arry.Address) uint32
-	AddSuperWork(cycle uint64, super arry.Address, works *types.Works)
-	SuperWork(cycle uint64, super arry.Address) (*types.Works, error)
+	AddAddressWork(cycle uint64, super arry.Address, works *types.Works)
+	AddressWork(cycle uint64, super arry.Address) (*types.Works, error)
 }

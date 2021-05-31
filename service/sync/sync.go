@@ -301,7 +301,7 @@ func (s *Sync) ReceivedBlockFromPeer(block types.IBlock) error {
 	localHeight := s.chain.LastHeight()
 	if localHeight == block.GetHeight()-1 {
 		if err := s.chain.Insert(block); err != nil {
-			log.Warn("Failed to insert received block", "err", err, "height", block.GetHeight(), "singer", block.GetSigner().String())
+			log.Warn("Failed to insert received block", "err", err, "height", block.GetHeight(),  "localHeight", localHeight, "singer", block.GetSigner().String())
 			return err
 		}
 		log.Info("Received block insert success", "module", module, "height", block.GetHeight(), "signer", block.GetSigner())

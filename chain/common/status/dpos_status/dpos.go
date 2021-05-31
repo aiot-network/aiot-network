@@ -56,7 +56,7 @@ func (d *DPosStatus) UpdateWork(msg types.IMessage) error {
 	}
 	cycle := msg.Time() / param.CycleInterval
 	for _, work := range body.List {
-		d.db.AddSuperWork(cycle, work.Address, &chaintypes.Works{
+		d.db.AddAddressWork(cycle, work.Address, &chaintypes.Works{
 			Cycle:    cycle,
 			WorkLoad: work.Workload,
 			EndTime:  work.EndTime,
@@ -132,10 +132,10 @@ func (d *DPosStatus)CoinBaseCount(cycle uint64, signer arry.Address) uint32 {
 	return d.db.CoinBaseCount(cycle, signer)
 }
 
-func (d *DPosStatus) AddSuperWork(cycle uint64, super arry.Address, works types.IWorks) {
-	d.db.AddSuperWork(cycle, super, works.(*chaintypes.Works))
+func (d *DPosStatus) AddAddressWork(cycle uint64, super arry.Address, works types.IWorks) {
+	d.db.AddAddressWork(cycle, super, works.(*chaintypes.Works))
 }
 
-func (d *DPosStatus) SuperWork(cycle uint64, super arry.Address) (types.IWorks, error) {
-	return d.db.SuperWork(cycle, super)
+func (d *DPosStatus) AddressWork(cycle uint64, super arry.Address) (types.IWorks, error) {
+	return d.db.AddressWork(cycle, super)
 }

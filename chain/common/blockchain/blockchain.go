@@ -583,28 +583,19 @@ func (c *Chain) RegisterMsgPoolDeleteFunc(fun func(message types.IMessage)) {
 
 func (c *Chain) getAllWorks(cycle uint64) uint64 {
 	var allWorks uint64
-	supers := c.status.CycleSupers(cycle)
-	if supers != nil {
-		list := supers.List()
-		for _, s := range list {
-			act := c.status.Account(s.GetSinger())
-			work := act.GetWorks()
-			actCycle, actWorks := work.GetCycle(), work.GetWorkLoad()
-			if actCycle == cycle-1 {
-				allWorks += actWorks
-			}
+	rewords := c.status.CycleReword(cycle)
+	if rewords != nil {
+		for _, s := range rewords {
+			allWorks +=s.GetWorkLoad()
 		}
 	}
 	return allWorks
 }
 
 func (c *Chain) getWorks(cycle uint64, address arry.Address) uint64 {
-	var works uint64
-	act := c.status.Account(address)
-	work := act.GetWorks()
-	actCycle, actWorks := work.GetCycle(), work.GetWorkLoad()
-	if actCycle == cycle-1 {
-		works = actWorks
+	works, err := c.status.CycleWork(cycle-1, address)
+	if err != nil{
+		return 0
 	}
-	return works
+	return works.GetWorkLoad()
 }
