@@ -10,6 +10,7 @@ import (
 	"github.com/aiot-network/aiotchain/common/dpos"
 	"github.com/aiot-network/aiotchain/common/param"
 	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/utils"
 	"github.com/aiot-network/aiotchain/types"
 )
 
@@ -94,6 +95,9 @@ func (d *DPos) CheckSigner(header types.IHeader, chain blockchain.IChain) error 
 
 func (d *DPos) CheckHeader(header types.IHeader, parent types.IHeader, chain blockchain.IChain) error {
 	// If the block time is in the future, it will fail
+	if header.GetTime() > uint64(utils.NowUnix()) {
+		return errors.New("block in the future")
+	}
 	// Verify whether it is the time point of block generation
 	if err := d.checkTime(parent, header); err != nil {
 		return errors.New("time check failed")
