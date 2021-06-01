@@ -114,7 +114,7 @@ func (m *Message) checkFees() error {
 	}
 	fees := uint64(minFees * len(m.MsgTo().ReceiverList()))
 	if m.Header.Fee < fees  {
-		return fmt.Errorf("fees %.8f is less than the minimum poundage allowed %.8f", amount.Amount(m.Header.Fee).ToCoin(), amount.Amount(minFees).ToCoin())
+		return fmt.Errorf("fees %.8f is less than the minimum poundage allowed %.8f", amount.Amount(m.Header.Fee).ToCoin(), amount.Amount(fees).ToCoin())
 	}
 	return nil
 }

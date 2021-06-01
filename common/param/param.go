@@ -294,7 +294,6 @@ var MainNetParam = &Param{
 		P2pPort:    "23561",
 		ExternalIp: "0.0.0.0",
 		//Aib7bDUym4KWu9painU1NHYi9w2dVAfe3ok
-		//CustomBoot: "/ip4/103.68.63.164/tcp/29564/ipfs/16Uiu2HAm3HfpZk6hMPpLVp7q5uiBBece2c9L9BVoD3hTXJAsnHDi",
 		CustomBoot: "/ip4/180.188.198.241/tcp/29564/ipfs/16Uiu2HAmBA6XR8USSaN4SWPwaha5gYcADSBu2hfA7rWtVE9NN44m",
 	},
 	RpcParam: &RpcParam{
