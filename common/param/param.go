@@ -131,7 +131,7 @@ var TestNetParam = &Param{
 		PrivatePass: APPName,
 	},
 	TokenParam: &TokenParam{
-		PreCirculation:  100000 * AtomsPerCoin,
+		PreCirculation:  160000 * AtomsPerCoin,
 		Circulation:     1 * 1e8 * AtomsPerCoin,
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
@@ -145,7 +145,7 @@ var TestNetParam = &Param{
 		EaterAddress:    arry.StringToAddress("aiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{
 			Address: "aiCSxRKuF8dYALbZ2av8gqcoVR34R4aecYX",
-			Amount:  100000 * AtomsPerCoin,
+			Amount:  160000 * AtomsPerCoin,
 		}},
 	},
 	P2pParam: &P2pParam{
@@ -272,7 +272,7 @@ var MainNetParam = &Param{
 		PrivatePass: "AIOT_NETWORK",
 	},
 	TokenParam: &TokenParam{
-		PreCirculation:  100000 * AtomsPerCoin,
+		PreCirculation:  160000 * AtomsPerCoin,
 		Circulation:     1 * 1e8 * AtomsPerCoin,
 		CoinBaseOneDay:  27390 * AtomsPerCoin,
 		Consume:         1e4 * AtomsPerCoin,
@@ -286,7 +286,7 @@ var MainNetParam = &Param{
 		EaterAddress:    arry.StringToAddress("AiCoinEaterAddressDontSend000000000"),
 		PreCirculations: []PreCirculation{{
 			Address: "AifLkzE8iMPEUy7mHwJ89YbsEDesVkRZ8Fn",
-			Amount:  100000 * AtomsPerCoin,
+			Amount:  160000 * AtomsPerCoin,
 		}},
 	},
 	P2pParam: &P2pParam{

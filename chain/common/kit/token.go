@@ -24,6 +24,7 @@ func CalCoinBase(net string, allWorks, works uint64) uint64 {
 	params := param.MainNetParam
 	switch net {
 	case param.MainNet:
+		params = param.MainNetParam
 	case param.TestNet:
 		params = param.TestNetParam
 	}
