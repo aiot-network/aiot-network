@@ -12,12 +12,13 @@ import (
 )
 
 const (
-	_cycleSupers = "cycleSupers"
-	_candidates  = "candidates"
-	_voters      = "voters"
-	_confirmed   = "confirmed"
-	_blockCount  = "blockCount"
-	_superWork   = "superWork"
+	_cycleSupers    = "cycleSupers"
+	_candidates     = "candidates"
+	_voters         = "voters"
+	_confirmed      = "confirmed"
+	_blockCount     = "blockCount"
+	_coinBaseCount  = "coinBaseCount"
+	_superWork      = "superWork"
 )
 
 type DPosDB struct {
@@ -141,7 +142,7 @@ func (d *DPosDB) Voter(from, to arry.Address) {
 }
 
 func (d *DPosDB) AddSuperBlockCount(cycle uint64, signer arry.Address) {
-	hash := cycleSuperCountKey(cycle, signer)
+	hash := cycleAddressCountKey(cycle, signer)
 	cnt := d.SuperBlockCount(cycle, signer)
 	cnt++
 	bytes, _ := rlp.EncodeToBytes(cnt)
@@ -149,21 +150,38 @@ func (d *DPosDB) AddSuperBlockCount(cycle uint64, signer arry.Address) {
 }
 
 func (d *DPosDB) SuperBlockCount(cycle uint64, signer arry.Address) uint32 {
-	hash := cycleSuperCountKey(cycle, signer)
+	hash := cycleAddressCountKey(cycle, signer)
 	bytes := d.trie.Get(base.Key(_blockCount, hash.Bytes()))
 	var count uint32
 	rlp.DecodeBytes(bytes, &count)
 	return count
 }
 
-func cycleSuperCountKey(cycle uint64, signer arry.Address) arry.Hash {
+func (d *DPosDB) AddCoinBaseCount(cycle uint64, address arry.Address) {
+	hash := cycleAddressCountKey(cycle, address)
+	cnt := d.CoinBaseCount(cycle, address)
+	cnt++
+	bytes, _ := rlp.EncodeToBytes(cnt)
+	d.trie.Update(base.Key(_coinBaseCount, hash.Bytes()), bytes)
+}
+
+func (d *DPosDB) CoinBaseCount(cycle uint64, address arry.Address) uint32 {
+	hash := cycleAddressCountKey(cycle, address)
+	bytes := d.trie.Get(base.Key(_coinBaseCount, hash.Bytes()))
+	var count uint32
+	rlp.DecodeBytes(bytes, &count)
+	return count
+}
+
+
+func cycleAddressCountKey(cycle uint64, signer arry.Address) arry.Hash {
 	bytes := bytes.Join([][]byte{[]byte(strconv.FormatUint(cycle, 10)), signer.Bytes()}, []byte{})
 	return hash.Hash(bytes)
 }
 
-func (d *DPosDB) AddSuperWork(cycle uint64, super arry.Address, works *types.Works) {
-	hash := cycleSuperCountKey(cycle, super)
-	workLast, err := d.SuperWork(cycle, super)
+func (d *DPosDB) AddAddressWork(cycle uint64, super arry.Address, works *types.Works) {
+	hash := cycleAddressCountKey(cycle, super)
+	workLast, err := d.AddressWork(cycle, super)
 	if err == nil {
 		works.WorkLoad += workLast.WorkLoad
 	}
@@ -171,8 +189,8 @@ func (d *DPosDB) AddSuperWork(cycle uint64, super arry.Address, works *types.Wor
 	d.trie.Update(base.Key(_superWork, hash.Bytes()), bytes)
 }
 
-func (d *DPosDB) SuperWork(cycle uint64, super arry.Address) (*types.Works, error) {
-	hash := cycleSuperCountKey(cycle, super)
+func (d *DPosDB) AddressWork(cycle uint64, super arry.Address) (*types.Works, error) {
+	hash := cycleAddressCountKey(cycle, super)
 	bytes := d.trie.Get(base.Key(_superWork, hash.Bytes()))
 	var work *types.Works
 	err := rlp.DecodeBytes(bytes, &work)

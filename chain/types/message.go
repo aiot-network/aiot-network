@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/aiot-network/aiotchain/tools/amount"
 	"github.com/aiot-network/aiotchain/tools/arry"
 	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
 	"github.com/aiot-network/aiotchain/tools/crypto/hash"
@@ -82,6 +83,10 @@ func (m *Message) Check() error {
 		return err
 	}
 
+	if err := m.checkFees();err != nil{
+		return err
+	}
+
 	if err := m.Header.Check(); err != nil {
 		return err
 	}
@@ -98,6 +103,18 @@ func (m *Message) CheckCoinBase(fee uint64, coinbase uint64) error {
 	if sumAmount != nTx.MsgAmount() {
 		return fmt.Errorf("the fee of %d and the reward of %d are not consistent "+
 			"with amount %d", fee, coinbase, nTx.MsgAmount())
+	}
+	return nil
+}
+
+
+func (m *Message) checkFees() error {
+	if m.Header.Type == Work{
+		return nil
+	}
+	fees := uint64(minFees * len(m.MsgTo().ReceiverList()))
+	if m.Header.Fee < fees  {
+		return fmt.Errorf("fees %.8f is less than the minimum poundage allowed %.8f", amount.Amount(m.Header.Fee).ToCoin(), amount.Amount(fees).ToCoin())
 	}
 	return nil
 }

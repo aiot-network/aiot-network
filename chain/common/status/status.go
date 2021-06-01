@@ -16,6 +16,7 @@ type Status struct {
 	actStatus   types.IActStatus
 	dPosStatus  dpos.IDPosStatus
 	tokenStatus types.ITokenStatus
+	x int
 }
 
 func NewStatus(actStatus types.IActStatus, dPosStatus dpos.IDPosStatus, tokenStatus types.ITokenStatus) *Status {
@@ -67,7 +68,11 @@ func (f *Status) CheckMsg(msg types.IMessage, strict bool) error {
 }
 
 func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
+	coinBaseAddr := arry.Address{}
 	for _, msg := range msgs {
+		if msg.IsCoinBase(){
+			coinBaseAddr = msg.MsgBody().MsgTo().ReceiverList()[0].Address
+		}
 		switch chaintypes.MessageType(msg.Type()) {
 		case chaintypes.Transaction:
 			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
@@ -122,6 +127,7 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 
 	}
 	f.dPosStatus.AddSuperBlockCount(block.GetCycle(), block.GetSigner())
+	f.dPosStatus.AddCoinBaseCount(block.GetCycle(), coinBaseAddr)
 	return nil
 }
 
@@ -168,10 +174,9 @@ func (f *Status) CycleSupers(cycle uint64) types.ICandidates {
 
 func (f *Status) CycleReword(cycle uint64) []types.IReword {
 	rewords := make([]*chaintypes.Reword, 0)
-	candidates := f.CycleSupers(cycle)
 	var allWork uint64
-	for _, can := range candidates.List() {
-		work, err := f.dPosStatus.SuperWork(cycle-1, can.GetSinger())
+	for _, info := range *config.Param.CoinBaseAddressList {
+		work, err := f.dPosStatus.AddressWork(cycle-1, arry.StringToAddress(info.Address))
 		if err != nil {
 			continue
 		}
@@ -179,9 +184,9 @@ func (f *Status) CycleReword(cycle uint64) []types.IReword {
 		rewords = append(rewords, &chaintypes.Reword{
 			Cycle:    cycle,
 			EndTime:  work.GetEndTime(),
-			Address:  can.GetSinger().String(),
+			Address:  info.Address,
 			WorkLoad: work.GetWorkLoad(),
-			Blocks:   uint64(can.GetMntCount()),
+			Blocks:   uint64(f.dPosStatus.CoinBaseCount(cycle, arry.StringToAddress(info.Address))),
 		})
 	}
 	for i, reword := range rewords {
@@ -193,6 +198,10 @@ func (f *Status) CycleReword(cycle uint64) []types.IReword {
 		iReword[i] = r
 	}
 	return iReword
+}
+
+func (f *Status)CycleWork(cycle uint64, address arry.Address) (types.IWorks, error){
+	return  f.dPosStatus.AddressWork(cycle, address)
 }
 
 func (f *Status) Token(address arry.Address) (types.IToken, error) {

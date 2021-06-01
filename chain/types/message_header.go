@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/aiot-network/aiotchain/chain/common/kit"
 	"github.com/aiot-network/aiotchain/common/config"
-	"github.com/aiot-network/aiotchain/tools/amount"
 	"github.com/aiot-network/aiotchain/tools/arry"
 )
 
@@ -46,10 +45,6 @@ func (m *MsgHeader) Check() error {
 		return err
 	}
 
-	if err := m.checkFee(); err != nil {
-		return err
-	}
-
 	if err := m.checkSinger(); err != nil {
 		return err
 	}
@@ -77,19 +72,6 @@ func (m *MsgHeader) checkType() error {
 func (m *MsgHeader) checkFrom() error {
 	if !kit.CheckAddress(config.Param.Name, m.From.String()) {
 		return fmt.Errorf("%s address illegal", m.From.String())
-	}
-	return nil
-}
-
-func (m *MsgHeader) checkFee() error {
-	if m.Type == Work {
-		return nil
-	}
-	if m.Fee < minFees {
-		return fmt.Errorf("fee %.8f is less than the minimum poundage allowed %.8f", amount.Amount(m.Fee).ToCoin(), amount.Amount(minFees).ToCoin())
-	}
-	if m.Fee > maxFees {
-		return fmt.Errorf("fee %.8f greater is greater than the maximum poundage allowed %.8f", amount.Amount(m.Fee).ToCoin(), amount.Amount(maxFees).ToCoin())
 	}
 	return nil
 }
