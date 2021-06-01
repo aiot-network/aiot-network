@@ -5,7 +5,7 @@ Format = true
 TestNet = false
 
 #Directory for managing private key json files（default = "keystore/"）
-KeystoreDir = "mainnet"
+KeystoreDir = ""
 
 #RPC address
 RpcIp = "127.0.0.1"
