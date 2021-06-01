@@ -2,7 +2,7 @@
 Format = true
 
 #testnet or mainnet
-TestNet = true
+TestNet = false
 
 #Directory for managing private key json files（default = "keystore/"）
 KeystoreDir = ""
@@ -11,7 +11,7 @@ KeystoreDir = ""
 RpcIp = "127.0.0.1"
 
 #RPC port
-RpcPort = "13562"
+RpcPort = "23562"
 
 #RPC TLS switch
 RpcTLS = false
