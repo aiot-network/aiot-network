@@ -420,3 +420,6 @@ func (s *CoinBaseAddress)CurrentAddress(height uint64)arry.Address{
 	}
 }
 
+func (s *CoinBaseAddress)Len()int{
+	return len(*s)
+}

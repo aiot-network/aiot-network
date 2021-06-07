@@ -3,11 +3,11 @@ package kit
 import (
 	"bytes"
 	"errors"
-	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/common/param"
 	"github.com/aiot-network/aiotchain/tools/arry"
 	"github.com/aiot-network/aiotchain/tools/crypto/base58"
 	"github.com/aiot-network/aiotchain/tools/crypto/hash"
+	"math/big"
 	"unicode"
 )
 
@@ -31,10 +31,11 @@ func CalCoinBase(net string, allWorks, works uint64) uint64 {
 	if allWorks == 0 {
 		return 0
 	}
-	times := params.CycleInterval / params.BlockInterval / uint64(len(*config.Param.CoinBaseAddressList))
-
-	coinbase := works * params.CoinBaseOneDay / allWorks / times
-	//fmt.Printf("allWorks=%d, works=%d, times=%d, coinbase=%d\n", allWorks, works, times, coinbase)
+	times := params.CycleInterval / params.BlockInterval / uint64(params.CoinBaseAddressList.Len())
+	x := big.NewInt(0).Mul(big.NewInt(int64(params.CoinBaseOneDay)), big.NewInt(int64(works)))
+	y := big.NewInt(0).Div(x, big.NewInt(int64(allWorks)))
+	coinbase := big.NewInt(0).Div(y, big.NewInt(int64(times))).Uint64()
+	// params.CoinBaseOneDay * works / allWorks / times
 	return coinbase
 }
 
