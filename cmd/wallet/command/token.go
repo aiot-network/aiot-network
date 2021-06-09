@@ -121,7 +121,7 @@ func parseToken(args []string) (*types.Message, error) {
 			return nil, errors.New("[amount] wrong")
 		}
 	}
-	tokenAddr, err = kit.GenerateTokenAddress(Net, from, shorthand)
+	tokenAddr, err = kit.GenerateTokenAddress(Net, shorthand)
 	if err != nil {
 		return nil, err
 	}

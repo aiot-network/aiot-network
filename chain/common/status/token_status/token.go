@@ -52,6 +52,15 @@ func (t *TokenStatus) CheckMessage(msg types.IMessage) error {
 		if token != nil {
 			return token.CheckToken(msg)
 		}
+	case chaintypes.TokenV2:
+		body, ok := msg.MsgBody().(*chaintypes.TokenV2Body)
+		if !ok {
+			return errors.New("incorrect message type and message body")
+		}
+		token := t.db.Token(body.TokenAddress)
+		if token != nil {
+			return token.CheckToken(msg)
+		}
 	case chaintypes.Redemption:
 		body, ok := msg.MsgBody().(*chaintypes.RedemptionBody)
 		if !ok {

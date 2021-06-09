@@ -51,6 +51,9 @@ func (t *TokenRecord) IsExist(msgHash arry.Hash) bool {
 
 func (t *TokenRecord) CheckToken(msg types.IMessage) error {
 	body := msg.MsgBody().(*TokenBody)
+	if !t.Sender.IsEqual(msg.From()){
+		return errors.New("the token already exists")
+	}
 	if !t.IncreaseIssues {
 		return errors.New("token does not allow increase issuance")
 	}

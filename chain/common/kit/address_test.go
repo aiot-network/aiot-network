@@ -15,7 +15,7 @@ func TestGenerateAddress(t *testing.T) {
 	if !CheckAddress(param.TestNet, addr) {
 		t.Fatalf("failed")
 	}
-	fmt.Println(GenerateTokenAddress(param.TestNet, addr, "SA"))
+	fmt.Println(GenerateTokenAddress(param.TestNet, "SA"))
 }
 
 func TestCheckAddress(t *testing.T) {
