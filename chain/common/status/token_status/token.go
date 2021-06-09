@@ -59,7 +59,7 @@ func (t *TokenStatus) CheckMessage(msg types.IMessage) error {
 		}
 		token := t.db.Token(body.TokenAddress)
 		if token != nil {
-			return token.CheckToken(msg)
+			return token.CheckTokenV2(msg)
 		}
 	case chaintypes.Redemption:
 		body, ok := msg.MsgBody().(*chaintypes.RedemptionBody)

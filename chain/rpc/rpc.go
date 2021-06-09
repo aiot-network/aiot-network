@@ -403,7 +403,7 @@ func (r *Rpc) GenerateAddress(ctx context.Context, req *GenerateReq) (*Response,
 }
 
 func (r *Rpc) GenerateTokenAddress(ctx context.Context, req *GenerateTokenReq) (*Response, error) {
-	address, err := kit.GenerateTokenAddress(req.Network, req.Address, req.Abbr)
+	address, err := kit.GenerateTokenAddress(req.Network, req.Abbr)
 	if err != nil {
 		return NewResponse(Err_Unknown, nil, err.Error()), nil
 	}

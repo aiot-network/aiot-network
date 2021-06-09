@@ -79,6 +79,37 @@ func (t *TokenRecord) CheckToken(msg types.IMessage) error {
 	return nil
 }
 
+
+func (t *TokenRecord) CheckTokenV2(msg types.IMessage) error {
+	body := msg.MsgBody().(*TokenV2Body)
+	if !t.Sender.IsEqual(msg.From()){
+		return errors.New("the token already exists")
+	}
+	if !t.IncreaseIssues {
+		return errors.New("token does not allow increase issuance")
+	}
+	if t.Shorthand != body.Shorthand {
+		return errors.New("token shorthand is not consistent")
+	}
+	if t.Name != body.Name {
+		return errors.New("token name is not consistent")
+	}
+	if !t.Address.IsEqual(body.TokenAddress) {
+		return errors.New("token address is not consistent")
+	}
+	if t.IsExist(msg.Hash()) {
+		return errors.New("duplicate message hash")
+	}
+	fAmount := amount.Amount(t.amount() + body.Amount).ToCoin()
+	if fAmount < 0 {
+		return fmt.Errorf("the total number of coins must not exceed %.8f", config.Param.MaxCoinCount)
+	}
+	if fAmount > config.Param.MaxCoinCount {
+		return fmt.Errorf("the total number of coins must not exceed %.8f", config.Param.MaxCoinCount)
+	}
+	return nil
+}
+
 func (t *TokenRecord) CheckRedemption(msg types.IMessage) error {
 	body := msg.MsgBody().(*RedemptionBody)
 	if !t.Address.IsEqual(body.TokenAddress) {
