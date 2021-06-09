@@ -51,7 +51,7 @@ func CalCountByTimes(coinbase *float64, times *uint64, coefficient float64) floa
 	return CalCountByTimes(coinbase, times, coefficient)
 }
 
-func GenerateTokenAddress(net string, address string, shorthand string) (string, error) {
+func GenerateTokenAddress(net string, shorthand string) (string, error) {
 	ver := []byte{}
 	switch net {
 	case param.MainNet:
@@ -64,11 +64,7 @@ func GenerateTokenAddress(net string, address string, shorthand string) (string,
 	if err := CheckShorthand(shorthand); err != nil {
 		return "", err
 	}
-	if !CheckAddress(net, address) {
-		return "", errors.New("incorrect address")
-	}
-	addrBytes := base58.Decode(address)
-	buffBytes := append(addrBytes, []byte(shorthand)...)
+	buffBytes := []byte(shorthand)
 	hashed := hash.Hash(buffBytes)
 	hash160, err := hash.Hash160(hashed.Bytes())
 	if err != nil {

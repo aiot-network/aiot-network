@@ -138,7 +138,7 @@ func (t *TokenBody) CheckBody(from arry.Address) error {
 	if !kit.CheckTokenAddress(config.Param.Name, t.TokenAddress.String()) {
 		return errors.New("token address verification failed")
 	}
-	toKenAddr, err := kit.GenerateTokenAddress(config.Param.Name, from.String(), t.Shorthand)
+	toKenAddr, err := kit.GenerateTokenAddress(config.Param.Name, t.Shorthand)
 	if err != nil {
 		return errors.New("token address verification failed")
 	}
@@ -309,7 +309,7 @@ func (t *TokenV2Body) CheckBody(from arry.Address) error {
 	if !kit.CheckTokenAddress(config.Param.Name, t.TokenAddress.String()) {
 		return errors.New("token address verification failed")
 	}
-	toKenAddr, err := kit.GenerateTokenAddress(config.Param.Name, from.String(), t.Shorthand)
+	toKenAddr, err := kit.GenerateTokenAddress(config.Param.Name, t.Shorthand)
 	if err != nil {
 		return errors.New("token address verification failed")
 	}
