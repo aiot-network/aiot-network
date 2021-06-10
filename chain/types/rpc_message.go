@@ -130,6 +130,9 @@ func RpcMsgToMsg(rpcMsg *RpcMessage) (*Message, error) {
 		}
 		msgBody, err = RpcWorkBodyToBody(body)
 	}
+	if err != nil{
+		return nil, err
+	}
 	hash, err := arry.StringToHash(rpcMsg.MsgHeader.MsgHash)
 	if err != nil {
 		return nil, fmt.Errorf("wrong message hash %s", rpcMsg.MsgHeader.MsgHash)

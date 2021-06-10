@@ -12,7 +12,6 @@ import (
 	"github.com/jessevdk/go-flags"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 var DefaultHomeDir string
@@ -41,11 +40,10 @@ type Config struct {
 	Private    private.IPrivate
 }
 
-// LoadConfig load the parse node startup parameter
+// LoadParam load the parse node startup parameter
 func LoadParam(private private.IPrivate) error {
 	cfg := &Config{}
-	appName := filepath.Base(os.Args[0])
-	appName = strings.TrimSuffix(appName, filepath.Ext(appName))
+
 	preParser := newConfigParser(cfg, flags.HelpFlag)
 	_, err := preParser.Parse()
 	if err != nil {

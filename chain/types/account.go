@@ -424,7 +424,7 @@ func (a *Account) checkRedemption(msg types.IMessage) error {
 	} else if token.Balance < body.MsgAmount() {
 		return fmt.Errorf("insufficient balance, it's not enough to redeem %d", body.MsgAmount())
 	}
-	main, ok := a.Tokens.Get(config.Param.MainToken.String())
+	main, _ := a.Tokens.Get(config.Param.MainToken.String())
 	reAmount := body.RedemptionAmount()
 	if reAmount > main.Pledge {
 		return fmt.Errorf("the redeemable amount is insufficient")

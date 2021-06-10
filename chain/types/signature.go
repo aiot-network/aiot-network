@@ -49,7 +49,10 @@ func Verify(hash arry.Hash, signScript types.ISignature) bool {
 	if err != nil {
 		return false
 	}
-	signature, err := secp256k1.ParseSignature(signScript.SignatureBytes(), secp256k1.S256())
+	signature, _ := secp256k1.ParseSignature(signScript.SignatureBytes(), secp256k1.S256())
+	if signature == nil{
+		return false
+	}
 	return signature.Verify(hash.Bytes(), pubkey)
 }
 
