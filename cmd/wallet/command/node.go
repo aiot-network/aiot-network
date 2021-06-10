@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"github.com/aiot-network/aiotchain/chain/rpc"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"time"
 )
@@ -34,7 +33,7 @@ func MsgPool(cmd *cobra.Command, args []string) {
 
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -44,7 +43,7 @@ func MsgPool(cmd *cobra.Command, args []string) {
 
 	resp, err := client.Gc.GetMsgPool(ctx, &rpc.NullReq{})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {
@@ -68,7 +67,7 @@ var PeerInfoCmd = &cobra.Command{
 func PeerInfo(cmd *cobra.Command, args []string) {
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -77,7 +76,7 @@ func PeerInfo(cmd *cobra.Command, args []string) {
 	defer cancel()
 	resp, err := client.Gc.PeersInfo(ctx, &rpc.NullReq{})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {
@@ -101,7 +100,7 @@ var LocalInfoCmd = &cobra.Command{
 func LocalInfo(cmd *cobra.Command, args []string) {
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -110,7 +109,7 @@ func LocalInfo(cmd *cobra.Command, args []string) {
 	defer cancel()
 	resp, err := client.Gc.LocalInfo(ctx, &rpc.NullReq{})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {

@@ -33,5 +33,5 @@ func MnemonicToEc(mnemonic string) (*secp256k1.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	return secp256k1.ParseStringToPrivate(hex.EncodeToString(masterKey.Key))
+	return secp256k1.PrivKeyFromString(hex.EncodeToString(masterKey.Key))
 }

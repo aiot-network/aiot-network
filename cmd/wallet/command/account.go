@@ -10,9 +10,9 @@ import (
 	"github.com/aiot-network/aiotchain/chain/rpc"
 	"github.com/aiot-network/aiotchain/chain/rpc/types"
 	"github.com/aiot-network/aiotchain/tools/crypto/mnemonic"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -21,6 +21,7 @@ func init() {
 		CreateCmd,
 		GetAccountCmd,
 		ShowAccountsCmd,
+		DerivedAddressesCmd,
 		DecryptPrivateCmd,
 		MnemonicToAccountCmd,
 	}
@@ -102,35 +103,35 @@ func Create(cmd *cobra.Command, args []string) {
 		fmt.Println("please set account password, cannot exceed 32 bytes：")
 		passWd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
 	if len(passWd) > 32 {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("password too long! "))
+		outputError(cmd.Use, fmt.Errorf("password too long! "))
 		return
 	}
 	entropy, err := kit.Entropy()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	mnemonicStr, err := kit.Mnemonic(entropy)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	key, err := kit.MnemonicToEc(mnemonicStr)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("generate secp256k1 key failed! %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("generate secp256k1 key failed! %s", err.Error()))
 		return
 	}
 	p2pId, err := kit.GenerateP2PID(key)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("generate p2p id failed! %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("generate p2p id failed! %s", err.Error()))
 	}
 	if j, err := keystore.GenerateKeyJson(Net, Cfg.KeystoreDir, key, mnemonicStr, passWd); err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("generate key failed! %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("generate key failed! %s", err.Error()))
 	} else {
 		j.P2pId = p2pId.String()
 		bytes, _ := json.Marshal(j)
@@ -164,7 +165,7 @@ var ShowAccountsCmd = &cobra.Command{
 
 func ListAccount(cmd *cobra.Command, args []string) {
 	if addrList, err := keystore.ReadAllAccount(Cfg.KeystoreDir); err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("read account failed! %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("read account failed! %s", err.Error()))
 	} else {
 		bytes, _ := json.Marshal(addrList)
 		output(string(bytes))
@@ -197,7 +198,7 @@ func DecryptPrivate(cmd *cobra.Command, args []string) {
 		fmt.Println("please input password：")
 		passWd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
@@ -209,7 +210,7 @@ func DecryptPrivate(cmd *cobra.Command, args []string) {
 
 	privKey, err := loadPrivate(keyFile, passWd)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("wrong password"))
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
 
@@ -235,7 +236,7 @@ func MnemonicToAccount(cmd *cobra.Command, args []string) {
 	var err error
 	priv, err := mnemonic.MnemonicToEc(args[0])
 	if err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("[mnemonic] wrong"))
+		outputError(cmd.Use, errors.New("[mnemonic] wrong"))
 		return
 	}
 	if len(args) == 2 && args[1] != "" {
@@ -244,25 +245,98 @@ func MnemonicToAccount(cmd *cobra.Command, args []string) {
 		fmt.Println("please set address password, cannot exceed 32 bytes：")
 		passWd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read pass word failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read pass word failed! %s", err.Error()))
 			return
 		}
 	}
 	if len(passWd) > 32 {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("password too long! "))
+		outputError(cmd.Use, fmt.Errorf("password too long! "))
 		return
 	}
 	p2pId, err := kit.GenerateP2PID(priv)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("generate p2p id failed! %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("generate p2p id failed! %s", err.Error()))
 	}
 	if j, err := keystore.GenerateKeyJson(Net, Cfg.KeystoreDir, priv, args[0], passWd); err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("generate key failed! %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("generate key failed! %s", err.Error()))
 	} else {
 		j.P2pId = p2pId.String()
 		bytes, _ := json.Marshal(j)
 		output(string(bytes))
 	}
+}
+
+var DerivedAddressesCmd = &cobra.Command{
+	Use:     "DerivedAddresses {address} {start} {count} {password}；Generate derived addresses;",
+	Short:   "DerivedAddresses {address} {start} {count} {password}; Generate derived addresses;",
+	Aliases: []string{"derivedaddresses", "DA", "da"},
+	Example: `
+	DerivedAddresses AifUjaD26AXCxMHuhG4HvvDkqJdfyAG652Z 1 10
+		OR
+	DerivedAddresses AifUjaD26AXCxMHuhG4HvvDkqJdfyAG652Z 1 10 123456
+	`,
+	Args: cobra.MinimumNArgs(3),
+	Run:  DerivedAddresses,
+}
+
+type Derived struct {
+	Address string `json:"address"`
+	Index   uint32 `json:"index"`
+}
+
+func DerivedAddresses(cmd *cobra.Command, args []string) {
+	var passWd []byte
+	var err error
+	if len(args) == 4 && args[3] != "" {
+		passWd = []byte(args[3])
+	} else {
+		fmt.Println("please set address password, cannot exceed 32 bytes：")
+		passWd, err = readPassWd()
+		if err != nil {
+			outputError(cmd.Use, fmt.Errorf("read pass word failed! %s", err.Error()))
+			return
+		}
+	}
+	if len(passWd) > 32 {
+		outputError(cmd.Use, fmt.Errorf("password too long! "))
+		return
+	}
+	ds := make([]*Derived, 0)
+	m, err := getMnemonic(getAddJsonPath(args[0]), passWd)
+	if err != nil {
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
+		return
+	}
+	e, err := kit.MnemonicToEntropy(m)
+	if err != nil {
+		outputError(cmd.Use, err)
+		return
+	}
+	sStart := args[1]
+	sCount := args[2]
+	start, err := strconv.Atoi(sStart)
+	if err != nil {
+		outputError(cmd.Use, err)
+		return
+	}
+	count, err := strconv.Atoi(sCount)
+	if err != nil {
+		outputError(cmd.Use, err)
+		return
+	}
+	for i := start; i < start+count; i++ {
+		address, err := kit.HdDeriveAddress(Net, e, uint32(i))
+		if err != nil {
+			outputError(cmd.Use, err)
+			return
+		}
+		ds = append(ds, &Derived{
+			Address: address,
+			Index:   uint32(i),
+		})
+	}
+	bytes, _ := json.Marshal(ds)
+	output(string(bytes))
 }
 
 func getAddJsonPath(addr string) string {
@@ -275,4 +349,12 @@ func loadPrivate(jsonFile string, password []byte) (*keystore.Private, error) {
 		return nil, err
 	}
 	return keystore.DecryptPrivate(password, j)
+}
+
+func getMnemonic(jsonFile string, password []byte) (string, error) {
+	j, err := keystore.ReadJson(jsonFile)
+	if err != nil {
+		return "", err
+	}
+	return keystore.DecryptMnemonic(password, j)
 }

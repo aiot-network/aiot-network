@@ -110,7 +110,7 @@ func LoadParam(private private.IPrivate) error {
 		Param.RpcParam.RpcTLS = cfg.RpcTLS
 	}
 	if cfg.RpcCert != "" {
-		Param.RpcParam.RpcCertKey = cfg.RpcCert
+		Param.RpcParam.RpcCertKey = cfg.RpcKey
 	}
 	if cfg.KeyFile != "" {
 		Param.PrivateFile = cfg.KeyFile

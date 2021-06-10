@@ -10,7 +10,7 @@ const (
 	// Block interval period
 	BlockInterval = uint64(15)
 	// Re-election interval
-	CycleInterval = 60 * 60 *24
+	CycleInterval = 60 * 60 * 24
 	//CycleInterval = 60
 	// Maximum number of super nodes
 	SuperSize = 9
@@ -41,6 +41,8 @@ type Param struct {
 	RollBack          uint64
 	PubKeyHashAddrID  [2]byte
 	PubKeyHashTokenID [2]byte
+	HDPrivateKeyID    [4]byte
+	HDPublicKeyID     [4]byte
 	Logging           bool
 	PeerRequestChan   uint32
 	*PrivateParam
@@ -99,14 +101,14 @@ type AddressInfo struct {
 }
 
 type DPosParam struct {
-	BlockInterval    uint64
-	CycleInterval    uint64
-	SuperSize        int
-	DPosSize         int
-	GenesisTime      uint64
-	GenesisCycle     uint64
-	WorkProofAddress string
-	GenesisSuperList []AddressInfo
+	BlockInterval       uint64
+	CycleInterval       uint64
+	SuperSize           int
+	DPosSize            int
+	GenesisTime         uint64
+	GenesisCycle        uint64
+	WorkProofAddress    string
+	GenesisSuperList    []AddressInfo
 	CoinBaseAddressList *CoinBaseAddress
 }
 
@@ -124,6 +126,8 @@ var TestNetParam = &Param{
 	RollBack:          0,
 	PubKeyHashAddrID:  [2]byte{0x12, 0xfb},
 	PubKeyHashTokenID: [2]byte{0x13, 0x14},
+	HDPrivateKeyID:    [4]byte{0x02, 0xb7, 0xc3, 0x21},
+	HDPublicKeyID:     [4]byte{0x02, 0xb7, 0xc3, 0x20},
 	Logging:           true,
 	PeerRequestChan:   1000,
 	PrivateParam: &PrivateParam{
@@ -265,6 +269,8 @@ var MainNetParam = &Param{
 	RollBack:          0,
 	PubKeyHashAddrID:  [2]byte{0x5, 0x78},
 	PubKeyHashTokenID: [2]byte{0x5, 0x91},
+	HDPrivateKeyID:    [4]byte{0x01, 0xb7, 0xc3, 0x21},
+	HDPublicKeyID:     [4]byte{0x01, 0xb7, 0xc3, 0x20},
 	Logging:           true,
 	PeerRequestChan:   1000,
 	PrivateParam: &PrivateParam{
@@ -407,19 +413,19 @@ type PreCirculation struct {
 
 type CoinBaseAddress []AddressInfo
 
-func (s *CoinBaseAddress)CurrentAddress(height uint64)arry.Address{
-	if len(*s) == 0 || height == 0{
+func (s *CoinBaseAddress) CurrentAddress(height uint64) arry.Address {
+	if len(*s) == 0 || height == 0 {
 		return arry.Address{}
 	}
 
 	index := height % uint64(len(*s))
-	if index == 0{
+	if index == 0 {
 		return arry.StringToAddress((*s)[len(*s)-1].Address)
-	}else{
+	} else {
 		return arry.StringToAddress((*s)[index-1].Address)
 	}
 }
 
-func (s *CoinBaseAddress)Len()int{
+func (s *CoinBaseAddress) Len() int {
 	return len(*s)
 }
