@@ -38,7 +38,7 @@ func (r *RequestHandler) LastHeight(conn *types.Conn) (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
-	response, err := r.UnmarshalResponse(s)
+	response, _ := r.UnmarshalResponse(s)
 	if response != nil && response.Code == Success {
 		err := rlp.DecodeBytes(response.Body, &height)
 		if err != nil {
@@ -67,7 +67,7 @@ func (r *RequestHandler) SendMsg(conn *types.Conn, msg types.IMessage) error {
 	if err != nil {
 		return err
 	}
-	response, err := r.UnmarshalResponse(s)
+	response, _ := r.UnmarshalResponse(s)
 	if response != nil && response.Code == Success {
 		return nil
 	} else {
@@ -93,7 +93,7 @@ func (r *RequestHandler) SendBlock(conn *types.Conn, block types.IBlock) error {
 	if err != nil {
 		return err
 	}
-	response, err := r.UnmarshalResponse(s)
+	response, _ := r.UnmarshalResponse(s)
 	if response != nil && response.Code == Success {
 		return nil
 	} else {
@@ -123,7 +123,7 @@ func (r *RequestHandler) GetBlocks(conn *types.Conn, height, count uint64) ([]ty
 	if err != nil {
 		return nil, request2.Err_PeerClosed
 	}
-	response, err := r.UnmarshalResponse(s)
+	response, _ := r.UnmarshalResponse(s)
 	if response != nil && response.Code == Success {
 		blocks, err := chaintypes.DecodeRlpBlocks(response.Body)
 		if err != nil {
@@ -158,7 +158,7 @@ func (r *RequestHandler) GetBlock(conn *types.Conn, height uint64) (types.IBlock
 	if err != nil {
 		return nil, request2.Err_PeerClosed
 	}
-	response, err := r.UnmarshalResponse(s)
+	response, _ := r.UnmarshalResponse(s)
 	if response != nil && response.Code == Success {
 		block, err := chaintypes.DecodeRlpBlock(response.Body)
 		if err != nil {
@@ -187,7 +187,7 @@ func (r *RequestHandler) IsEqual(conn *types.Conn, header types.IHeader) (bool, 
 
 	request := NewRequest(isEqual, header.Bytes())
 	err = requestStream(request, s)
-	response, err := r.UnmarshalResponse(s)
+	response, _ := r.UnmarshalResponse(s)
 	var rs bool
 	if response != nil && response.Code == Success {
 		err := rlp.DecodeBytes(response.Body, &rs)
@@ -215,7 +215,7 @@ func (r *RequestHandler) LocalInfo(conn *types.Conn) (*types.Local, error) {
 
 	request := NewRequest(localInfo, nil)
 	err = requestStream(request, s)
-	response, err := r.UnmarshalResponse(s)
+	response, _ := r.UnmarshalResponse(s)
 	var rs *types.Local
 	if response != nil && response.Code == Success {
 		err := rlp.DecodeBytes(response.Body, &rs)

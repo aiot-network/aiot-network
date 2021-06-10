@@ -27,7 +27,6 @@ type DPosDB struct {
 }
 
 func Open(path string) (*DPosDB, error) {
-	var err error
 	baseDB, err := base.Open(path)
 	if err != nil {
 		return nil, err
@@ -92,6 +91,9 @@ func (d *DPosDB) CycleSupers(cycle uint64) (*types.Supers, error) {
 		return nil, err
 	}
 	bytes, err := d.base.GetFromBucket(_cycleSupers, cycleBytes)
+	if err != nil{
+		return nil, err
+	}
 	if err := rlp.DecodeBytes(bytes, &supers); err != nil {
 		return nil, err
 	}
