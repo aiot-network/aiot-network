@@ -112,7 +112,7 @@ func DecryptPrivate(passWd []byte, j *Key) (*Private, error) {
 	if !ok {
 		return nil, errors.New("aes decrypt failed")
 	}
-	privKey, err := secp256k1.ParseStringToPrivate(privKeyStr)
+	privKey, err := secp256k1.PrivKeyFromString(privKeyStr)
 	if err != nil {
 		return nil, fmt.Errorf("parse private string failed! %s", err.Error())
 	}
@@ -129,6 +129,28 @@ func DecryptPrivate(passWd []byte, j *Key) (*Private, error) {
 	}
 	privateJson := &Private{Private: privKey.String(), Mnemonic: mnemonicStr}
 	return privateJson, nil
+}
+
+func DecryptMnemonic(passWd []byte, j *Key) (string, error) {
+	var mnemonicStr string
+	var ok bool
+	salt, err := hex.DecodeString(j.Crypto.Salt)
+	if err != nil {
+		return "", fmt.Errorf("decode salt failed! %s", err.Error())
+	}
+	if j.Crypto.MnemonicCipherText != "" {
+		mnemonicText, err := hex.DecodeString(j.Crypto.MnemonicCipherText)
+		if err != nil {
+			return "", fmt.Errorf("decode mnemonicText failed! %s", err.Error())
+		}
+		mnemonicStr, ok = aes.AESCFBDecrypt(bytes.Join([][]byte{passWd, salt}, []byte{}), mnemonicText)
+		if !ok {
+			return "", errors.New("aes decrypt failed")
+		}
+		return mnemonicStr, nil
+	} else {
+		return "", fmt.Errorf("this is no mnemonic")
+	}
 }
 
 func ReadJson(jsonFile string) (*Key, error) {

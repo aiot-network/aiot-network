@@ -11,7 +11,6 @@ import (
 	"github.com/aiot-network/aiotchain/service/p2p"
 	"github.com/aiot-network/aiotchain/tools/amount"
 	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strconv"
 	"time"
@@ -56,44 +55,44 @@ func SendWork(cmd *cobra.Command, args []string) {
 		fmt.Println("please input password：")
 		passwd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
 	private, err := loadPrivate(getAddJsonPath(args[0]), passwd)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("wrong password"))
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
-	privKey, err := secp256k1.ParseStringToPrivate(private.Private)
+	privKey, err := secp256k1.PrivKeyFromString(private.Private)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("failed to parse private %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("failed to parse private %s", err.Error()))
 		return
 	}
 
 	workMsg, err := parseWork(args)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err.Error())
+		outputError(cmd.Use, err)
 		return
 	}
 	account, err := AccountByRpc(workMsg.From().String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if workMsg.Header.Nonce == 0 {
 		workMsg.Header.Nonce = account.Nonce + 1
 	}
 	if err := signMsg(workMsg, privKey.String()); err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("signature failure"))
+		outputError(cmd.Use, errors.New("signature failure"))
 		return
 	}
 
 	rs, err := sendMsg(workMsg)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 	} else if rs.Code != 0 {
-		log.Errorf(cmd.Use+" err: code %d, message: %s", rs.Code, rs.Err)
+		outputRespError(cmd.Use, rs)
 	} else {
 		fmt.Println()
 		fmt.Println(string(rs.Result))
@@ -152,45 +151,45 @@ func SendCandidate(cmd *cobra.Command, args []string) {
 		fmt.Println("please input password：")
 		passwd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
 	private, err := loadPrivate(getAddJsonPath(args[0]), passwd)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("wrong password"))
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
-	privKey, err := secp256k1.ParseStringToPrivate(private.Private)
+	privKey, err := secp256k1.PrivKeyFromString(private.Private)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("failed to parse private %s", err.Error()))
+		outputError(cmd.Use, fmt.Errorf("failed to parse private %s", err.Error()))
 		return
 	}
 	p2pId, _ := p2p.PrivateToP2pId(private2.NewPrivate(privKey))
 
 	candidateMsg, err := parseCandidate(cmd, args, p2pId.String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err.Error())
+		outputError(cmd.Use, err)
 		return
 	}
 	account, err := AccountByRpc(candidateMsg.From().String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if candidateMsg.Header.Nonce == 0 {
 		candidateMsg.Header.Nonce = account.Nonce + 1
 	}
 	if err := signMsg(candidateMsg, privKey.String()); err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("signature failure"))
+		outputError(cmd.Use, errors.New("signature failure"))
 		return
 	}
 
 	rs, err := sendMsg(candidateMsg)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 	} else if rs.Code != 0 {
-		log.Errorf(cmd.Use+" err: code %d, message: %s", rs.Code, rs.Err)
+		outputRespError(cmd.Use, rs)
 	} else {
 		fmt.Println()
 		fmt.Println(string(rs.Result))
@@ -210,7 +209,6 @@ func parseCandidate(cmd *cobra.Command, args []string, p2pid string) (*types.Mes
 			return nil, errors.New("[fees] wrong")
 		}
 		if fee, err = amount.NewAmount(fFees); err != nil {
-			log.Error(cmd.Use + " err: ")
 			return nil, errors.New("[fees] wrong")
 		}
 	}
@@ -248,7 +246,7 @@ func CancelCandidate(cmd *cobra.Command, args []string) {
 		fmt.Println("please input password：")
 		passwd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
@@ -260,27 +258,27 @@ func CancelCandidate(cmd *cobra.Command, args []string) {
 
 	cancel, err := parseCancel(args)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	account, err := AccountByRpc(cancel.From().String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if cancel.Header.Nonce == 0 {
 		cancel.Header.Nonce = account.Nonce + 1
 	}
 	if err := signMsg(cancel, privKey.Private); err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("signature failure"))
+		outputError(cmd.Use, errors.New("signature failure"))
 		return
 	}
 
 	rs, err := sendMsg(cancel)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 	} else if rs.Code != 0 {
-		log.Errorf(cmd.Use+" err: code %d, message: %s", rs.Code, rs.Err)
+		outputRespError(cmd.Use, rs)
 	} else {
 		fmt.Println()
 		fmt.Println(string(rs.Result))
@@ -341,18 +339,18 @@ func Vote(cmd *cobra.Command, args []string) {
 	}
 	privKey, err := loadPrivate(getAddJsonPath(args[0]), passwd)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 
 	vote, err := parseVote(args)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	account, err := AccountByRpc(vote.From().String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 
@@ -360,18 +358,17 @@ func Vote(cmd *cobra.Command, args []string) {
 		vote.Header.Nonce = account.Nonce + 1
 	}
 	if err := signMsg(vote, privKey.Private); err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("signature failure"))
+		outputError(cmd.Use, errors.New("signature failure"))
 		return
 	}
 
 	rs, err := sendMsg(vote)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 	} else if rs.Code != 0 {
-		log.Errorf(cmd.Use+" err: code %d, message: %s", rs.Code, rs.Err)
+		outputRespError(cmd.Use, rs)
 	} else {
-		fmt.Println()
-		fmt.Println(string(rs.Result))
+		output(string(rs.Result))
 	}
 }
 
@@ -413,7 +410,7 @@ var GetCandidatesCmd = &cobra.Command{
 func GetCandidates(cmd *cobra.Command, args []string) {
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -422,7 +419,7 @@ func GetCandidates(cmd *cobra.Command, args []string) {
 	defer cancel()
 	resp, err := client.Gc.Candidates(ctx, &rpc.NullReq{})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {
@@ -446,12 +443,12 @@ var CycleSupersCmd = &cobra.Command{
 func CycleSupers(cmd *cobra.Command, args []string) {
 	term, err := strconv.ParseUint(args[0], 10, 64)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("[term] wrong"))
+		outputError(cmd.Use, errors.New("[term] wrong"))
 		return
 	}
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -460,7 +457,7 @@ func CycleSupers(cmd *cobra.Command, args []string) {
 
 	resp, err := client.Gc.GetCycleSupers(ctx, &rpc.CycleReq{Cycle: term})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {
@@ -485,12 +482,12 @@ var CycleRewordCmd = &cobra.Command{
 func CycleReword(cmd *cobra.Command, args []string) {
 	term, err := strconv.ParseUint(args[0], 10, 64)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("[term] wrong"))
+		outputError(cmd.Use, errors.New("[term] wrong"))
 		return
 	}
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -499,7 +496,7 @@ func CycleReword(cmd *cobra.Command, args []string) {
 
 	resp, err := client.Gc.GetSupersReward(ctx, &rpc.CycleReq{Cycle: term})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {

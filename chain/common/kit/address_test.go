@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenerateAddress(t *testing.T) {
-	key, _ := secp256k1.ParseStringToPrivate("cbb838da3e01d02946afdf6d6394ca79cb07068048503ce5b0ff1c1e65de3eac")
+	key, _ := secp256k1.PrivKeyFromString("cbb838da3e01d02946afdf6d6394ca79cb07068048503ce5b0ff1c1e65de3eac")
 
 	addr, _ := GenerateAddress(param.TestNet, key.PubKey().SerializeCompressedString())
 	fmt.Println(addr)

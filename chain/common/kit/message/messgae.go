@@ -210,7 +210,7 @@ func NewWork(from string, nonce uint64, start uint64, end uint64, t uint64, work
 }
 
 func Sign(keyStr string, hash string) (*types.Signature, error) {
-	key, err := secp256k1.ParseStringToPrivate(keyStr)
+	key, err := secp256k1.PrivKeyFromString(keyStr)
 	if err != nil {
 		return nil, err
 	}

@@ -62,7 +62,7 @@ func GeneratePrivateKey() (*PrivateKey, error) {
 	return (*PrivateKey)(key), nil
 }
 
-func ParseStringToPrivate(keyStr string) (*PrivateKey, error) {
+func PrivKeyFromString(keyStr string) (*PrivateKey, error) {
 	bytes, err := hex.DecodeString(keyStr)
 	if err != nil {
 		return nil, err

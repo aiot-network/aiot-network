@@ -7,7 +7,6 @@ import (
 	"github.com/aiot-network/aiotchain/chain/rpc"
 	"github.com/aiot-network/aiotchain/cmd/wallet/config"
 	"github.com/aiot-network/aiotchain/common/param"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io"
 	"reflect"
@@ -44,11 +43,11 @@ func output(dataStr string) {
 }
 
 func outputRespError(cmdUser string, resp *rpc.Response) {
-	logrus.Errorf(cmdUser+" err code :%d, message :%s", resp.Code, resp.Err)
+	fmt.Printf("ERR: "+cmdUser+" err code :%d, message :%s\n", resp.Code, resp.Err)
 }
 
 func outputError(cmdUser string, err error) {
-	logrus.Errorf(cmdUser+" %s", err.Error())
+	fmt.Printf("ERR: "+cmdUser+" %s\n", err.Error())
 }
 
 func NewRpcClient() (*rpc.Client, error) {

@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/aiot-network/aiotchain/chain/common/kit"
 	"github.com/aiot-network/aiotchain/chain/common/kit/message"
 	"github.com/aiot-network/aiotchain/chain/rpc"
 	"github.com/aiot-network/aiotchain/chain/types"
 	amount2 "github.com/aiot-network/aiotchain/tools/amount"
 	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strconv"
 	"strings"
@@ -23,6 +23,7 @@ func init() {
 		GetBlockCmd,
 		GetMessageCmd,
 		SendMessageCmd,
+		SendDerivedTransactionCmd,
 	}
 
 	RootCmd.AddCommand(blockCmds...)
@@ -43,7 +44,7 @@ var LastHeightCmd = &cobra.Command{
 func LastHeight(cmd *cobra.Command, args []string) {
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -52,7 +53,7 @@ func LastHeight(cmd *cobra.Command, args []string) {
 	defer cancel()
 	resp, err := client.Gc.LastHeight(ctx, &rpc.NullReq{})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {
@@ -82,7 +83,7 @@ func GetBlock(cmd *cobra.Command, args []string) {
 	}
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -92,7 +93,7 @@ func GetBlock(cmd *cobra.Command, args []string) {
 
 	resp, err := client.Gc.GetBlockHeight(ctx, &rpc.HeightReq{Height: height})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {
@@ -107,7 +108,7 @@ func GetBlockByHash(cmd *cobra.Command, args []string) {
 	var err error
 	client, err := NewRpcClient()
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	defer client.Close()
@@ -117,7 +118,7 @@ func GetBlockByHash(cmd *cobra.Command, args []string) {
 
 	resp, err := client.Gc.GetBlockHash(ctx, &rpc.HashReq{Hash: args[0]})
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {
@@ -152,39 +153,39 @@ func SendTransaction(cmd *cobra.Command, args []string) {
 		fmt.Println("please input password：")
 		passwd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
 	privKey, err := loadPrivate(getAddJsonPath(args[0]), passwd)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("wrong password"))
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
 
 	tx, err := parseTransaction(args)
 	if err != nil {
-		log.Errorf(cmd.Use+" err: %s", err.Error())
+		outputError(cmd.Use, err)
 		return
 	}
 	account, err := AccountByRpc(tx.From().String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if tx.Header.Nonce == 0 {
 		tx.Header.Nonce = account.Nonce + 1
 	}
 	if err := signMsg(tx, privKey.Private); err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("signature failure"))
+		outputError(cmd.Use, errors.New("signature failure"))
 		return
 	}
 
 	rs, err := sendMsg(tx)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 	} else if rs.Code != 0 {
-		log.Errorf(cmd.Use+" err: code %d, message: %s", rs.Code, rs.Err)
+		outputRespError(cmd.Use, rs)
 	} else {
 		fmt.Println()
 		fmt.Println(string(rs.Result))
@@ -245,9 +246,130 @@ func parseReceiver(toStr string) ([]map[string]uint64, error) {
 	return toList, nil
 }
 
+var SendDerivedTransactionCmd = &cobra.Command{
+	Use:     "SendDerivedTransaction {from} {index} {token} {to:amount|{to:amount}} {fees} {password} {nonce}; Send a transaction;",
+	Aliases: []string{"sendderivedtransaction", "SDT", "sdt"},
+	Short:   "SendDerivedTransaction {from} {index} {token} {to:amount|to:amount} {fees} {password} {nonce}; Send a transaction;",
+	Example: `
+	SendDerivedTransaction xCHiGPLCzgnrdTqjKABXZteAGVJu3jXLjnQ 1 FC xCE9boXz2TxSE9srVPDdfszyiXtfT3vduc8:10|xCHiGPLCzgnrdTqjKABXZteAGVJu3jXLjnQ:10 0.1
+		OR
+	SendDerivedTransaction xCHiGPLCzgnrdTqjKABXZteAGVJu3jXLjnQ 1 FC xCE9boXz2TxSE9srVPDdfszyiXtfT3vduc8:10|xCHiGPLCzgnrdTqjKABXZteAGVJu3jXLjnQ:10 0.1 123456
+		OR
+	SendDerivedTransaction xCHiGPLCzgnrdTqjKABXZteAGVJu3jXLjnQ 1 FC xCE9boXz2TxSE9srVPDdfszyiXtfT3vduc8:10 123456 1
+	`,
+	Args: cobra.MinimumNArgs(6),
+	Run:  SendDerivedTransaction,
+}
+
+func SendDerivedTransaction(cmd *cobra.Command, args []string) {
+	var passwd []byte
+	var err error
+	if len(args) > 5 {
+		passwd = []byte(args[5])
+	} else {
+		fmt.Println("please input password：")
+		passwd, err = readPassWd()
+		if err != nil {
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
+			return
+		}
+	}
+	m, err := getMnemonic(getAddJsonPath(args[0]), passwd)
+	if err != nil {
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
+		return
+	}
+	entropy, err := kit.MnemonicToEntropy(m)
+	if err != nil {
+		outputError(cmd.Use, err)
+		return
+	}
+	tx, privStr, err := parseHDTransaction(args, entropy)
+	if err != nil {
+		outputError(cmd.Use, err)
+		return
+	}
+	fmt.Println(tx.From().String())
+	account, err := AccountByRpc(tx.From().String())
+	if err != nil {
+		outputError(cmd.Use, err)
+		return
+	}
+	if tx.Header.Nonce == 0 {
+		tx.Header.Nonce = account.Nonce + 1
+	}
+	if err := signMsg(tx, privStr); err != nil {
+		outputError(cmd.Use, errors.New("signature failure"))
+		return
+	}
+
+	rs, err := sendMsg(tx)
+	if err != nil {
+		outputError(cmd.Use, err)
+	} else if rs.Code != 0 {
+		outputRespError(cmd.Use, rs)
+	} else {
+		fmt.Println()
+		fmt.Println(string(rs.Result))
+	}
+}
+
+func parseHDTransaction(args []string, entropy string) (*types.Message, string, error) {
+	var err error
+	var from, tos, token string
+	var fee, nonce uint64
+	index, err := strconv.Atoi(args[1])
+	if err != nil {
+		return nil, "", err
+	}
+	hdPri, err := kit.HdDerive(Net, entropy, uint32(index))
+	if err != nil {
+		return nil, "", err
+	}
+	hdPub, err := kit.HdPrivateToPublic(hdPri, Net)
+	if err != nil {
+		return nil, "", err
+	}
+	pub, err := kit.HdToEc(hdPub, Net)
+	if err != nil {
+		return nil, "", err
+	}
+	priv, err := kit.HdToEc(hdPri, Net)
+	if err != nil {
+		return nil, "", err
+	}
+	from, err = kit.GenerateAddress(Net, pub)
+	if err != nil {
+		return nil, "", err
+	}
+	token = args[2]
+	tos = args[3]
+	if fFees, err := strconv.ParseFloat(args[4], 64); err != nil {
+		return nil, "", errors.New("[fees] wrong")
+	} else {
+		if fFees < 0 {
+			return nil, "", errors.New("[fees] wrong")
+		}
+		if fee, err = amount2.NewAmount(fFees); err != nil {
+			return nil, "", errors.New("[fees] wrong")
+		}
+	}
+	if len(args) > 6 {
+		nonce, err = strconv.ParseUint(args[6], 10, 64)
+		if err != nil {
+			return nil, "", errors.New("[nonce] wrong")
+		}
+	}
+	toList, err := parseReceiver(tos)
+	if err != nil {
+		return nil, "", err
+	}
+	return message.NewTransaction(from, token, toList, fee, nonce, uint64(time.Now().Unix())), priv, nil
+}
+
 func signMsg(msg *types.Message, key string) error {
 	msg.SetHash()
-	priv, err := secp256k1.ParseStringToPrivate(key)
+	priv, err := secp256k1.PrivKeyFromString(key)
 	if err != nil {
 		return errors.New("[key] wrong")
 	}
@@ -298,7 +420,7 @@ var GetMessageCmd = &cobra.Command{
 func GetMessage(cmd *cobra.Command, args []string) {
 	resp, err := GetMessageRpc(args[0])
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {

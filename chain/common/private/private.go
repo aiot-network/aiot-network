@@ -61,7 +61,7 @@ func (p *Private) Load(file string, key string) error {
 	if err != nil {
 		return fmt.Errorf("decrypt priavte failed! %s", err.Error())
 	}
-	privKey, err := secp256k1.ParseStringToPrivate(privJson.Private)
+	privKey, err := secp256k1.PrivKeyFromString(privJson.Private)
 	if err != nil {
 		return fmt.Errorf("parse priavte failed! %s", err.Error())
 	}

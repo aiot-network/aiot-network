@@ -9,7 +9,6 @@ import (
 	"github.com/aiot-network/aiotchain/chain/rpc"
 	"github.com/aiot-network/aiotchain/chain/types"
 	amount2 "github.com/aiot-network/aiotchain/tools/amount"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strconv"
 	"time"
@@ -50,42 +49,41 @@ func SendCreateToken(cmd *cobra.Command, args []string) {
 		fmt.Println("please input password：")
 		passwd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
 	privKey, err := loadPrivate(getAddJsonPath(args[0]), passwd)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("wrong password"))
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
 
 	tokenMsg, err := parseToken(args)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	account, err := AccountByRpc(tokenMsg.From().String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if tokenMsg.Header.Nonce == 0 {
 		tokenMsg.Header.Nonce = account.Nonce + 1
 	}
 	if err := signMsg(tokenMsg, privKey.Private); err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("signature failure"))
+		outputError(cmd.Use, errors.New("signature failure"))
 		return
 	}
 
 	rs, err := sendMsg(tokenMsg)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 	} else if rs.Code != 0 {
-		log.Errorf(cmd.Use+" err: code %d, message: %s", rs.Code, rs.Err)
+		outputRespError(cmd.Use, rs)
 	} else {
-		fmt.Println()
-		fmt.Println(string(rs.Result))
+		output(string(rs.Result))
 	}
 }
 
@@ -172,39 +170,39 @@ func SendRedemption(cmd *cobra.Command, args []string) {
 		fmt.Println("please input password：")
 		passwd, err = readPassWd()
 		if err != nil {
-			log.Error(cmd.Use+" err: ", fmt.Errorf("read password failed! %s", err.Error()))
+			outputError(cmd.Use, fmt.Errorf("read password failed! %s", err.Error()))
 			return
 		}
 	}
 	privKey, err := loadPrivate(getAddJsonPath(args[0]), passwd)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", fmt.Errorf("wrong password"))
+		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
 
 	reMsg, err := parseRedemption(args)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	account, err := AccountByRpc(reMsg.From().String())
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if reMsg.Header.Nonce == 0 {
 		reMsg.Header.Nonce = account.Nonce + 1
 	}
 	if err := signMsg(reMsg, privKey.Private); err != nil {
-		log.Error(cmd.Use+" err: ", errors.New("signature failure"))
+		outputError(cmd.Use, errors.New("signature failure"))
 		return
 	}
 
 	rs, err := sendMsg(reMsg)
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 	} else if rs.Code != 0 {
-		log.Errorf(cmd.Use+" err: code %d, message: %s", rs.Code, rs.Err)
+		outputRespError(cmd.Use, rs)
 	} else {
 		fmt.Println()
 		fmt.Println(string(rs.Result))
@@ -275,7 +273,7 @@ var TokenCmd = &cobra.Command{
 func Token(cmd *cobra.Command, args []string) {
 	resp, err := GetTokenByRpc(args[0])
 	if err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	}
 	if resp.Code == 0 {

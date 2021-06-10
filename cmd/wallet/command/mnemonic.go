@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"github.com/aiot-network/aiotchain/chain/common/kit"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +30,7 @@ var EntropyCmd = &cobra.Command{
 
 func Entropy(cmd *cobra.Command, args []string) {
 	if entropy, err := kit.Entropy(); err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	} else {
 		fmt.Println()
@@ -52,7 +51,7 @@ var MnemonicCmd = &cobra.Command{
 
 func Mnemonic(cmd *cobra.Command, args []string) {
 	if mnemonic, err := kit.Mnemonic(args[0]); err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	} else {
 		fmt.Println()
@@ -73,7 +72,7 @@ var MnemonicToEcCmd = &cobra.Command{
 
 func MnemonicToEc(cmd *cobra.Command, args []string) {
 	if ec, err := kit.MnemonicToEc(args[0]); err != nil {
-		log.Error(cmd.Use+" err: ", err)
+		outputError(cmd.Use, err)
 		return
 	} else {
 		fmt.Println()
