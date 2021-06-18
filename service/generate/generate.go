@@ -2,6 +2,7 @@ package generate
 
 import (
 	"github.com/aiot-network/aiotchain/common/blockchain"
+	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/common/dpos"
 	"github.com/aiot-network/aiotchain/common/horn"
 	"github.com/aiot-network/aiotchain/service/pool"
@@ -68,7 +69,12 @@ func (g *Generate) generate() {
 }
 
 func (g *Generate) generateBlock(now time.Time) {
-	header, err := g.chain.NextHeader(uint64(now.Unix()))
+	nowUint := uint64(now.Unix())
+	if nowUint <= config.Param.GenesisTime {
+		log.Info("Wait for the creation")
+		return
+	}
+	header, err := g.chain.NextHeader(nowUint)
 	if err != nil {
 		log.Error("Failed to generate next header", "module", module, "error", err)
 		return
