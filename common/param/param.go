@@ -317,8 +317,8 @@ var MainNetParam = &Param{
 		CycleInterval:    CycleInterval,
 		SuperSize:        SuperSize,
 		DPosSize:         DPosSize,
-		GenesisTime:      1622525262,
-		GenesisCycle:     1622525262 / CycleInterval,
+		GenesisTime:      1624083180,
+		GenesisCycle:     1624083180 / CycleInterval,
 		WorkProofAddress: "AiZ3V77E7S5jA8afLVrS3eDYoNFKXQYSRo1",
 		GenesisSuperList: []AddressInfo{
 			{

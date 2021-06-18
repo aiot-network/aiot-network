@@ -68,7 +68,8 @@ func (g *Generate) generate() {
 }
 
 func (g *Generate) generateBlock(now time.Time) {
-	header, err := g.chain.NextHeader(uint64(now.Unix()))
+	nowUint := uint64(now.Unix())
+	header, err := g.chain.NextHeader(nowUint)
 	if err != nil {
 		log.Error("Failed to generate next header", "module", module, "error", err)
 		return
@@ -82,6 +83,7 @@ func (g *Generate) generateBlock(now time.Time) {
 		//.Warn("check winner failed!", "height", header.Height, "error", err)
 		return
 	}
+
 	txs := g.pool.NeedPackaged(maxPackedBytes)
 	nextBlock, err := g.chain.NextBlock(txs, uint64(now.Unix()))
 	if err != nil {
