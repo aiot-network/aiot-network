@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -22,18 +21,14 @@ import (
 	log "github.com/aiot-network/aiotchain/tools/log/log15"
 	"github.com/aiot-network/aiotchain/tools/utils"
 	"github.com/aiot-network/aiotchain/types"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"golang.org/x/net/http2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 )
 
 const module = "rpc"
@@ -58,12 +53,6 @@ func (r *Rpc) Name() string {
 
 func (r *Rpc) Start() error {
 	var err error
-	var tlsConfig *tls.Config
-	httpListen, err := net.Listen("tcp", ":"+config.Param.HttpPort)
-	if err != nil {
-		return err
-	}
-	endPoint := "127.0.0.1:" + config.Param.RpcPort
 	lis, err := net.Listen("tcp", ":"+config.Param.RpcPort)
 	if err != nil {
 		return err
@@ -80,80 +69,13 @@ func (r *Rpc) Start() error {
 		}
 	}()
 
-	getWay, err := r.NewGetWay(endPoint)
-	if err != nil {
-		return err
-	}
 
-	mux := http.NewServeMux()
-	mux.Handle("/", getWay)
-	if config.Param.RpcTLS {
-		tlsConfig, err = getTLSConfig(config.Param.RpcCert, config.Param.RpcCertKey)
-		if err != nil {
-			return err
-		}
-		httpListen = tls.NewListener(httpListen, tlsConfig)
-	}
-
-	r.httpServer = &http.Server{
-		Addr:      ":" + config.Param.HttpPort,
-		Handler:   GrpcHandlerFunc(r.grpcServer, mux),
-		TLSConfig: tlsConfig,
-	}
-
-	go func() {
-		if err := r.httpServer.Serve(httpListen); err != nil {
-			log.Info("Rpc startup failed!", "module", module, "err", err)
-			os.Exit(1)
-			return
-		}
-		log.Info("http startup", "module", module, "port", config.Param.HttpPort)
-	}()
 	if config.Param.RpcTLS {
 		log.Info("Rpc startup", "module", module, "port", config.Param.RpcPort, "pem", config.Param.RpcCert)
 	} else {
 		log.Info("Rpc startup", "module", module, "port", config.Param.RpcPort)
 	}
 	return nil
-}
-
-func getTLSConfig(certPemPath, certKeyPath string) (*tls.Config, error) {
-	var certKeyPair *tls.Certificate
-	cert, _ := ioutil.ReadFile(certPemPath)
-	key, _ := ioutil.ReadFile(certKeyPath)
-
-	pair, err := tls.X509KeyPair(cert, key)
-	if err != nil {
-		return nil, err
-	}
-
-	certKeyPair = &pair
-
-	return &tls.Config{
-		Certificates: []tls.Certificate{*certKeyPair},
-		NextProtos:   []string{http2.NextProtoTLS},
-	}, nil
-}
-
-func GrpcHandlerFunc(grpcServer *grpc.Server, otherHandler http.Handler) http.Handler {
-	if otherHandler == nil {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			grpcServer.ServeHTTP(w, r)
-		})
-	}
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, pass, _ := r.BasicAuth()
-		if user != config.Param.RpcUser || pass != config.Param.RpcPass {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(fmt.Sprintf("the token authentication information is invalid: username=%s, password=%s\n", user, pass)))
-			return
-		}
-		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-			grpcServer.ServeHTTP(w, r)
-		} else {
-			otherHandler.ServeHTTP(w, r)
-		}
-	})
 }
 
 func (r *Rpc) Stop() error {
@@ -190,32 +112,6 @@ func (r *Rpc) NewGRpcServer() (*grpc.Server, error) {
 	RegisterGreeterServer(server, r)
 	reflection.Register(server)
 	return server, nil
-}
-
-func (r *Rpc) NewGetWay(endPoint string) (*runtime.ServeMux, error) {
-	dopts := []grpc.DialOption{}
-	dopts = append(dopts, grpc.WithPerRPCCredentials(&customCredential{
-		Username: config.Param.RpcUser,
-		Password: config.Param.RpcPass,
-		OpenTLS:  config.Param.RpcTLS,
-	}))
-	ctx := context.Background()
-	if config.Param.RpcTLS {
-		creds, err := credentials.NewClientTLSFromFile(config.Param.RpcCert, "")
-		if err != nil {
-			return nil, err
-		}
-		dopts = append(dopts, grpc.WithTransportCredentials(creds))
-	} else {
-		dopts = append(dopts, grpc.WithInsecure())
-	}
-
-	gwmux := runtime.NewServeMux()
-	if err := RegisterGreeterHandlerFromEndpoint(ctx, gwmux, endPoint, dopts); err != nil {
-		return nil, err
-	}
-	gwmux.GetForwardResponseOptions()
-	return gwmux, nil
 }
 
 func (r *Rpc) RegisterLocalInfo(f func() *types.Local) {
