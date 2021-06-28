@@ -67,7 +67,8 @@ func (p *Pool) Info() map[string]interface{} {
 // Verify adding messages to the message pool
 func (p *Pool) Put(msg types.IMessage, isPeer bool) error {
 	if err := p.msgMgt.Put(msg); err != nil {
-		return utils.Error(fmt.Sprintf("add message failed, %s", err.Error()), module)
+		log.Warn("Received the message", "module", module, "error", err.Error())
+		return utils.Error(fmt.Sprintf("add GF failed, %s", err.Error()), module)
 	}
 	log.Info("Received the message", "module", module, "hash", msg.Hash().String())
 	if !isPeer {

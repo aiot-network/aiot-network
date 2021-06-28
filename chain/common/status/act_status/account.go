@@ -2,6 +2,7 @@ package act_status
 
 import (
 	"errors"
+	"fmt"
 	"github.com/aiot-network/aiotchain/chain/db/status/act_db"
 	fmtypes "github.com/aiot-network/aiotchain/chain/types"
 	"github.com/aiot-network/aiotchain/common/config"
@@ -215,8 +216,9 @@ func (a *ActStatus) SetConfirmed(height uint64) {
 
 // Verify the status of the trading account
 func (a *ActStatus) Check(msg types.IMessage, strict bool) error {
-	if msg.Time() > uint64(utils.NowUnix()) {
-		return errors.New("incorrect message time")
+	now :=  uint64(utils.NowUnix())
+	if msg.Time() > now{
+		return fmt.Errorf("incorrect message time, msg time = %d, now time = %d", msg.Time(), now)
 	}
 
 	account := a.Account(msg.From())
