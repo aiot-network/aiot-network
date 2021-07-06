@@ -37,10 +37,11 @@ func (a *ActStatus) SetTrieRoot(stateRoot arry.Hash) error {
 
 func (a *ActStatus) CheckMessage(msg types.IMessage, strict bool) error {
 	a.mutex.RLock()
-	a.mutex.RUnlock()
+	defer a.mutex.RUnlock()
 
-	if msg.Time() > uint64(utils.NowUnix()) {
-		return errors.New("incorrect transaction time")
+	now := uint64(utils.NowUnix())
+	if msg.Time() > now {
+		return fmt.Errorf("incorrect message time, msg time = %d, now time = %d", msg.Time(), now)
 	}
 
 	account := a.Account(msg.From())
