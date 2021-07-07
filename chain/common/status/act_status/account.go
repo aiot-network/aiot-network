@@ -40,7 +40,7 @@ func (a *ActStatus) CheckMessage(msg types.IMessage, strict bool) error {
 	defer a.mutex.RUnlock()
 
 	now := uint64(utils.NowUnix())
-	if msg.Time() > now {
+	if msg.Time() > now + 60 * 10 {
 		return fmt.Errorf("incorrect message time, msg time = %d, now time = %d", msg.Time(), now)
 	}
 
@@ -218,7 +218,7 @@ func (a *ActStatus) SetConfirmed(height uint64) {
 // Verify the status of the trading account
 func (a *ActStatus) Check(msg types.IMessage, strict bool) error {
 	now :=  uint64(utils.NowUnix())
-	if msg.Time() > now{
+	if msg.Time() > now + 60 * 10{
 		return fmt.Errorf("incorrect message time, msg time = %d, now time = %d", msg.Time(), now)
 	}
 
