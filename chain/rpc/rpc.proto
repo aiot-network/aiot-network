@@ -52,8 +52,7 @@ service Greeter {
   rpc CreateTransaction(TransactionReq)returns (Response) {}
   // Create a token
   rpc CreateToken(TokenReq)returns (Response) {}
-  // Send a transaction
-  rpc token(TransactionReq)returns (Response) {}
+  rpc SendTransaction(TransactionReq)returns (Response) {}
   // Send a Token
   rpc SendToken(TokenReq)returns (Response) {}
 }
