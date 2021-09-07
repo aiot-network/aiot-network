@@ -19,91 +19,142 @@ package rpc;
 
 // The greeting service definition.
 service Greeter {
-    // Sends a greeting
-    rpc GetAccount(AddressReq)returns (Response) {}
-    rpc SendMessageRaw(SendMessageCodeReq)returns (Response) {}
-    rpc GetMessage(HashReq)returns (Response) {}
-    rpc GetBlockHash(HashReq)returns (Response) {}
-    rpc GetBlockHeight(HeightReq)returns (Response) {}
-    rpc LastHeight(NullReq)returns (Response) {}
-    rpc Confirmed(NullReq)returns (Response) {}
-    rpc GetMsgPool(NullReq)returns (Response) {}
-    rpc GetCycleSupers(CycleReq)returns (Response) {}
-    rpc GetSupersReward(CycleReq)returns (Response) {}
-    rpc Token(TokenAddressReq)returns (Response) {}
-    rpc PeersInfo(NullReq)returns (Response) {}
-    rpc LocalInfo(NullReq)returns (Response) {}
-    rpc GenerateAddress(GenerateReq)returns (Response) {}
-    rpc GenerateTokenAddress(GenerateTokenReq)returns (Response) {}
-    rpc CreateTransaction(TransactionReq)returns (Response) {}
-    rpc CreateToken(TokenReq)returns (Response) {}
-    rpc SendTransaction(TransactionReq)returns (Response) {}
-    rpc SendToken(TokenReq)returns (Response) {}
+  // Get account information
+  rpc GetAccount(AddressReq)returns (Response) {}
+  // Send a signed message
+  rpc SendMessageRaw(SendMessageCodeReq)returns (Response) {}
+  // Query message
+  rpc GetMessage(HashReq)returns (Response) {}
+  // Query block using hash
+  rpc GetBlockHash(HashReq)returns (Response) {}
+  // Query block using height
+  rpc GetBlockHeight(HeightReq)returns (Response) {}
+  // The final height
+  rpc LastHeight(NullReq)returns (Response) {}
+  // Confirmed height
+  rpc Confirmed(NullReq)returns (Response) {}
+  // Get message pool information
+  rpc GetMsgPool(NullReq)returns (Response) {}
+  rpc GetCycleSupers(CycleReq)returns (Response) {}
+  // Get reward information
+  rpc GetSupersReward(CycleReq)returns (Response) {}
+  // Get token information
+  rpc Token(TokenAddressReq)returns (Response) {}
+  // Get peer information
+  rpc PeersInfo(NullReq)returns (Response) {}
+  // Get local node information
+  rpc LocalInfo(NullReq)returns (Response) {}
+  // To generate address
+  rpc GenerateAddress(GenerateReq)returns (Response) {}
+  // To generate token address
+  rpc GenerateTokenAddress(GenerateTokenReq)returns (Response) {}
+  // Create a transaction
+  rpc CreateTransaction(TransactionReq)returns (Response) {}
+  // Create a token
+  rpc CreateToken(TokenReq)returns (Response) {}
+  // Send a transaction
+  rpc token(TransactionReq)returns (Response) {}
+  // Send a Token
+  rpc SendToken(TokenReq)returns (Response) {}
 }
 
+// null req
 message NullReq {
 }
 
 message AddressReq {
+  // address
   string address = 1;
 }
 
 message TokenAddressReq {
+  // token address
   string token = 1;
 }
 
 message SendMessageCodeReq{
+  // message data
   bytes code = 1;
 }
 
 message HashReq{
+  // hash
   string hash = 1;
 }
 
 message HeightReq{
+  // height
   uint64 height = 1;
 }
 
 message CycleReq{
+  // cycle
   uint64 cycle = 1;
 }
 
 message GenerateReq{
+  // mainnet or testnet
   string network = 1;
+  // public key
   string publickey = 2;
 }
 
 message GenerateTokenReq{
+  // mainnet or testnet
   string network = 1;
+  // address
   string address = 2;
+  // token symbol
   string abbr = 3;
 }
 
 message TransactionReq{
+  // transfer from
   string from = 1;
+  // transfer to
   string to = 2;
+  // transfer token
   string token = 3;
+  // transfer note
   string note = 4;
+  // transfer amount
   uint64 amount = 5;
+  // transfer fees
   uint64 fees = 6;
+  // transfer time
   uint64 timestamp = 7;
+  // transfer nonce
   uint64 nonce = 8;
+  // signature
   string signature = 9;
+  // public key
   string publickey = 10;
 }
 
 message TokenReq{
+  // token from
   string from = 1;
+  // token receiver
   string receiver = 2;
+  // token address
   string token = 4;
+  // token name
   string name = 5;
+  // token symbol
   string abbr = 6;
+  // false
   bool increase = 7;
+  // token amount
   uint64 amount = 8;
+  // fees
   uint64 fees = 9;
+  // time
   uint64 timestamp = 10;
+  // nonce
   uint64 nonce = 11;
+  // signature
   string signature = 12;
+  // public key
   string publickey = 13;
 }
 
