@@ -40,7 +40,7 @@ func (a *ActStatus) CheckMessage(msg types.IMessage, strict bool) error {
 	defer a.mutex.RUnlock()
 
 	now := uint64(utils.NowUnix())
-	if msg.Time() > now + 60 * 10 {
+	if msg.Time() > now+60*10 {
 		return fmt.Errorf("incorrect message time, msg time = %d, now time = %d", msg.Time(), now)
 	}
 
@@ -168,7 +168,7 @@ func (a *ActStatus) ToMessage(msg types.IMessage, height uint64) error {
 			if err != nil {
 				return err
 			}
-			err = toAct.ToMessage(msg.Type(), re.Address, msgBody.MsgToken(), re.Amount, height)
+			err = toAct.ToMessage(msg.Type(), re.Address, msgBody.MsgContract(), re.Amount, height)
 			if err != nil {
 				return err
 			}
@@ -198,7 +198,7 @@ func (a *ActStatus) ToMessage(msg types.IMessage, height uint64) error {
 			if err != nil {
 				return err
 			}
-			err = toAct.ToMessage(msg.Type(), re.Address, msgBody.MsgToken(), re.Amount, height)
+			err = toAct.ToMessage(msg.Type(), re.Address, msgBody.MsgContract(), re.Amount, height)
 			if err != nil {
 				return err
 			}
@@ -215,10 +215,106 @@ func (a *ActStatus) SetConfirmed(height uint64) {
 	a.confirmed = height
 }
 
+func (a *ActStatus) Transfer(from, to, token arry.Address, amount uint64, height uint64) error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
+	fromAcc := a.Account(from)
+	if err := fromAcc.TransferOut(token, amount, height); err != nil {
+		return err
+	}
+	toAcc := a.Account(to)
+	if err := toAcc.TransferIn(token, amount, height); err != nil {
+		return err
+	}
+	a.setAccount(fromAcc)
+	a.setAccount(toAcc)
+	return nil
+}
+
+func (a *ActStatus) PreTransfer(from, to, token arry.Address, amount uint64, height uint64) error {
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
+
+	fromAcc := a.Account(from)
+	if err := fromAcc.TransferOut(token, amount, height); err != nil {
+		return err
+	}
+	toAcc := a.Account(to)
+	if err := toAcc.TransferIn(token, amount, height); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *ActStatus) PreBurn(from arry.Address, contract arry.Address, amount, height uint64) error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
+	return a.preBurn(from, contract, amount, height)
+}
+
+func (a *ActStatus) preBurn(from arry.Address, contract arry.Address, amount, height uint64) error {
+	var toAccount types.IAccount
+
+	toAccount = a.db.Account(from)
+	err := toAccount.UpdateLocked(a.confirmed)
+	if err != nil {
+		return err
+	}
+
+	return toAccount.TransferOut(contract, amount, height)
+}
+
+func (a *ActStatus) Burn(from arry.Address, contract arry.Address, amount, height uint64) error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
+	return a.burn(from, contract, amount, height)
+}
+
+func (a *ActStatus) burn(from arry.Address, contract arry.Address, amount, height uint64) error {
+	var toAccount types.IAccount
+
+	toAccount = a.db.Account(from)
+	err := toAccount.UpdateLocked(a.confirmed)
+	if err != nil {
+		return err
+	}
+
+	toAccount.TransferOut(contract, amount, height)
+	a.setAccount(toAccount)
+	return nil
+}
+
+func (a *ActStatus) Mint(reviver arry.Address, contract arry.Address, amount, height uint64) error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
+	return a.mint(&types.Receiver{
+		Address: reviver,
+		Amount:  amount,
+	}, contract, height)
+}
+
+func (a *ActStatus) mint(receiver *types.Receiver, contract arry.Address, height uint64) error {
+	var toAccount types.IAccount
+
+	toAccount = a.db.Account(receiver.Address)
+	err := toAccount.UpdateLocked(a.confirmed)
+	if err != nil {
+		return err
+	}
+
+	toAccount.ContractChangeTo(receiver, contract, height)
+	a.setAccount(toAccount)
+	return nil
+}
+
 // Verify the status of the trading account
 func (a *ActStatus) Check(msg types.IMessage, strict bool) error {
-	now :=  uint64(utils.NowUnix())
-	if msg.Time() > now + 60 * 10{
+	now := uint64(utils.NowUnix())
+	if msg.Time() > now+60*10 {
 		return fmt.Errorf("incorrect message time, msg time = %d, now time = %d", msg.Time(), now)
 	}
 

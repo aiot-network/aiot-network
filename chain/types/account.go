@@ -110,7 +110,7 @@ func (a *Account) FromMessage(msg types.IMessage, height uint64) error {
 		return a.addRedemption(msg, height)
 	default:
 		body := msg.MsgBody()
-		tokenAddr := body.MsgToken()
+		tokenAddr := body.MsgContract()
 		if tokenAddr == config.Param.MainToken {
 			return a.changeMain(msg, height)
 		} else {
@@ -251,7 +251,7 @@ func (a *Account) changeToken(msg types.IMessage, height uint64) error {
 	if mainAccount.Balance < fees {
 		return fmt.Errorf("insufficient balance")
 	}
-	tokenAddr := msgBody.MsgToken()
+	tokenAddr := msgBody.MsgContract()
 	coinAccount, ok := a.Tokens.Get(tokenAddr.String())
 	if !ok {
 		return errors.New("account is not exist")
@@ -471,6 +471,60 @@ func (a *Account) checkFees(msg types.IMessage) error {
 		return fmt.Errorf("%s does not have enough balance to pay the handling fee", main)
 	}
 	return nil
+}
+
+func (a *Account) TransferOut(token arry.Address, amount, height uint64) error {
+	tokenInfo, ok := a.Tokens.Get(token.String())
+	if !ok {
+		return errors.New("balance is not enough")
+	}
+	if tokenInfo.Balance < amount {
+		return errors.New("balance is not enough")
+	}
+	tokenInfo.Balance -= amount
+	tokenInfo.LockedOut += amount
+	a.Tokens.Set(tokenInfo)
+	a.JournalOut.Add(token, amount, 0, 0, 0, height)
+	return nil
+}
+
+func (a *Account) TransferIn(token arry.Address, amount, height uint64) error {
+	tokenInfo, ok := a.Tokens.Get(token.String())
+	if ok {
+		tokenInfo.LockedIn += amount
+	} else {
+		tokenInfo = &TokenAccount{
+			Address:   token.String(),
+			Balance:   0,
+			LockedIn:  amount,
+			LockedOut: 0,
+		}
+	}
+	a.Tokens.Set(tokenInfo)
+	a.JournalIn.Add(amount, height, token.String())
+	return nil
+}
+
+// ContractChangeTo Change of contract information
+func (a *Account) ContractChangeTo(re *types.Receiver, contract arry.Address, blockHeight uint64) {
+	if !a.Exist() {
+		a.Address = re.Address
+	}
+
+	amount := re.Amount
+	coinAccount, ok := a.Tokens.Get(contract.String())
+	if ok {
+		coinAccount.LockedIn += amount
+	} else {
+		coinAccount = &TokenAccount{
+			Address:   contract.String(),
+			Balance:   0,
+			LockedIn:  amount,
+			LockedOut: 0,
+		}
+	}
+	a.Tokens.Set(coinAccount)
+	a.JournalIn.Add(re.Amount, blockHeight, contract.String())
 }
 
 func (a *Account) Exist() bool {

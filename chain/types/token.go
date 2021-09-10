@@ -49,6 +49,10 @@ func (t *TokenRecord) IsExist(msgHash arry.Hash) bool {
 	return false
 }
 
+func (t *TokenRecord) Symbol() string {
+	return t.Shorthand
+}
+
 func (t *TokenRecord) CheckToken(msg types.IMessage) error {
 	body := msg.MsgBody().(*TokenBody)
 	if !t.Sender.IsEqual(msg.From()){

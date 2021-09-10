@@ -3,6 +3,7 @@ package types
 import "github.com/aiot-network/aiotchain/tools/arry"
 
 type IToken interface {
+	Symbol() string
 }
 
 type ITokenStatus interface {

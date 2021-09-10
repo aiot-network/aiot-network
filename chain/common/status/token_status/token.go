@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/aiot-network/aiotchain/chain/db/status/token_db"
 	chaintypes "github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/chain/types/status"
 	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/tools/arry"
 	"github.com/aiot-network/aiotchain/types"
@@ -12,6 +13,7 @@ import (
 )
 
 const tokenDB = "token_db"
+const symbolDB = "token_db"
 
 type TokenStatus struct {
 	db    ITokenDB
@@ -72,6 +74,13 @@ func (t *TokenStatus) CheckMessage(msg types.IMessage) error {
 		}
 	}
 	return nil
+}
+
+func (t *TokenStatus) SetToken(record *chaintypes.TokenRecord) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	t.db.SetToken(record)
 }
 
 // Update contract status
@@ -160,7 +169,7 @@ func (t *TokenStatus) UpdateToken(msg types.IMessage, height uint64) error {
 		tokenAddr := msgBody.TokenAddress
 		token := t.db.Token(tokenAddr)
 		if token == nil {
-			return fmt.Errorf("token %s is not exist", msgBody.MsgToken().String())
+			return fmt.Errorf("token %s is not exist", msgBody.MsgContract().String())
 		}
 		reAmount := msgBody.RedemptionAmount()
 		if token.PledgeAmount < reAmount {
@@ -180,4 +189,48 @@ func (t *TokenStatus) Token(address arry.Address) (types.IToken, error) {
 		return nil, errors.New("not found")
 	}
 	return token, nil
+}
+
+func (t *TokenStatus) Contract(address arry.Address) (*status.Contract, error) {
+	contract := t.db.Contract(address)
+	if contract == nil {
+		return nil, errors.New("not found")
+	}
+	return contract, nil
+}
+
+func (t *TokenStatus) SetContract(contract *status.Contract) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	t.db.SetContract(contract)
+}
+
+func (t *TokenStatus) SetContractState(msgHash arry.Hash, state *chaintypes.ContractStatus) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	t.db.SetContractState(msgHash, state)
+
+}
+
+func (t *TokenStatus) ContractState(msgHash arry.Hash) *chaintypes.ContractStatus {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
+	return t.db.ContractState(msgHash)
+}
+
+func (t *TokenStatus) SymbolContract(symbol string) (arry.Address, bool) {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
+	return t.db.SymbolContract(symbol)
+}
+
+func (t *TokenStatus) SetSymbolContract(symbol string, address arry.Address) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	t.db.SetSymbolContract(symbol, address)
 }

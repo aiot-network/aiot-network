@@ -18,7 +18,7 @@ func TestGenerateTokenAddress(t *testing.T) {
 		t.Fatalf(err.Error())
 	}
 	fmt.Println(addr)
-	if !CheckTokenAddress("mainnet", addr){
+	if !CheckContractAddress("mainnet", addr){
 		t.Fatalf(err.Error())
 	}
 }

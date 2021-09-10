@@ -2,6 +2,7 @@ package token_db
 
 import (
 	"github.com/aiot-network/aiotchain/chain/types"
+	"github.com/aiot-network/aiotchain/chain/types/status"
 	"github.com/aiot-network/aiotchain/common/db/base"
 	"github.com/aiot-network/aiotchain/tools/arry"
 	"github.com/aiot-network/aiotchain/tools/trie"
@@ -53,4 +54,39 @@ func (t *TokenDB) Token(address arry.Address) *types.TokenRecord {
 
 func (t *TokenDB) SetToken(token *types.TokenRecord) {
 	t.trie.Update(token.Address.Bytes(), token.Bytes())
+}
+
+func (t *TokenDB) Contract(address arry.Address) *status.Contract {
+	bytes := t.trie.Get(address.Bytes())
+	contract, err := status.DecodeContract(bytes)
+	if err != nil {
+		return nil
+	}
+	return contract
+}
+
+func (t *TokenDB) SetContract(contract *status.Contract) {
+	t.trie.Update(contract.Address.Bytes(), contract.Bytes())
+}
+
+func (t *TokenDB) SetContractState(msgHash arry.Hash, state *types.ContractStatus) {
+	t.trie.Update(msgHash.Bytes(), state.Bytes())
+}
+
+func (t *TokenDB) ContractState(msgHash arry.Hash) *types.ContractStatus {
+	bytes := t.trie.Get(msgHash.Bytes())
+	cs, _ := types.DecodeContractState(bytes)
+	return cs
+}
+
+func (t *TokenDB) SymbolContract(symbol string) (arry.Address, bool) {
+	bytes := t.trie.Get([]byte(symbol))
+	if bytes == nil {
+		return arry.Address{}, false
+	}
+	return arry.BytesToAddress(bytes), true
+}
+
+func (t *TokenDB) SetSymbolContract(symbol string, address arry.Address) {
+	t.trie.Update([]byte(symbol), address.Bytes())
 }

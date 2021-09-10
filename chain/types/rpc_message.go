@@ -130,7 +130,7 @@ func RpcMsgToMsg(rpcMsg *RpcMessage) (*Message, error) {
 		}
 		msgBody, err = RpcWorkBodyToBody(body)
 	}
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	hash, err := arry.StringToHash(rpcMsg.MsgHeader.MsgHash)
@@ -177,7 +177,7 @@ func MsgToRpcMsg(msg types.IMessage) (*RpcMessage, error) {
 			})
 		}
 		rpcMsg.MsgBody = RpcTransactionBody{
-			Token:     msg.MsgBody().MsgToken().String(),
+			Token:     msg.MsgBody().MsgContract().String(),
 			Receivers: rpcRecis,
 		}
 	case Token:
@@ -187,7 +187,7 @@ func MsgToRpcMsg(msg types.IMessage) (*RpcMessage, error) {
 		}
 
 		rpcMsg.MsgBody = &RpcTokenBody{
-			Address:        msg.MsgBody().MsgToken().String(),
+			Address:        msg.MsgBody().MsgContract().String(),
 			Receiver:       msg.MsgBody().MsgTo().ReceiverList()[0].Address.String(),
 			Name:           body.Name,
 			Shorthand:      body.Shorthand,
@@ -201,7 +201,7 @@ func MsgToRpcMsg(msg types.IMessage) (*RpcMessage, error) {
 		}
 
 		rpcMsg.MsgBody = &RpcTokenBody{
-			Address:        msg.MsgBody().MsgToken().String(),
+			Address:        msg.MsgBody().MsgContract().String(),
 			Receiver:       msg.MsgBody().MsgTo().ReceiverList()[0].Address.String(),
 			Name:           body.Name,
 			Shorthand:      body.Shorthand,
@@ -216,7 +216,7 @@ func MsgToRpcMsg(msg types.IMessage) (*RpcMessage, error) {
 		}
 
 		rpcMsg.MsgBody = &RpcRedemptionBody{
-			Address:    msg.MsgBody().MsgToken().String(),
+			Address:    msg.MsgBody().MsgContract().String(),
 			PledgeRate: int(body.PledgeRate),
 			Amount:     body.Amount,
 		}

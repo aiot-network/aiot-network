@@ -19,11 +19,13 @@ const (
 	Work
 	TokenV2
 	Redemption
+	Contract
 )
 
 const (
-	minFees = 1e4
-	maxFees = 1e9
+	minFees      = 1e4
+	maxFees      = 1e9
+	ContractFees = 1e5
 )
 
 type MsgHeader struct {
@@ -64,6 +66,8 @@ func (m *MsgHeader) checkType() error {
 	case TokenV2:
 		return nil
 	case Redemption:
+		return nil
+	case Contract:
 		return nil
 	}
 	return fmt.Errorf("there are no messages of type %d", m.Type)

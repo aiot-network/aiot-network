@@ -16,6 +16,10 @@ type IAccount interface {
 	GetAddress() arry.Address
 	GetBalance(tokenAddr arry.Address) uint64
 	GetWorks() IWorks
+
+	TransferOut(token arry.Address, amount, height uint64) error
+	TransferIn(token arry.Address, amount, height uint64) error
+	ContractChangeTo(re *Receiver, contract arry.Address, blockHeight uint64)
 }
 
 type IActStatus interface {

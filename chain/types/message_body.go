@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aiot-network/aiotchain/chain/common/kit"
+	contractv2 "github.com/aiot-network/aiotchain/chain/types/status"
 	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/tools/amount"
 	"github.com/aiot-network/aiotchain/tools/arry"
 	"github.com/aiot-network/aiotchain/tools/math"
+	"github.com/aiot-network/aiotchain/tools/rlp"
 	"github.com/aiot-network/aiotchain/types"
 	"time"
 )
@@ -94,7 +96,7 @@ func (t *TransactionBody) CheckBody(from arry.Address) error {
 		return err
 	}
 	if !t.TokenAddress.IsEqual(config.Param.MainToken) {
-		if !kit.CheckTokenAddress(config.Param.Name, t.TokenAddress.String()) {
+		if !kit.CheckContractAddress(config.Param.Name, t.TokenAddress.String()) {
 			return errors.New("token address verification failed")
 		}
 	}
@@ -112,7 +114,7 @@ func (t *TransactionBody) MsgAmount() uint64 {
 	return sum
 }
 
-func (t *TransactionBody) MsgToken() arry.Address {
+func (t *TransactionBody) MsgContract() arry.Address {
 	return t.TokenAddress
 }
 
@@ -135,7 +137,7 @@ func (t *TokenBody) CheckBody(from arry.Address) error {
 	if !kit.CheckAddress(config.Param.Name, t.Receiver.String()) {
 		return errors.New("receive address verification failed")
 	}
-	if !kit.CheckTokenAddress(config.Param.Name, t.TokenAddress.String()) {
+	if !kit.CheckContractAddress(config.Param.Name, t.TokenAddress.String()) {
 		return errors.New("token address verification failed")
 	}
 	toKenAddr, err := kit.GenerateTokenAddress(config.Param.Name, t.Shorthand)
@@ -145,7 +147,7 @@ func (t *TokenBody) CheckBody(from arry.Address) error {
 	if toKenAddr != t.TokenAddress.String() {
 		return errors.New("token address verification failed")
 	}
-	if err := kit.CheckShorthand(t.Shorthand); err != nil {
+	if err := kit.CheckSymbol(t.Shorthand); err != nil {
 		return fmt.Errorf("shorthand verification failed, %s", err.Error())
 	}
 	if len(t.Name) > MaxName {
@@ -165,7 +167,7 @@ func (t *TokenBody) MsgAmount() uint64 {
 	return t.Amount
 }
 
-func (t *TokenBody) MsgToken() arry.Address {
+func (t *TokenBody) MsgContract() arry.Address {
 	return t.TokenAddress
 }
 
@@ -185,7 +187,7 @@ func (c *CandidateBody) MsgAmount() uint64 {
 	return 0
 }
 
-func (c *CandidateBody) MsgToken() arry.Address {
+func (c *CandidateBody) MsgContract() arry.Address {
 	return config.Param.MainToken
 }
 
@@ -200,7 +202,7 @@ func (c *CancelBody) CheckBody(from arry.Address) error {
 	return nil
 }
 
-func (c *CancelBody) MsgToken() arry.Address {
+func (c *CancelBody) MsgContract() arry.Address {
 	return config.Param.MainToken
 }
 
@@ -225,7 +227,7 @@ func (v *VoteBody) CheckBody(from arry.Address) error {
 	return nil
 }
 
-func (v *VoteBody) MsgToken() arry.Address {
+func (v *VoteBody) MsgContract() arry.Address {
 	return config.Param.MainToken
 }
 
@@ -271,7 +273,7 @@ func (w *WorkBody) CheckBody(from arry.Address) error {
 	return nil
 }
 
-func (w *WorkBody) MsgToken() arry.Address {
+func (w *WorkBody) MsgContract() arry.Address {
 	return config.Param.MainToken
 }
 
@@ -306,7 +308,7 @@ func (t *TokenV2Body) CheckBody(from arry.Address) error {
 	if !kit.CheckAddress(config.Param.Name, t.Receiver.String()) {
 		return errors.New("receive address verification failed")
 	}
-	if !kit.CheckTokenAddress(config.Param.Name, t.TokenAddress.String()) {
+	if !kit.CheckContractAddress(config.Param.Name, t.TokenAddress.String()) {
 		return errors.New("token address verification failed")
 	}
 	toKenAddr, err := kit.GenerateTokenAddress(config.Param.Name, t.Shorthand)
@@ -316,7 +318,7 @@ func (t *TokenV2Body) CheckBody(from arry.Address) error {
 	if toKenAddr != t.TokenAddress.String() {
 		return errors.New("token address verification failed")
 	}
-	if err := kit.CheckShorthand(t.Shorthand); err != nil {
+	if err := kit.CheckSymbol(t.Shorthand); err != nil {
 		return fmt.Errorf("shorthand verification failed, %s", err.Error())
 	}
 	if len(t.Name) > MaxName {
@@ -346,7 +348,7 @@ func (t *TokenV2Body) MsgAmount() uint64 {
 	return t.Amount
 }
 
-func (t *TokenV2Body) MsgToken() arry.Address {
+func (t *TokenV2Body) MsgContract() arry.Address {
 	return t.TokenAddress
 }
 
@@ -365,7 +367,7 @@ func (r *RedemptionBody) MsgTo() types.IReceiver {
 }
 
 func (r *RedemptionBody) CheckBody(from arry.Address) error {
-	if !kit.CheckTokenAddress(config.Param.Name, r.TokenAddress.String()) {
+	if !kit.CheckContractAddress(config.Param.Name, r.TokenAddress.String()) {
 		return errors.New("token address verification failed")
 	}
 	if r.Amount > math.MaxInt64 {
@@ -382,10 +384,113 @@ func (r *RedemptionBody) MsgAmount() uint64 {
 	return r.Amount
 }
 
-func (r *RedemptionBody) MsgToken() arry.Address {
+func (r *RedemptionBody) MsgContract() arry.Address {
 	return r.TokenAddress
 }
 
 func (r *RedemptionBody) RedemptionAmount() uint64 {
 	return r.Amount / uint64(r.PledgeRate) * config.Param.RedemptionRate / 100
+}
+
+type IFunction interface {
+	Verify() error
+}
+
+type ContractBody struct {
+	Contract     arry.Address
+	Type         contractv2.ContractType
+	FunctionType contractv2.FunctionType
+	Function     IFunction
+}
+
+func (c *ContractBody) MsgTo() types.IReceiver {
+	return NewReceivers()
+}
+
+func (c *ContractBody) CheckBody(from arry.Address) error {
+	if err := c.checkType(); err != nil {
+		return err
+	}
+	if err := c.checkType(); err != nil {
+		return err
+	}
+	return c.Function.Verify()
+}
+
+func (c *ContractBody) checkType() error {
+	switch c.Type {
+	case contractv2.Exchange_:
+		switch c.FunctionType {
+		case contractv2.Exchange_Init:
+			return nil
+		case contractv2.Exchange_SetAdmin:
+			return nil
+		case contractv2.Exchange_SetFeeTo:
+			return nil
+		case contractv2.Exchange_ExactIn:
+			return nil
+		case contractv2.Exchange_ExactOut:
+			return nil
+		}
+		return errors.New("invalid contract function type")
+	case contractv2.Pair_:
+		switch c.FunctionType {
+		case contractv2.Pair_AddLiquidity:
+			return nil
+		case contractv2.Pair_RemoveLiquidity:
+			return nil
+		}
+		return errors.New("invalid contract function type")
+	}
+	return errors.New("invalid contract type")
+}
+
+func (c *ContractBody) MsgAmount() uint64 {
+	return 0
+}
+
+func (c *ContractBody) MsgContract() arry.Address {
+	return c.Contract
+}
+
+type StatusCode uint8
+
+const (
+	Status_Success StatusCode = 0
+	Status_Failed  StatusCode = 1
+	Status_Wait    StatusCode = 2
+)
+
+type ContractStatus struct {
+	State StatusCode
+	Event []*Event
+	Error string
+}
+
+func (c *ContractStatus) Bytes() []byte {
+	bytes, _ := rlp.EncodeToBytes(c)
+	return bytes
+}
+
+func DecodeContractState(bytes []byte) (*ContractStatus, error) {
+	var c *ContractStatus
+	err := rlp.DecodeBytes(bytes, &c)
+	return c, err
+}
+
+type EventType uint32
+
+const (
+	Event_Transfer EventType = 0
+	Event_Mint     EventType = 1
+	Event_Burn     EventType = 2
+)
+
+type Event struct {
+	EventType EventType
+	From      arry.Address
+	To        arry.Address
+	Token     arry.Address
+	Amount    uint64
+	Height    uint64
 }

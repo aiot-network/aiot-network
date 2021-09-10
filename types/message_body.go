@@ -4,7 +4,7 @@ import "github.com/aiot-network/aiotchain/tools/arry"
 
 type IMessageBody interface {
 	MsgTo() IReceiver
-	MsgToken() arry.Address
+	MsgContract() arry.Address
 	MsgAmount() uint64
 	CheckBody(from arry.Address) error
 }

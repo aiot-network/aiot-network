@@ -61,7 +61,7 @@ func GenerateTokenAddress(net string, shorthand string) (string, error) {
 	default:
 		return "", errors.New("wrong network")
 	}
-	if err := CheckShorthand(shorthand); err != nil {
+	if err := CheckSymbol(shorthand); err != nil {
 		return "", err
 	}
 	buffBytes := []byte(shorthand)
@@ -80,7 +80,7 @@ func GenerateTokenAddress(net string, shorthand string) (string, error) {
 	return arry.StringToAddress(code58).String(), nil
 }
 
-func CheckTokenAddress(net string, address string) bool {
+func CheckContractAddress(net string, address string) bool {
 	ver := []byte{}
 	switch net {
 	case param.MainNet:
@@ -112,7 +112,7 @@ func CheckTokenAddress(net string, address string) bool {
 // Check the secondary account name, it must be letters,
 // all uppercase or all lowercase, no more than 10
 // characters and no less than 2.
-func CheckShorthand(shorthand string) error {
+func CheckSymbol(shorthand string) error {
 	if len(shorthand) < 2 || len(shorthand) > 10 {
 		return errors.New("the shorthand length must be in the range of 2 and 10")
 	}
@@ -125,4 +125,31 @@ func CheckShorthand(shorthand string) error {
 		}
 	}
 	return nil
+}
+
+func GenerateContractAddress(net string, bytes []byte) (string, error) {
+	ver := []byte{}
+	switch net {
+	case param.MainNet:
+		ver = append(ver, param.MainNetParam.PubKeyHashTokenID[0:]...)
+	case param.TestNet:
+		ver = append(ver, param.TestNetParam.PubKeyHashTokenID[0:]...)
+	default:
+		return "", errors.New("wrong network")
+	}
+
+	buffBytes := bytes
+	hashed := hash.Hash(buffBytes)
+	hash160, err := hash.Hash160(hashed.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	addNet := append(ver, hash160...)
+	hashed1 := hash.Hash(addNet)
+	hashed2 := hash.Hash(hashed1.Bytes())
+	checkSum := hashed2[0:4]
+	hashedCheck1 := append(addNet, checkSum...)
+	code58 := base58.Encode(hashedCheck1)
+	return arry.StringToAddress(code58).String(), nil
 }
