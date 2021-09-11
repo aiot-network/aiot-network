@@ -22,7 +22,6 @@ func init() {
 		SendCandidateCmd,
 		SendCancelCmd,
 		SendVoteCmd,
-		GetCandidatesCmd,
 		CycleSupersCmd,
 		CycleRewordCmd,
 	}
@@ -395,38 +394,6 @@ func parseVote(args []string) (*types.Message, error) {
 		}
 	}
 	return message.NewVote(from, to, fee, nonce, uint64(time.Now().Unix())), nil
-}
-
-var GetCandidatesCmd = &cobra.Command{
-	Use:     "GetCandidates",
-	Short:   "GetCandidates;Get current candidates;",
-	Aliases: []string{"getcandidates", "GC", "gc"},
-	Example: `
-	GetCandidates
-	`,
-	Run: GetCandidates,
-}
-
-func GetCandidates(cmd *cobra.Command, args []string) {
-	client, err := NewRpcClient()
-	if err != nil {
-		outputError(cmd.Use, err)
-		return
-	}
-	defer client.Close()
-
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*20)
-	defer cancel()
-	resp, err := client.Gc.Candidates(ctx, &rpc.NullReq{})
-	if err != nil {
-		outputError(cmd.Use, err)
-		return
-	}
-	if resp.Code == 0 {
-		output(string(resp.Result))
-		return
-	}
-	outputRespError(cmd.Use, resp)
 }
 
 var CycleSupersCmd = &cobra.Command{
