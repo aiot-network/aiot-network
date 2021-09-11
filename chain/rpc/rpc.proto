@@ -39,6 +39,10 @@ service Greeter {
     rpc CreateToken(TokenReq)returns (Response) {}
     rpc SendTransaction(TransactionReq)returns (Response) {}
     rpc SendToken(TokenReq)returns (Response) {}
+    rpc GetContract(AddressReq)returns (Response) {}
+    rpc GetContractBySymbol(SymbolReq)returns (Response) {}
+    rpc ContractMethod(MethodReq)returns (Response) {}
+    rpc TokenList(NullReq)returns (Response) {}
 }
 
 message NullReq {
@@ -60,6 +64,10 @@ message HashReq{
   string hash = 1;
 }
 
+message SymbolReq{
+  string Symbol = 1;
+}
+
 message HeightReq{
   uint64 height = 1;
 }
@@ -67,6 +75,13 @@ message HeightReq{
 message CycleReq{
   uint64 cycle = 1;
 }
+
+message MethodReq{
+  string contract = 1;
+  string method = 2;
+  repeated string params = 3;
+}
+
 
 message GenerateReq{
   string network = 1;

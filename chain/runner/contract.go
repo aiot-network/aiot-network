@@ -2,6 +2,13 @@ package runner
 
 import (
 	"fmt"
+	"github.com/aiot-network/aiotchain/chain/common/status/act_status"
+	"github.com/aiot-network/aiotchain/chain/common/status/token_status"
+	"github.com/aiot-network/aiotchain/chain/runner/exchange_runner"
+	"github.com/aiot-network/aiotchain/chain/runner/library"
+	chaintypes "github.com/aiot-network/aiotchain/chain/types"
+	contractv2 "github.com/aiot-network/aiotchain/chain/types/status"
+	"github.com/aiot-network/aiotchain/types"
 
 	"reflect"
 	"strconv"
@@ -13,21 +20,21 @@ type ContractRunner struct {
 	library *library.RunnerLibrary
 }
 
-func NewContractRunner(accountState _interface.IAccountState, contractState _interface.IContractState) *ContractRunner {
+func NewContractRunner(accountState *act_status.ActStatus, contractState *token_status.TokenStatus) *ContractRunner {
 	library := library.NewRunnerLibrary(accountState, contractState)
 	return &ContractRunner{
 		library: library,
 	}
 }
 
-func (c *ContractRunner) Verify(tx types.ITransaction, lastHeight uint64) error {
+func (c *ContractRunner) Verify(tx types.IMessage, lastHeight uint64) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	if tx.GetTxType() != types.ContractV2_ {
+	if chaintypes.MessageType(tx.Type()) != chaintypes.Contract {
 		return nil
 	}
-	body, _ := tx.GetTxBody().(*types.TxContractV2Body)
+	body, _ := tx.MsgBody().(*chaintypes.ContractBody)
 	switch body.Type {
 	case contractv2.Exchange_:
 		ex := exchange_runner.NewExchangeRunner(c.library, tx, lastHeight)
@@ -57,11 +64,11 @@ func (c *ContractRunner) Verify(tx types.ITransaction, lastHeight uint64) error 
 	return nil
 }
 
-func (c *ContractRunner) RunContract(tx types.ITransaction, blockHeight uint64, blockTime uint64) error {
+func (c *ContractRunner) RunContract(tx types.IMessage, blockHeight uint64, blockTime uint64) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	body, _ := tx.GetTxBody().(*types.TxContractV2Body)
+	body, _ := tx.MsgBody().(*chaintypes.ContractBody)
 	switch body.Type {
 	case contractv2.Exchange_:
 		ex := exchange_runner.NewExchangeRunner(c.library, tx, blockHeight)
@@ -106,7 +113,7 @@ type openContract interface {
 func (c *ContractRunner) ReadMethod(address, method string, params []string) (interface{}, error) {
 	var open openContract
 	var err error
-	contract := c.library.GetContractV2(address)
+	contract := c.library.GetContract(address)
 	if contract == nil {
 		return nil, fmt.Errorf("contract %s dose not exist", address)
 	}

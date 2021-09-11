@@ -11,6 +11,7 @@ type ITokenDB interface {
 	Root() arry.Hash
 	Commit() (arry.Hash, error)
 	Token(addr arry.Address) *types.TokenRecord
+	TokenList() []map[string]string
 	SetToken(token *types.TokenRecord)
 	Contract(addr arry.Address) *status.Contract
 	SetContract(contract *status.Contract)

@@ -16,7 +16,7 @@ type Status struct {
 	actStatus   types.IActStatus
 	dPosStatus  dpos.IDPosStatus
 	tokenStatus types.ITokenStatus
-	x int
+	x           int
 }
 
 func NewStatus(actStatus types.IActStatus, dPosStatus dpos.IDPosStatus, tokenStatus types.ITokenStatus) *Status {
@@ -70,7 +70,7 @@ func (f *Status) CheckMsg(msg types.IMessage, strict bool) error {
 func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 	coinBaseAddr := arry.Address{}
 	for _, msg := range msgs {
-		if msg.IsCoinBase(){
+		if msg.IsCoinBase() {
 			coinBaseAddr = msg.MsgBody().MsgTo().ReceiverList()[0].Address
 		}
 		switch chaintypes.MessageType(msg.Type()) {
@@ -200,10 +200,22 @@ func (f *Status) CycleReword(cycle uint64) []types.IReword {
 	return iReword
 }
 
-func (f *Status)CycleWork(cycle uint64, address arry.Address) (types.IWorks, error){
-	return  f.dPosStatus.AddressWork(cycle, address)
+func (f *Status) CycleWork(cycle uint64, address arry.Address) (types.IWorks, error) {
+	return f.dPosStatus.AddressWork(cycle, address)
 }
 
 func (f *Status) Token(address arry.Address) (types.IToken, error) {
 	return f.tokenStatus.Token(address)
+}
+
+func (f *Status) TokenList() []map[string]string {
+	return f.tokenStatus.TokenList()
+}
+
+func (f *Status) SymbolContract(symbol string) (arry.Address, bool) {
+	return f.tokenStatus.SymbolContract(symbol)
+}
+
+func (f *Status) Contract(address arry.Address) (types.IContract, error) {
+	return f.tokenStatus.Contract(address)
 }

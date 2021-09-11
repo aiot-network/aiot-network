@@ -44,8 +44,11 @@ func (r *RunnerLibrary) SetToken(token *types.TokenRecord) {
 }
 
 func (r *RunnerLibrary) GetContract(address string) *status.Contract {
-	contract, _ := r.cState.Contract(arry.StringToAddress(address))
-	return contract
+	contract, err := r.cState.Contract(arry.StringToAddress(address))
+	if err != nil {
+		return nil
+	}
+	return contract.(*status.Contract)
 }
 
 func (r *RunnerLibrary) SetContract(contract *status.Contract) {

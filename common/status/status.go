@@ -13,8 +13,11 @@ type IStatus interface {
 	Change(msgs []types.IMessage, block types.IBlock) error
 	Account(address arry.Address) types.IAccount
 	Token(address arry.Address) (types.IToken, error)
+	TokenList() []map[string]string
+	Contract(address arry.Address) (types.IContract, error)
 	Candidates() types.ICandidates
 	CycleSupers(cycle uint64) types.ICandidates
 	CycleReword(cycle uint64) []types.IReword
 	CycleWork(cycle uint64, address arry.Address) (types.IWorks, error)
+	SymbolContract(symbol string) (arry.Address, bool)
 }

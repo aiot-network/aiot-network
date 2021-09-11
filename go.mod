@@ -5,10 +5,13 @@ go 1.15
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/btcsuite/goleveldb v1.0.0
+	github.com/cloudflare/roughtime v0.0.0-20210217223727-1fe56bcbcfd4
+	github.com/deckarep/golang-set v1.7.1
 	github.com/fbsobreira/gotron-sdk v0.0.0-20210316163828-8cb47d581197
 	github.com/go-stack/stack v1.8.0
 	github.com/golang/protobuf v1.4.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/ipfs/go-ipfs-util v0.0.1
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jrick/logrotate v1.0.0
 	github.com/libp2p/go-libp2p v0.7.2

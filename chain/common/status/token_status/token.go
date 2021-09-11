@@ -191,7 +191,7 @@ func (t *TokenStatus) Token(address arry.Address) (types.IToken, error) {
 	return token, nil
 }
 
-func (t *TokenStatus) Contract(address arry.Address) (*status.Contract, error) {
+func (t *TokenStatus) Contract(address arry.Address) (types.IContract, error) {
 	contract := t.db.Contract(address)
 	if contract == nil {
 		return nil, errors.New("not found")
@@ -233,4 +233,11 @@ func (t *TokenStatus) SetSymbolContract(symbol string, address arry.Address) {
 	defer t.mutex.Unlock()
 
 	t.db.SetSymbolContract(symbol, address)
+}
+
+func (t *TokenStatus) TokenList() []map[string]string {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
+	return t.db.TokenList()
 }

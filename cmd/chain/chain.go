@@ -13,6 +13,7 @@ import (
 	"github.com/aiot-network/aiotchain/chain/node"
 	"github.com/aiot-network/aiotchain/chain/request"
 	"github.com/aiot-network/aiotchain/chain/rpc"
+	runner2 "github.com/aiot-network/aiotchain/chain/runner"
 	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/common/horn"
 	"github.com/aiot-network/aiotchain/service/generate"
@@ -122,7 +123,8 @@ func createNode() (*node.Node, error) {
 	}
 	poolSv := pool.NewPool(horn, msgManage)
 
-	rpcSv := rpc.NewRpc(status, poolSv, chain, peersSv)
+	runner := runner2.NewContractRunner(actStatus, tokenStatus)
+	rpcSv := rpc.NewRpc(status, poolSv, chain, peersSv, runner)
 	syncSv := sync_service.NewSync(peersSv, dPosStatus, reqHandler, chain)
 	generateSv := generate.NewGenerate(chain, dPos, poolSv, horn)
 	node := node.NewNode()

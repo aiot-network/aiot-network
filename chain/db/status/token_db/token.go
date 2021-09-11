@@ -52,6 +52,22 @@ func (t *TokenDB) Token(address arry.Address) *types.TokenRecord {
 	return token
 }
 
+func (t *TokenDB) TokenList() []map[string]string {
+	/*iter := t.trie.PrefixIterator([]byte{})
+	var tokens []*types.TokenRecord
+	for iter.Next(true) {
+		if iter.Leaf() {
+			key := iter.LeafKey()
+			tokens = append(tokens, &types.Token{
+				Symbol:   string(database.LeafKeyToKey(symbolBucket, key)),
+				Contract: hasharry.BytesToAddress(iter.LeafBlob()).String(),
+			})
+		}
+	}
+	return tokens*/
+	return nil
+}
+
 func (t *TokenDB) SetToken(token *types.TokenRecord) {
 	t.trie.Update(token.Address.Bytes(), token.Bytes())
 }
