@@ -151,7 +151,9 @@ func (t *TokenStatus) UpdateToken(msg types.IMessage, height uint64) error {
 					record,
 				},
 			}
+			t.db.SetSymbolContract(msgBody.Shorthand, tokenAddr)
 		}
+
 		t.db.SetToken(token)
 	case chaintypes.Redemption:
 		msgBody, ok := msg.MsgBody().(*chaintypes.RedemptionBody)

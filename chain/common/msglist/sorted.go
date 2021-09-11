@@ -77,7 +77,7 @@ func (t *Sorted) StagnantMsgs() []types.IMessage {
 	for rIndex.Len() > 0 {
 		ti := heap.Pop(rIndex).(*msgInfo)
 		msg := t.msgs[ti.address]
-		if msg != nil && msg.Time() < timeNow && msg.Time() + maxStagnantTime > timeNow {
+		if msg != nil && msg.Time() < timeNow && msg.Time()+maxStagnantTime > timeNow {
 			msgs = append(msgs, msg)
 		}
 
@@ -124,9 +124,9 @@ func (t *Sorted) Remove(msg types.IMessage) {
 }
 
 // Delete already packed messages
-func (t *Sorted) RemoveExecuted(v validator.IValidator) {
+func (t *Sorted) RemoveExecuted(v validator.IValidator, height uint64) {
 	for _, msg := range t.cache {
-		if err := v.CheckMsg(msg, false); err != nil {
+		if err := v.CheckMsg(msg, false, height); err != nil {
 			t.Remove(msg)
 		}
 	}

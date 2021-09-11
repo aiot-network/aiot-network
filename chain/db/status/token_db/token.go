@@ -52,22 +52,6 @@ func (t *TokenDB) Token(address arry.Address) *types.TokenRecord {
 	return token
 }
 
-func (t *TokenDB) TokenList() []map[string]string {
-	/*iter := t.trie.PrefixIterator([]byte{})
-	var tokens []*types.TokenRecord
-	for iter.Next(true) {
-		if iter.Leaf() {
-			key := iter.LeafKey()
-			tokens = append(tokens, &types.Token{
-				Symbol:   string(database.LeafKeyToKey(symbolBucket, key)),
-				Contract: hasharry.BytesToAddress(iter.LeafBlob()).String(),
-			})
-		}
-	}
-	return tokens*/
-	return nil
-}
-
 func (t *TokenDB) SetToken(token *types.TokenRecord) {
 	t.trie.Update(token.Address.Bytes(), token.Bytes())
 }
@@ -95,8 +79,21 @@ func (t *TokenDB) ContractState(msgHash arry.Hash) *types.ContractStatus {
 	return cs
 }
 
+const symbolBucket = "s_"
+
+func (t *TokenDB) TokenList() []map[string]string {
+	rs := t.base.Foreach(symbolBucket)
+	var tokens []map[string]string
+	for key, value := range rs {
+		tokens = append(tokens, map[string]string{
+			key: arry.BytesToAddress(value).String(),
+		})
+	}
+	return nil
+}
+
 func (t *TokenDB) SymbolContract(symbol string) (arry.Address, bool) {
-	bytes := t.trie.Get([]byte(symbol))
+	bytes, _ := t.base.GetFromBucket(symbolBucket, []byte(symbol))
 	if bytes == nil {
 		return arry.Address{}, false
 	}
@@ -104,5 +101,5 @@ func (t *TokenDB) SymbolContract(symbol string) (arry.Address, bool) {
 }
 
 func (t *TokenDB) SetSymbolContract(symbol string, address arry.Address) {
-	t.trie.Update([]byte(symbol), address.Bytes())
+	t.base.PutInBucket(symbolBucket, []byte(symbol), address.Bytes())
 }

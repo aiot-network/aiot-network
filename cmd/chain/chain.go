@@ -117,7 +117,7 @@ func createNode() (*node.Node, error) {
 	}
 
 	horn := horn.NewHorn(peersSv, gPool, reqHandler)
-	msgManage, err := msglist.NewMsgManagement(status, actStatus)
+	msgManage, err := msglist.NewMsgManagement(status, actStatus, chain.LastHeight)
 	if err != nil {
 		return nil, err
 	}

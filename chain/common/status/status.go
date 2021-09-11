@@ -3,6 +3,7 @@ package status
 import (
 	"errors"
 	"github.com/aiot-network/aiotchain/chain/common/kit"
+	"github.com/aiot-network/aiotchain/chain/runner"
 	chaintypes "github.com/aiot-network/aiotchain/chain/types"
 	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/common/dpos"
@@ -12,11 +13,13 @@ import (
 
 const module = "chain"
 
+type lastHeightFunc func() uint64
+
 type Status struct {
 	actStatus   types.IActStatus
 	dPosStatus  dpos.IDPosStatus
 	tokenStatus types.ITokenStatus
-	x           int
+	runner      *runner.ContractRunner
 }
 
 func NewStatus(actStatus types.IActStatus, dPosStatus dpos.IDPosStatus, tokenStatus types.ITokenStatus) *Status {
@@ -48,7 +51,7 @@ func (f *Status) Account(address arry.Address) types.IAccount {
 	return f.actStatus.Account(address)
 }
 
-func (f *Status) CheckMsg(msg types.IMessage, strict bool) error {
+func (f *Status) CheckMsg(msg types.IMessage, strict bool, height uint64) error {
 	if err := msg.Check(); err != nil {
 		return err
 	}
@@ -64,6 +67,30 @@ func (f *Status) CheckMsg(msg types.IMessage, strict bool) error {
 	if err := f.tokenStatus.CheckMessage(msg); err != nil {
 		return err
 	}
+
+	if err := f.runner.Verify(msg, height); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f *Status) CheckBlockMsg(msg types.IMessage, strict bool) error {
+	if err := msg.Check(); err != nil {
+		return err
+	}
+
+	if err := f.dPosStatus.CheckMessage(msg); err != nil {
+		return err
+	}
+
+	if err := f.actStatus.CheckMessage(msg, strict); err != nil {
+		return err
+	}
+
+	if err := f.tokenStatus.CheckMessage(msg); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -97,6 +124,13 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 				return err
 			}
 			if err := f.tokenStatus.UpdateToken(msg, block.GetHeight()); err != nil {
+				return err
+			}
+		case chaintypes.Contract:
+			if err := f.actStatus.FromMessage(msg, block.GetHeight()); err != nil {
+				return err
+			}
+			if err := f.runner.RunContract(msg, block.GetHeight(), block.GetTime()); err != nil {
 				return err
 			}
 		case chaintypes.Vote:

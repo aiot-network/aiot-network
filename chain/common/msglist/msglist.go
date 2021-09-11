@@ -12,6 +12,8 @@ import (
 const msgList_db = "msg_List_db"
 const maxPoolTx = 100000
 
+type lastHeightFunc func() uint64
+
 type MsgManagement struct {
 	cache     *Cache
 	ready     *Sorted
@@ -19,19 +21,21 @@ type MsgManagement struct {
 	actStatus types.IActStatus
 	mutex     sync.RWMutex
 	msgDB     ITxListDB
+	lastHeightFunc
 }
 
-func NewMsgManagement(validator validator.IValidator, actStatus types.IActStatus) (*MsgManagement, error) {
+func NewMsgManagement(validator validator.IValidator, actStatus types.IActStatus, lastHeightFunc lastHeightFunc) (*MsgManagement, error) {
 	msgDB, err := msglist.Open(config.Param.Data + "/" + msgList_db)
 	if err != nil {
 		return nil, err
 	}
 	return &MsgManagement{
-		cache:     NewCache(msgDB),
-		ready:     NewSorted(msgDB),
-		validator: validator,
-		actStatus: actStatus,
-		msgDB:     msgDB,
+		cache:          NewCache(msgDB),
+		ready:          NewSorted(msgDB),
+		validator:      validator,
+		actStatus:      actStatus,
+		msgDB:          msgDB,
+		lastHeightFunc: lastHeightFunc,
 	}, nil
 }
 
@@ -62,7 +66,7 @@ func (t *MsgManagement) Put(msg types.IMessage) error {
 	if t.Exist(msg) {
 		return fmt.Errorf("the message %s already exists", msg.Hash().String())
 	}
-	if err := t.validator.CheckMsg(msg, false); err != nil {
+	if err := t.validator.CheckMsg(msg, false, t.lastHeightFunc()); err != nil {
 		return err
 	}
 
@@ -169,7 +173,7 @@ func (t *MsgManagement) Update() {
 }
 
 func (t *MsgManagement) update() {
-	t.ready.RemoveExecuted(t.validator)
+	t.ready.RemoveExecuted(t.validator, t.lastHeightFunc())
 	for _, msg := range t.cache.msgs {
 		nonce := t.actStatus.Nonce(msg.From())
 		if nonce < msg.Nonce()-1 {

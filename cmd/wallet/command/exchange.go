@@ -1,12 +1,17 @@
 package command
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/aiot-network/aiotchain/chain/common/kit/message"
+	"github.com/aiot-network/aiotchain/chain/rpc"
+	"github.com/aiot-network/aiotchain/chain/runner/exchange_runner"
 	"github.com/aiot-network/aiotchain/chain/types"
 	"github.com/aiot-network/aiotchain/tools/amount"
 	hasharry "github.com/aiot-network/aiotchain/tools/arry"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -653,7 +658,7 @@ func parseSEOParams(args []string, nonce uint64) (*types.Message, error) {
 }
 
 func GetExchangeRouter(exchange string, tokenA, tokenB string) ([]string, error) {
-	/*client, err := NewRpcClient()
+	client, err := NewRpcClient()
 	if err != nil {
 		return nil, err
 	}
@@ -661,7 +666,7 @@ func GetExchangeRouter(exchange string, tokenA, tokenB string) ([]string, error)
 
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*20)
 	defer cancel()
-	rs, err := client.Gc.ContractMethod(ctx, &rpc.Method{
+	rs, err := client.Gc.ContractMethod(ctx, &rpc.MethodReq{
 		Contract: exchange,
 		Method:   "ExchangeOptimalRouter",
 		Params: []string{
@@ -673,7 +678,7 @@ func GetExchangeRouter(exchange string, tokenA, tokenB string) ([]string, error)
 	if err != nil {
 		return nil, err
 	}
-	if rs.Code != rpctypes.RpcSuccess {
+	if rs.Code != rpc.Success {
 		return nil, errors.New(rs.Err)
 	}
 	fmt.Println(string(rs.Result))
@@ -681,7 +686,6 @@ func GetExchangeRouter(exchange string, tokenA, tokenB string) ([]string, error)
 	if err := json.Unmarshal(rs.Result, router); err != nil {
 		return nil, err
 	}
-	fmt.Println(router)*/
-	//return router.Path, nil
-	return nil, nil
+	fmt.Println(router)
+	return router.Path, nil
 }

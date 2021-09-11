@@ -108,6 +108,8 @@ func (a *Account) FromMessage(msg types.IMessage, height uint64) error {
 		return a.addTokenV2(msg, height)
 	case Redemption:
 		return a.addRedemption(msg, height)
+	case Contract:
+		return a.addContract(msg, height)
 	default:
 		body := msg.MsgBody()
 		tokenAddr := body.MsgContract()
@@ -170,6 +172,23 @@ func (a *Account) addTokenV2(msg types.IMessage, height uint64) error {
 	a.Tokens.Set(mainAccount)
 	a.Nonce = msg.Nonce()
 	a.JournalOut.Add(config.Param.MainToken, pledgeAmount, fees, msg.Nonce(), msg.Time(), height)
+	return nil
+}
+
+func (a *Account) addContract(msg types.IMessage, height uint64) error {
+	fees := msg.Fee()
+	main, ok := a.Tokens.Get(config.Param.MainToken.String())
+	if !ok {
+		return errors.New("account is not exist")
+	}
+	if main.Balance < fees {
+		return fmt.Errorf("balance %d is not enough to pay the fee %d", main.Balance, fees)
+	}
+	main.Balance -= fees
+	main.LockedOut += fees
+	a.Tokens.Set(main)
+	a.Nonce = msg.Nonce()
+	a.JournalOut.Add(config.Param.MainToken, 0, fees, msg.Nonce(), msg.Time(), height)
 	return nil
 }
 
