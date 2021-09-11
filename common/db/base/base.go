@@ -80,7 +80,7 @@ func (b *Base) Foreach(bucket string) map[string][]byte {
 	for iter.Next() {
 		value := make([]byte, len(iter.Value()))
 		copy(value, iter.Value())
-		rs[string(iter.Key())] = value
+		rs[string(LeafKeyToKey(bucket, iter.Key()))] = value
 	}
 	return rs
 }

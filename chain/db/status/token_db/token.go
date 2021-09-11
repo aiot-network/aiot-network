@@ -89,7 +89,7 @@ func (t *TokenDB) TokenList() []map[string]string {
 			key: arry.BytesToAddress(value).String(),
 		})
 	}
-	return nil
+	return tokens
 }
 
 func (t *TokenDB) SymbolContract(symbol string) (arry.Address, bool) {

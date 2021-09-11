@@ -197,7 +197,7 @@ func (r *Rpc) Confirmed(context.Context, *NullReq) (*Response, error) {
 }
 
 func (r *Rpc) GetMsgPool(context.Context, *NullReq) (*Response, error) {
-	bytes, _ := json.Marshal(r.api.msgPool)
+	bytes, _ := json.Marshal(r.api.GetMsgPool())
 	return NewResponse(Success, bytes, ""), nil
 }
 

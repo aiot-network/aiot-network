@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/aiot-network/aiotchain/chain/types/functionbody/exchange_func"
+	"github.com/aiot-network/aiotchain/chain/types/status"
 	"github.com/aiot-network/aiotchain/tools/amount"
 	"github.com/aiot-network/aiotchain/tools/arry"
 	"github.com/aiot-network/aiotchain/tools/crypto/ecc/secp256k1"
@@ -70,7 +72,52 @@ func (m *Message) PublicKey() string {
 func (m *Message) ToRlp() types.IRlpMessage {
 	rlpMsg := &RlpMessage{}
 	rlpMsg.MsgHeader = m.Header
-	rlpMsg.MsgBody, _ = rlp.EncodeToBytes(m.Body)
+	switch MessageType(m.Type()) {
+	case Contract:
+		body, _ := m.Body.(*ContractBody)
+		rlpC := &RlpContract{
+			MsgHeader: m.Header,
+			MsgBody: RlpContractBody{
+				Contract:     body.Contract,
+				Type:         body.Type,
+				FunctionType: body.FunctionType,
+				Function:     nil,
+			},
+		}
+		switch body.FunctionType {
+		case status.Exchange_Init:
+			function, _ := body.Function.(*exchange_func.ExchangeInitBody)
+			bytes, _ := rlp.EncodeToBytes(function)
+			rlpC.MsgBody.Function = bytes
+		case status.Exchange_SetAdmin:
+			function, _ := body.Function.(*exchange_func.ExchangeAdmin)
+			bytes, _ := rlp.EncodeToBytes(function)
+			rlpC.MsgBody.Function = bytes
+		case status.Exchange_SetFeeTo:
+			function, _ := body.Function.(*exchange_func.ExchangeFeeTo)
+			bytes, _ := rlp.EncodeToBytes(function)
+			rlpC.MsgBody.Function = bytes
+		case status.Exchange_ExactIn:
+			function, _ := body.Function.(*exchange_func.ExactIn)
+			bytes, _ := rlp.EncodeToBytes(function)
+			rlpC.MsgBody.Function = bytes
+		case status.Exchange_ExactOut:
+			function, _ := body.Function.(*exchange_func.ExactOut)
+			bytes, _ := rlp.EncodeToBytes(function)
+			rlpC.MsgBody.Function = bytes
+		case status.Pair_AddLiquidity:
+			function, _ := body.Function.(*exchange_func.ExchangeAddLiquidity)
+			bytes, _ := rlp.EncodeToBytes(function)
+			rlpC.MsgBody.Function = bytes
+		case status.Pair_RemoveLiquidity:
+			function, _ := body.Function.(*exchange_func.ExchangeRemoveLiquidity)
+			bytes, _ := rlp.EncodeToBytes(function)
+			rlpC.MsgBody.Function = bytes
+		}
+		rlpMsg.MsgBody, _ = rlp.EncodeToBytes(rlpC.MsgBody)
+	default:
+		rlpMsg.MsgBody, _ = rlp.EncodeToBytes(m.Body)
+	}
 	return rlpMsg
 }
 
@@ -83,7 +130,7 @@ func (m *Message) Check() error {
 		return err
 	}
 
-	if err := m.checkFees();err != nil{
+	if err := m.checkFees(); err != nil {
 		return err
 	}
 
@@ -107,13 +154,12 @@ func (m *Message) CheckCoinBase(fee uint64, coinbase uint64) error {
 	return nil
 }
 
-
 func (m *Message) checkFees() error {
-	if m.Header.Type == Work{
+	if m.Header.Type == Work {
 		return nil
 	}
 	fees := uint64(minFees * len(m.MsgTo().ReceiverList()))
-	if m.Header.Fee < fees  {
+	if m.Header.Fee < fees {
 		return fmt.Errorf("fees %.8f is less than the minimum poundage allowed %.8f", amount.Amount(m.Header.Fee).ToCoin(), amount.Amount(fees).ToCoin())
 	}
 	return nil

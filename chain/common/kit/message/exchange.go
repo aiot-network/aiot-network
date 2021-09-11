@@ -19,7 +19,7 @@ func NewExchange(net, from, admin, feeTo, symbol string, nonce uint64) (*types.M
 		Header: &types.MsgHeader{
 			Type:  types.Contract,
 			Hash:  arry.Hash{},
-			From:  arry.Address{},
+			From:  arry.StringToAddress(from),
 			Nonce: nonce,
 			Fee:   types.ContractFees,
 			Time:  uint64(time.Now().Unix()),
@@ -49,7 +49,7 @@ func NewSetAdmin(from, exchange, admin string, nonce uint64) (*types.Message, er
 		Header: &types.MsgHeader{
 			Type:  types.Contract,
 			Hash:  arry.Hash{},
-			From:  arry.Address{},
+			From:  arry.StringToAddress(from),
 			Nonce: nonce,
 			Fee:   types.ContractFees,
 			Time:  uint64(time.Now().Unix()),
@@ -76,7 +76,7 @@ func NewSetFeeTo(from, exchange, feeTo string, nonce uint64) (*types.Message, er
 		Header: &types.MsgHeader{
 			Type:  types.Contract,
 			Hash:  arry.Hash{},
-			From:  arry.Address{},
+			From:  arry.StringToAddress(from),
 			Nonce: nonce,
 			Fee:   types.ContractFees,
 			Time:  uint64(time.Now().Unix()),
@@ -107,7 +107,7 @@ func NewPairAddLiquidity(net, from, to, exchange, tokenA, tokenB string, amountA
 		Header: &types.MsgHeader{
 			Type:  types.Contract,
 			Hash:  arry.Hash{},
-			From:  arry.Address{},
+			From:  arry.StringToAddress(from),
 			Nonce: nonce,
 			Fee:   types.ContractFees,
 			Time:  uint64(time.Now().Unix()),
@@ -146,7 +146,7 @@ func NewPairRemoveLiquidity(net, from, to, exchange, tokenA, tokenB string, amou
 		Header: &types.MsgHeader{
 			Type:  types.Contract,
 			Hash:  arry.Hash{},
-			From:  arry.Address{},
+			From:  arry.StringToAddress(from),
 			Nonce: nonce,
 			Fee:   types.ContractFees,
 			Time:  uint64(time.Now().Unix()),
@@ -184,7 +184,7 @@ func NewSwapExactIn(from, to, exchange string, amountIn, amountOutMin uint64, pa
 		Header: &types.MsgHeader{
 			Type:  types.Contract,
 			Hash:  arry.Hash{},
-			From:  arry.Address{},
+			From:  arry.StringToAddress(from),
 			Nonce: nonce,
 			Fee:   types.ContractFees,
 			Time:  uint64(time.Now().Unix()),
@@ -219,7 +219,7 @@ func NewSwapExactOut(from, to, exchange string, amountOut, amountInMax uint64, p
 		Header: &types.MsgHeader{
 			Type:  types.Contract,
 			Hash:  arry.Hash{},
-			From:  arry.Address{},
+			From:  arry.StringToAddress(from),
 			Nonce: nonce,
 			Fee:   types.ContractFees,
 			Time:  uint64(time.Now().Unix()),

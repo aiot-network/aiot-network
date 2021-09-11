@@ -93,6 +93,15 @@ func (a *ActStatus) Account(address arry.Address) types.IAccount {
 	return account
 }
 
+func (a *ActStatus) account(address arry.Address) types.IAccount {
+	account := a.db.Account(address)
+
+	if account.NeedUpdate() {
+		account = a.updateLocked(address)
+	}
+	return account
+}
+
 func (a *ActStatus) Nonce(address arry.Address) uint64 {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
@@ -219,11 +228,11 @@ func (a *ActStatus) Transfer(from, to, token arry.Address, amount uint64, height
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	fromAcc := a.Account(from)
+	fromAcc := a.account(from)
 	if err := fromAcc.TransferOut(token, amount, height); err != nil {
 		return err
 	}
-	toAcc := a.Account(to)
+	toAcc := a.account(to)
 	if err := toAcc.TransferIn(token, amount, height); err != nil {
 		return err
 	}
@@ -236,11 +245,11 @@ func (a *ActStatus) PreTransfer(from, to, token arry.Address, amount uint64, hei
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
-	fromAcc := a.Account(from)
+	fromAcc := a.account(from)
 	if err := fromAcc.TransferOut(token, amount, height); err != nil {
 		return err
 	}
-	toAcc := a.Account(to)
+	toAcc := a.account(to)
 	if err := toAcc.TransferIn(token, amount, height); err != nil {
 		return err
 	}

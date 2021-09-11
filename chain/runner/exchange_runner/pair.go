@@ -267,14 +267,14 @@ func (p *PairRunner) PreAddLiquidityVerify() error {
 	noMainTokenCount := 0
 	if !p.addBody.TokenA.IsEqual(config.Param.MainToken) {
 		noMainTokenCount++
-		if contract := p.pairState.library.GetContract(p.addBody.TokenA.String()); contract == nil {
+		if contract := p.pairState.library.GetToken(p.addBody.TokenA.String()); contract == nil {
 			return fmt.Errorf("tokenA %s is not exist", p.addBody.TokenA.String())
 		}
 	}
 
 	if !p.addBody.TokenB.IsEqual(config.Param.MainToken) {
 		noMainTokenCount++
-		if contract := p.pairState.library.GetContract(p.addBody.TokenB.String()); contract == nil {
+		if contract := p.pairState.library.GetToken(p.addBody.TokenB.String()); contract == nil {
 			return fmt.Errorf("tokenB %s is not exist", p.addBody.TokenB.String())
 		}
 	}
@@ -286,27 +286,32 @@ func (p *PairRunner) PreAddLiquidityVerify() error {
 	if address != p.address.String() {
 		return fmt.Errorf("wrong pair contract address")
 	}
-	if p.pairState.pairBody != nil {
-		return p.preAddLiquidityVerify(address)
+	if err := p.preBalanceVerify(address); err != nil {
+		return err
 	}
 	_, err = p.pairState.exBody.LegalPair(p.addBody.TokenA.String(), p.addBody.TokenB.String())
 	return err
 }
 
-func (p *PairRunner) preAddLiquidityVerify(pairAddr string) error {
+func (p *PairRunner) preBalanceVerify(pairAddr string) error {
+	var amountA, amountB uint64
+	var err error
 	if p.pairState.pairBody == nil {
-		return errors.New("pair not exist")
+		amountA = p.addBody.AmountADesired
+		amountB = p.addBody.AmountADesired
+	} else {
+		pairContract := p.pairState.library.GetContract(pairAddr)
+		if pairContract == nil {
+			return fmt.Errorf("the pair %s is not exist", pairAddr)
+		}
+		pair := pairContract.Body.(*exchange.Pair)
+		reserveA, reserveB := p.pairState.library.GetReservesByPair(pair, p.addBody.TokenA, p.addBody.TokenB)
+		amountA, amountB, err = p.pairState.optimalAmount(reserveA, reserveB, p.addBody.AmountADesired, p.addBody.AmountBDesired, p.addBody.AmountAMin, p.addBody.AmountBMin)
+		if err != nil {
+			return err
+		}
 	}
-	pairContract := p.pairState.library.GetContract(pairAddr)
-	if pairContract == nil {
-		return fmt.Errorf("the pair %s is not exist", pairAddr)
-	}
-	pair := pairContract.Body.(*exchange.Pair)
-	reserveA, reserveB := p.pairState.library.GetReservesByPair(pair, p.addBody.TokenA, p.addBody.TokenB)
-	amountA, amountB, err := p.pairState.optimalAmount(reserveA, reserveB, p.addBody.AmountADesired, p.addBody.AmountBDesired, p.addBody.AmountAMin, p.addBody.AmountBMin)
-	if err != nil {
-		return err
-	}
+
 	balanceA := p.pairState.library.GetBalance(p.sender, p.addBody.TokenA)
 	if balanceA < amountA {
 		return fmt.Errorf("insufficient balance %s", p.sender.String())
@@ -333,12 +338,12 @@ func (p *PairRunner) PreRemoveLiquidityVerify(lastHeight uint64) error {
 		return fmt.Errorf("invalid liquidity")
 	}
 	if !p.removeBody.TokenA.IsEqual(config.Param.MainToken) {
-		if contract := p.pairState.library.GetContract(p.removeBody.TokenA.String()); contract == nil {
+		if contract := p.pairState.library.GetToken(p.removeBody.TokenA.String()); contract == nil {
 			return fmt.Errorf("tokenA %s is not exist", p.removeBody.TokenA.String())
 		}
 	}
 	if !p.removeBody.TokenB.IsEqual(config.Param.MainToken) {
-		if contract := p.pairState.library.GetContract(p.removeBody.TokenB.String()); contract == nil {
+		if contract := p.pairState.library.GetToken(p.removeBody.TokenB.String()); contract == nil {
 			return fmt.Errorf("tokenB %s is not exist", p.removeBody.TokenB.String())
 		}
 	}
@@ -395,7 +400,6 @@ func (p *PairRunner) AddLiquidity() {
 		} else {
 			p.state.Event = p.events
 		}
-		p.state.Event = p.events
 		p.pairState.library.SetContractState(p.tx.Hash().String(), p.state)
 	}()
 	if p.addBody.Deadline != 0 && p.addBody.Deadline < p.height {

@@ -95,7 +95,8 @@ func createNode() (*node.Node, error) {
 	}
 
 	dPos := chaindpos.NewDPos(dPosStatus)
-	status := chainstatus.NewStatus(actStatus, dPosStatus, tokenStatus)
+	runner := runner2.NewContractRunner(actStatus, tokenStatus)
+	status := chainstatus.NewStatus(actStatus, dPosStatus, tokenStatus, runner)
 	gPool := gorutinue.NewPool()
 	chain, err := blockchain.NewChain(status, dPos)
 	if err != nil {
@@ -123,7 +124,6 @@ func createNode() (*node.Node, error) {
 	}
 	poolSv := pool.NewPool(horn, msgManage)
 
-	runner := runner2.NewContractRunner(actStatus, tokenStatus)
 	rpcSv := rpc.NewRpc(status, poolSv, chain, peersSv, runner)
 	syncSv := sync_service.NewSync(peersSv, dPosStatus, reqHandler, chain)
 	generateSv := generate.NewGenerate(chain, dPos, poolSv, horn)

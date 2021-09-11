@@ -22,11 +22,12 @@ type Status struct {
 	runner      *runner.ContractRunner
 }
 
-func NewStatus(actStatus types.IActStatus, dPosStatus dpos.IDPosStatus, tokenStatus types.ITokenStatus) *Status {
+func NewStatus(actStatus types.IActStatus, dPosStatus dpos.IDPosStatus, tokenStatus types.ITokenStatus, runner *runner.ContractRunner) *Status {
 	return &Status{
 		actStatus:   actStatus,
 		dPosStatus:  dPosStatus,
 		tokenStatus: tokenStatus,
+		runner:      runner,
 	}
 }
 
@@ -100,6 +101,9 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 		if msg.IsCoinBase() {
 			coinBaseAddr = msg.MsgBody().MsgTo().ReceiverList()[0].Address
 		}
+		if err := f.actStatus.FromMessage(msg, block.GetHeight()); err != nil {
+			return err
+		}
 		switch chaintypes.MessageType(msg.Type()) {
 		case chaintypes.Transaction:
 			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
@@ -127,9 +131,6 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 				return err
 			}
 		case chaintypes.Contract:
-			if err := f.actStatus.FromMessage(msg, block.GetHeight()); err != nil {
-				return err
-			}
 			if err := f.runner.RunContract(msg, block.GetHeight(), block.GetTime()); err != nil {
 				return err
 			}
@@ -154,9 +155,6 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 			}
 		default:
 			return errors.New("wrong message type")
-		}
-		if err := f.actStatus.FromMessage(msg, block.GetHeight()); err != nil {
-			return err
 		}
 
 	}
@@ -252,4 +250,8 @@ func (f *Status) SymbolContract(symbol string) (arry.Address, bool) {
 
 func (f *Status) Contract(address arry.Address) (types.IContract, error) {
 	return f.tokenStatus.Contract(address)
+}
+
+func (f *Status) ContractState(msgHash arry.Hash) types.IStatus {
+	return f.tokenStatus.ContractState(msgHash)
 }

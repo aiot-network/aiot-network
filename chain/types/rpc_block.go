@@ -1,18 +1,14 @@
 package types
 
-import (
-	chaintypes "github.com/aiot-network/aiotchain/chain/types"
-)
-
 type RpcBlock struct {
 	RpcHeader *RpcHeader `json:"header"`
 	RpcBody   *RpcBody   `json:"body"`
 	Confirmed bool       `json:"confirmed"`
 }
 
-func BlockToRpcBlock(block *chaintypes.Block, confirmed uint64) (*RpcBlock, error) {
+func BlockToRpcBlock(block *Block, confirmed uint64, stateFunc GetContractState) (*RpcBlock, error) {
 	rpcHeader := HeaderToRpcHeader(block.Header)
-	rpcBody, err := BodyToRpcBody(block.Body)
+	rpcBody, err := BodyToRpcBody(block.Body, stateFunc)
 	if err != nil {
 		return nil, err
 	}

@@ -42,7 +42,7 @@ func (a *ActDB) Commit() (arry.Hash, error) {
 func (a *ActDB) Account(address arry.Address) types2.IAccount {
 	bytes := a.trie.Get(address.Bytes())
 	if account, err := types.DecodeAccount(bytes); err != nil {
-		return types.NewAccount()
+		return types.NewAccount(address)
 	} else {
 		return account
 	}

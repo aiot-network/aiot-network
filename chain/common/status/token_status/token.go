@@ -216,7 +216,7 @@ func (t *TokenStatus) SetContractState(msgHash arry.Hash, state *chaintypes.Cont
 
 }
 
-func (t *TokenStatus) ContractState(msgHash arry.Hash) *chaintypes.ContractStatus {
+func (t *TokenStatus) ContractState(msgHash arry.Hash) types.IStatus {
 	t.mutex.RLock()
 	defer t.mutex.RUnlock()
 

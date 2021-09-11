@@ -16,6 +16,7 @@ type IStatus interface {
 	Token(address arry.Address) (types.IToken, error)
 	TokenList() []map[string]string
 	Contract(address arry.Address) (types.IContract, error)
+	ContractState(msgHash arry.Hash) types.IStatus
 	Candidates() types.ICandidates
 	CycleSupers(cycle uint64) types.ICandidates
 	CycleReword(cycle uint64) []types.IReword

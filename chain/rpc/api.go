@@ -11,7 +11,6 @@ import (
 	chaintypes "github.com/aiot-network/aiotchain/chain/types"
 	chainstatus "github.com/aiot-network/aiotchain/chain/types/status"
 	"github.com/aiot-network/aiotchain/common/blockchain"
-	"github.com/aiot-network/aiotchain/common/config"
 	"github.com/aiot-network/aiotchain/common/status"
 	"github.com/aiot-network/aiotchain/service/peers"
 	"github.com/aiot-network/aiotchain/service/pool"
@@ -47,9 +46,9 @@ type ApiResponse struct {
 
 func (a *Api) GetAccount(address string) (*rpctypes.Account, error) {
 	arryAddr := arry.StringToAddress(address)
-	if !kit.CheckAddress(config.Param.Name, arryAddr.String()) {
+	/*if !kit.CheckAddress(config.Param.Name, arryAddr.String()) {
 		return nil, fmt.Errorf("%s address check failed", address)
-	}
+	}*/
 	account := a.status.Account(arryAddr)
 	return rpctypes.ToRpcAccount(account.(*chaintypes.Account)), nil
 }
@@ -96,7 +95,9 @@ func (a *Api) GetMessage(hash string) (*chaintypes.RpcMessageWithHeight, error) 
 		height = index.GetHeight()
 		confirmed = confirmedHeight >= height
 	}
-	rpcMsg, _ := chaintypes.MsgToRpcMsg(msg.(*chaintypes.Message))
+	status := a.status.ContractState(msg.Hash())
+
+	rpcMsg, _ := chaintypes.MsgToRpcMsgWithState(msg.(*chaintypes.Message), status.(*chaintypes.ContractStatus))
 	rsMsg := &chaintypes.RpcMessageWithHeight{
 		MsgHeader: rpcMsg.MsgHeader,
 		MsgBody:   rpcMsg.MsgBody,
@@ -107,7 +108,7 @@ func (a *Api) GetMessage(hash string) (*chaintypes.RpcMessageWithHeight, error) 
 	return rsMsg, nil
 }
 
-func (a *Api) GetBlockHash(hash string) (*rpctypes.RpcBlock, error) {
+func (a *Api) GetBlockHash(hash string) (*chaintypes.RpcBlock, error) {
 	hashArry, err := arry.StringToHash(hash)
 	if err != nil {
 		return nil, fmt.Errorf("wrong hash")
@@ -116,15 +117,15 @@ func (a *Api) GetBlockHash(hash string) (*rpctypes.RpcBlock, error) {
 	if err != nil {
 		return nil, err
 	}
-	return rpctypes.BlockToRpcBlock(block.(*chaintypes.Block), a.chain.LastConfirmed())
+	return chaintypes.BlockToRpcBlock(block.(*chaintypes.Block), a.chain.LastConfirmed(), a.status.ContractState)
 }
 
-func (a *Api) GetBlockHeight(height uint64) (*rpctypes.RpcBlock, error) {
+func (a *Api) GetBlockHeight(height uint64) (*chaintypes.RpcBlock, error) {
 	block, err := a.chain.GetBlockHeight(height)
 	if err != nil {
 		return nil, err
 	}
-	return rpctypes.BlockToRpcBlock(block.(*chaintypes.Block), a.chain.LastConfirmed())
+	return chaintypes.BlockToRpcBlock(block.(*chaintypes.Block), a.chain.LastConfirmed(), a.status.ContractState)
 }
 
 func (a *Api) LastHeight() uint64 {

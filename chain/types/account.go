@@ -20,8 +20,9 @@ type Account struct {
 	Works       *Works       `json:"works"`
 }
 
-func NewAccount() *Account {
+func NewAccount(address arry.Address) *Account {
 	return &Account{
+		Address:    address,
 		Tokens:     make(Tokens, 0),
 		JournalOut: newJournalOut(),
 		JournalIn:  newJournalIn(),
@@ -101,6 +102,9 @@ func (a *Account) FromMessage(msg types.IMessage, height uint64) error {
 		return fmt.Errorf("wrong nonce value")
 	}
 
+	if msg.From().String() == "" {
+		return nil
+	}
 	switch MessageType(msg.Type()) {
 	case Token:
 		return a.addToken(msg, height)

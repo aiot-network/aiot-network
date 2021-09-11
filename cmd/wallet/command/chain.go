@@ -394,6 +394,7 @@ func sendMsg(msg *types.Message) (*rpc.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(jsonBytes))
 	re := &rpc.SendMessageCodeReq{Code: jsonBytes}
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*20)
 	defer cancel()

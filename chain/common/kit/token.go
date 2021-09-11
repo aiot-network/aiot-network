@@ -81,12 +81,19 @@ func GenerateTokenAddress(net string, shorthand string) (string, error) {
 }
 
 func CheckContractAddress(net string, address string) bool {
+
 	ver := []byte{}
 	switch net {
 	case param.MainNet:
 		ver = append(ver, param.MainNetParam.PubKeyHashTokenID[0:]...)
+		if address == param.MainNetParam.MainToken.String() {
+			return true
+		}
 	case param.TestNet:
 		ver = append(ver, param.TestNetParam.PubKeyHashTokenID[0:]...)
+		if address == param.TestNetParam.MainToken.String() {
+			return true
+		}
 	default:
 		return false
 	}

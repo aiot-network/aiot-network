@@ -4,14 +4,14 @@ import (
 	"github.com/aiot-network/aiotchain/chain/types/status"
 )
 
-type RpcContractV2TransactionBody struct {
+type RpcContractBody struct {
 	Contract     string              `json:"contract"`
 	Type         status.ContractType `json:"type"`
 	FunctionType status.FunctionType `json:"functiontype"`
 	Function     IRCFunction         `json:"function"`
 }
 
-type RpcContractV2BodyWithState struct {
+type RpcContractBodyWithState struct {
 	Contract     string              `json:"contract"`
 	Type         status.ContractType `json:"type"`
 	FunctionType status.FunctionType `json:"functiontype"`
@@ -20,9 +20,9 @@ type RpcContractV2BodyWithState struct {
 }
 
 type RpcContractState struct {
-	StateCode ContractStatus `json:"statecode"`
-	Events    []*RpcEvent    `json:"event"`
-	Error     string         `json:"error"`
+	StateCode StatusCode  `json:"statecode"`
+	Events    []*RpcEvent `json:"event"`
+	Error     string      `json:"error"`
 }
 
 type RpcEvent struct {
