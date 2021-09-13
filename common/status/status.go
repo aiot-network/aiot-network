@@ -12,6 +12,7 @@ type IStatus interface {
 	CheckMsg(msg types.IMessage, strict bool, height uint64) error
 	CheckBlockMsg(msg types.IMessage, strict bool) error
 	Change(msgs []types.IMessage, block types.IBlock) error
+	GenesisChange(msgs []types.IMessage, block types.IBlock) error
 	Account(address arry.Address) types.IAccount
 	Token(address arry.Address) (types.IToken, error)
 	TokenList() []map[string]string

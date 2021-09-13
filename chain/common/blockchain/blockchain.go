@@ -334,7 +334,7 @@ func (c *Chain) saveGenesisBlock(block types.IBlock) error {
 		return err
 	}
 
-	c.status.Change(block.BlockBody().MsgList(), block)
+	c.status.GenesisChange(block.BlockBody().MsgList(), block)
 	bk := block.(*chaintypes.Block)
 	rlpBlock := bk.ToRlpBlock().(*chaintypes.RlpBlock)
 	c.db.SaveHeader(bk.Header)

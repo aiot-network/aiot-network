@@ -131,6 +131,9 @@ func (a *ActStatus) FromMessage(msg types.IMessage, height uint64) error {
 	if msg.IsCoinBase() {
 		return nil
 	}
+	if msg.From().String() == "" {
+		return nil
+	}
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()

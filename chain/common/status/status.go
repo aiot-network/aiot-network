@@ -163,6 +163,68 @@ func (f *Status) Change(msgs []types.IMessage, block types.IBlock) error {
 	return nil
 }
 
+func (f *Status) GenesisChange(msgs []types.IMessage, block types.IBlock) error {
+	for _, msg := range msgs {
+		if err := f.actStatus.FromMessage(msg, block.GetHeight()); err != nil {
+			return err
+		}
+		switch chaintypes.MessageType(msg.Type()) {
+		case chaintypes.Transaction:
+			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
+				return err
+			}
+		case chaintypes.Token:
+			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
+				return err
+			}
+			if err := f.tokenStatus.UpdateToken(msg, block.GetHeight()); err != nil {
+				return err
+			}
+		case chaintypes.TokenV2:
+			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
+				return err
+			}
+			if err := f.tokenStatus.UpdateToken(msg, block.GetHeight()); err != nil {
+				return err
+			}
+		case chaintypes.Redemption:
+			if err := f.actStatus.ToMessage(msg, block.GetHeight()); err != nil {
+				return err
+			}
+			if err := f.tokenStatus.UpdateToken(msg, block.GetHeight()); err != nil {
+				return err
+			}
+		case chaintypes.Contract:
+			if err := f.runner.RunContract(msg, block.GetHeight(), block.GetTime()); err != nil {
+				return err
+			}
+		case chaintypes.Vote:
+			if err := f.dPosStatus.Voter(msg); err != nil {
+				return nil
+			}
+		case chaintypes.Candidate:
+			if err := f.dPosStatus.AddCandidate(msg); err != nil {
+				return nil
+			}
+		case chaintypes.Cancel:
+			if err := f.dPosStatus.CancelCandidate(msg); err != nil {
+				return nil
+			}
+		case chaintypes.Work:
+			if err := f.actStatus.WorkMessage(msg); err != nil {
+				return nil
+			}
+			if err := f.dPosStatus.UpdateWork(msg); err != nil {
+				return err
+			}
+		default:
+			return errors.New("wrong message type")
+		}
+
+	}
+	return nil
+}
+
 func (f *Status) Commit() (arry.Hash, arry.Hash, arry.Hash, error) {
 	actRoot, err := f.actStatus.Commit()
 	if err != nil {
