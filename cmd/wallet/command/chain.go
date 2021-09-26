@@ -279,12 +279,9 @@ func SendDerivedTransaction(cmd *cobra.Command, args []string) {
 		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
-	entropy, err := kit.MnemonicToEntropy(m)
-	if err != nil {
-		outputError(cmd.Use, err)
-		return
-	}
-	tx, privStr, err := parseHDTransaction(args, entropy)
+	seed := kit.MnemonicToSeed(m)
+
+	tx, privStr, err := parseHDTransaction(args, seed)
 	if err != nil {
 		outputError(cmd.Use, err)
 		return

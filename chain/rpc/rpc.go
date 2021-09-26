@@ -69,7 +69,6 @@ func (r *Rpc) Start() error {
 		}
 	}()
 
-
 	if config.Param.RpcTLS {
 		log.Info("Rpc startup", "module", module, "port", config.Param.RpcPort, "pem", config.Param.RpcCert)
 	} else {

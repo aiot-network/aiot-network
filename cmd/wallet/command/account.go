@@ -307,11 +307,8 @@ func DerivedAddresses(cmd *cobra.Command, args []string) {
 		outputError(cmd.Use, fmt.Errorf("wrong password"))
 		return
 	}
-	e, err := kit.MnemonicToEntropy(m)
-	if err != nil {
-		outputError(cmd.Use, err)
-		return
-	}
+	seed := kit.MnemonicToSeed(m)
+
 	sStart := args[1]
 	sCount := args[2]
 	start, err := strconv.Atoi(sStart)
@@ -325,7 +322,7 @@ func DerivedAddresses(cmd *cobra.Command, args []string) {
 		return
 	}
 	for i := start; i < start+count; i++ {
-		address, err := kit.HdDeriveAddress(Net, e, uint32(i))
+		address, err := kit.HdDeriveAddress(Net, seed, uint32(i))
 		if err != nil {
 			outputError(cmd.Use, err)
 			return

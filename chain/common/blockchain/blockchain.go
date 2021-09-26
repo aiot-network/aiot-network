@@ -96,9 +96,9 @@ func (c *Chain) NextBlock(msgs []types.IMessage, blockTime uint64) (types.IBlock
 
 	height := c.lastHeight + 1
 
-	var coinBaseAddr  = config.Param.CoinBaseAddressList.CurrentAddress(height)
+	var coinBaseAddr = config.Param.CoinBaseAddressList.CurrentAddress(height)
 	var feeAddr = config.Param.IPrivate.Address()
-	if coinBaseAddr.IsEqual(arry.Address{}){
+	if coinBaseAddr.IsEqual(arry.Address{}) {
 		return nil, errors.New("wrong coinbase address")
 	}
 	cycle := blockTime / uint64(param.CycleInterval)
@@ -461,7 +461,7 @@ func (c *Chain) checkCoinBase(coinBase types.IMessage, fee, height uint64) error
 	allWorks := c.getAllWorks(cycle)
 
 	address := config.Param.CoinBaseAddressList.CurrentAddress(height)
-	if !rei[0].Address.IsEqual(address){
+	if !rei[0].Address.IsEqual(address) {
 		return errors.New("the Coinbase address is inconsistent")
 	}
 	works := c.getWorks(cycle, rei[0].Address)
@@ -586,7 +586,7 @@ func (c *Chain) getAllWorks(cycle uint64) uint64 {
 	rewords := c.status.CycleReword(cycle)
 	if rewords != nil {
 		for _, s := range rewords {
-			allWorks +=s.GetWorkLoad()
+			allWorks += s.GetWorkLoad()
 		}
 	}
 	return allWorks
@@ -594,7 +594,7 @@ func (c *Chain) getAllWorks(cycle uint64) uint64 {
 
 func (c *Chain) getWorks(cycle uint64, address arry.Address) uint64 {
 	works, err := c.status.CycleWork(cycle-1, address)
-	if err != nil{
+	if err != nil {
 		return 0
 	}
 	return works.GetWorkLoad()
