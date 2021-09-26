@@ -166,6 +166,7 @@ RpcPass = ""
 # SendTransaction {from} {token} {to:amount|to:amount} {fees} {password} {nonce}; Send a transaction;
 # {token} AIOT 为主币 二层代币是需要替换成对应的合约地址
 # {fees}  默认输入 0.0001
+## 单笔手续费 0.0001 同时多地址转账 {to:amount} 数量 * 0.0001 例: Ai01:100|Ai02:100 手续费为 0.0002
 # {nonce} 可选 可以通过 Account 命令获取
 ./wallet SendTransaction AiS9RfVfjsb5tdE7xJY7m4kezTQbYnzCvfn AIOT AiLXhnvEPmz9GFwzfBBrg7RiW6EEzncKqUf:1000 0.0001 111111
 ```
@@ -176,6 +177,7 @@ RpcPass = ""
 # {index} 指定转出的派生地址
 # {token} AIOT 为主币 二层代币是需要替换成对应的合约地址
 # {fees}  默认输入 0.0001
+## 单笔手续费 0.0001 同时多地址转账 {to:amount} 数量 * 0.0001 例: Ai01:100|Ai02:100 手续费为 0.0002
 # {nonce} 可选 可以通过 Account 命令获取
 ./wallet SendDerivedTransaction AiS9RfVfjsb5tdE7xJY7m4kezTQbYnzCvfn 1 AIOT AiUv3jvqncVZmDzRdQ4Ri3ZseGg1aRazkDq:1000 0.0001 111111
 ```
