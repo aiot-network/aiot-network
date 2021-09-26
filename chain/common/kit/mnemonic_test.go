@@ -9,7 +9,7 @@ func TestHdDerive(t *testing.T) {
 	e, _ := Entropy()
 	m, _ := Mnemonic(e)
 	fmt.Println(m)
-	e1, err := MnemonicToEntropy(m)
+	e1, err := MnemonicToSeed(m)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}

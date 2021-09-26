@@ -83,7 +83,7 @@ func (m *Message) Check() error {
 		return err
 	}
 
-	if err := m.checkFees();err != nil{
+	if err := m.checkFees(); err != nil {
 		return err
 	}
 
@@ -107,13 +107,12 @@ func (m *Message) CheckCoinBase(fee uint64, coinbase uint64) error {
 	return nil
 }
 
-
 func (m *Message) checkFees() error {
-	if m.Header.Type == Work{
+	if m.Header.Type == Work {
 		return nil
 	}
 	fees := uint64(minFees * len(m.MsgTo().ReceiverList()))
-	if m.Header.Fee < fees  {
+	if m.Header.Fee < fees {
 		return fmt.Errorf("fees %.8f is less than the minimum poundage allowed %.8f", amount.Amount(m.Header.Fee).ToCoin(), amount.Amount(fees).ToCoin())
 	}
 	return nil

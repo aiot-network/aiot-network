@@ -77,7 +77,7 @@ func (t *Sorted) StagnantMsgs() []types.IMessage {
 	for rIndex.Len() > 0 {
 		ti := heap.Pop(rIndex).(*msgInfo)
 		msg := t.msgs[ti.address]
-		if msg != nil && msg.Time() < timeNow && msg.Time() + maxStagnantTime > timeNow {
+		if msg != nil && msg.Time() < timeNow && msg.Time()+maxStagnantTime > timeNow {
 			msgs = append(msgs, msg)
 		}
 

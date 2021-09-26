@@ -3,7 +3,7 @@ package kit
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/aiot-network/aiotchain/common/param"
+	"github.com/aiot-network/aiotchain/chain/common/kit/hd"
 	"github.com/aiot-network/aiotchain/tools/crypto/base58"
 	"github.com/aiot-network/aiotchain/tools/crypto/bip32"
 	"github.com/aiot-network/aiotchain/tools/crypto/bip39"
@@ -51,56 +51,42 @@ func MnemonicToEcString(mnemonic string) (string, error) {
 	return hex.EncodeToString(masterKey.Key), nil
 }
 
-func MnemonicToEntropy(mnemonic string) (string, error) {
-	entropy, err := bip39.EntropyFromMnemonic(mnemonic)
-	if err != nil {
-		return "", err
-	}
+func MnemonicToSeed(mnemonic string) string {
+	seed := bip39.NewSeed(mnemonic, "")
 
-	return hex.EncodeToString(entropy), nil
+	return hex.EncodeToString(seed)
 }
 
-func HdDerive(network string, entropy string, index uint32) (string, error) {
-	bipVersion := bip32.Bip32Version{}
-	switch network {
-	case "mainnet":
-		bipVersion.PrivKeyVersion = param.MainNetParam.HDPrivateKeyID[:]
-		bipVersion.PubKeyVersion = param.MainNetParam.HDPublicKeyID[:]
-	case "testnet":
-		bipVersion.PrivKeyVersion = param.TestNetParam.HDPrivateKeyID[:]
-		bipVersion.PubKeyVersion = param.TestNetParam.HDPublicKeyID[:]
-	default:
-		return "", fmt.Errorf("unknown network")
-	}
-	bytes, err := hex.DecodeString(entropy)
+func HdDerive(network string, seed string, index uint32) (string, error) {
+	bytes, err := hex.DecodeString(seed)
 	if err != nil {
 		return "", err
 	}
 
-	mKey, err := bip32.NewMasterKey2(bytes, bipVersion)
+	mKey, err := bip32.NewMasterKey2(bytes, bip32.DefaultBip32Version)
 	if err != nil {
 		return "", err
 	}
-	var childKey *bip32.Key
-	childKey, err = mKey.NewChildKey(index)
-	return childKey.String(), nil
+	path := fmt.Sprintf("m/44'/0'/0'/0/%d", index)
+	derivePath, err := hd.ParseDerivationPath(path)
+	if err != nil {
+		return "", err
+	}
+
+	for _, i := range derivePath {
+		tmk, err := mKey.NewChildKey(i)
+		if err != nil {
+			return "", err
+		}
+		mKey = tmk
+	}
+
+	return mKey.String(), nil
 }
 
 func HdPrivateToPublic(private string, network string) (string, error) {
-	bipVersion := bip32.Bip32Version{}
-	switch network {
-	case "mainnet":
-		bipVersion.PrivKeyVersion = param.MainNetParam.HDPrivateKeyID[:]
-		bipVersion.PubKeyVersion = param.MainNetParam.HDPublicKeyID[:]
-	case "testnet":
-		bipVersion.PrivKeyVersion = param.TestNetParam.HDPrivateKeyID[:]
-		bipVersion.PubKeyVersion = param.TestNetParam.HDPublicKeyID[:]
-	default:
-		return "", fmt.Errorf("unknown network")
-	}
-
 	data := base58.Decode(private)
-	masterKey, err := bip32.Deserialize2(data, bipVersion)
+	masterKey, err := bip32.Deserialize2(data, bip32.DefaultBip32Version)
 	if err != nil {
 		return "", err
 	}
@@ -112,20 +98,8 @@ func HdPrivateToPublic(private string, network string) (string, error) {
 }
 
 func HdToEc(hdPrivateOrPublic string, network string) (string, error) {
-	bipVersion := bip32.Bip32Version{}
-	switch network {
-	case "mainnet":
-		bipVersion.PrivKeyVersion = param.MainNetParam.HDPrivateKeyID[:]
-		bipVersion.PubKeyVersion = param.MainNetParam.HDPublicKeyID[:]
-	case "testnet":
-		bipVersion.PrivKeyVersion = param.TestNetParam.HDPrivateKeyID[:]
-		bipVersion.PubKeyVersion = param.TestNetParam.HDPublicKeyID[:]
-	default:
-		return "", fmt.Errorf("unknown network")
-	}
-
 	data := base58.Decode(hdPrivateOrPublic)
-	key, err := bip32.Deserialize2(data, bipVersion)
+	key, err := bip32.Deserialize2(data, bip32.DefaultBip32Version)
 	if err != nil {
 		return "", err
 	}
