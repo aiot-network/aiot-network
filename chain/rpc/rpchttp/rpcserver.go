@@ -119,7 +119,7 @@ func NewRPCServer(cfg *config.RpcConfig) (*RpcServer, error) {
 	}
 
 	if cfg.RpcPass != "" {
-		login := "" + ":" + cfg.RpcPass
+		login := cfg.RpcUser + ":" + cfg.RpcPass
 		auth := "Basic " +
 			base64.StdEncoding.EncodeToString([]byte(login))
 		rpc.authsha = sha256.Sum256([]byte(auth))
