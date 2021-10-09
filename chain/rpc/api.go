@@ -183,7 +183,7 @@ func (a *Api) Token(address string) (*rpctypes.RpcToken, error) {
 func (a *Api) GetContract(address string) (interface{}, error) {
 	contract, err := a.status.Contract(arry.StringToAddress(address))
 	if err != nil {
-		return nil, err
+		return a.Token(address)
 	}
 	return rpctypes.TranslateContractToRpcContract(contract.(*chainstatus.Contract)), nil
 }
