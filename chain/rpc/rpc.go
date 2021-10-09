@@ -240,7 +240,7 @@ func (r *Rpc) Token(ctx context.Context, req *TokenAddressReq) (*Response, error
 }
 
 func (r *Rpc) GetContract(ctx context.Context, in *AddressReq) (*Response, error) {
-	contract, err := r.api.Token(in.Address)
+	contract, err := r.api.GetContract(in.Address)
 	if err != nil {
 		return NewResponse(Err_Chain, nil, err.Error()), nil
 	}
