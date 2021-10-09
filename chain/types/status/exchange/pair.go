@@ -2,8 +2,8 @@ package exchange
 
 import (
 	"fmt"
-	"github.com/aiot-network/aiotchain/tools/rlp"
 	"github.com/aiot-network/aiotchain/tools/arry"
+	"github.com/aiot-network/aiotchain/tools/rlp"
 	"math/big"
 )
 

@@ -55,7 +55,7 @@ func (t *TokenRecord) Symbol() string {
 
 func (t *TokenRecord) CheckToken(msg types.IMessage) error {
 	body := msg.MsgBody().(*TokenBody)
-	if !t.Sender.IsEqual(msg.From()){
+	if !t.Sender.IsEqual(msg.From()) {
 		return errors.New("the token already exists")
 	}
 	if !t.IncreaseIssues {
@@ -83,10 +83,9 @@ func (t *TokenRecord) CheckToken(msg types.IMessage) error {
 	return nil
 }
 
-
 func (t *TokenRecord) CheckTokenV2(msg types.IMessage) error {
 	body := msg.MsgBody().(*TokenV2Body)
-	if !t.Sender.IsEqual(msg.From()){
+	if !t.Sender.IsEqual(msg.From()) {
 		return errors.New("the token already exists")
 	}
 	if !t.IncreaseIssues {

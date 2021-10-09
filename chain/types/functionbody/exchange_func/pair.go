@@ -51,10 +51,10 @@ func (e *ExchangeAddLiquidity) Verify() error {
 }
 
 type ExchangeRemoveLiquidity struct {
-	Exchange  arry.Address
-	TokenA    arry.Address
-	TokenB    arry.Address
-	To        arry.Address
+	Exchange   arry.Address
+	TokenA     arry.Address
+	TokenB     arry.Address
+	To         arry.Address
 	Liquidity  uint64
 	AmountAMin uint64
 	AmountBMin uint64
