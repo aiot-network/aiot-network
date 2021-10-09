@@ -631,7 +631,7 @@ func (p *PairRunner) runEvents() error {
 
 func PairAddress(net string, tokenA, tokenB arry.Address, exchange arry.Address) (string, error) {
 	token0, token1 := library.SortToken(tokenA, tokenB)
-	bytes := bytes2.Join([][]byte{base58.Decode(token0.String()), base58.Decode(token1.String()),
+	bytes := bytes2.Join([][]byte{[]byte(token0.String()), []byte(token1.String()),
 		base58.Decode(exchange.String())}, []byte{})
 	return kit.GenerateContractAddress(net, bytes)
 }
