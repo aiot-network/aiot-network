@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -140,7 +141,7 @@ func Create(cmd *cobra.Command, args []string) {
 }
 
 func readPassWd() ([]byte, error) {
-	var passWd [33]byte
+	var passWd [34]byte
 
 	n, err := os.Stdin.Read(passWd[:])
 	if err != nil {
@@ -149,7 +150,10 @@ func readPassWd() ([]byte, error) {
 	if n <= 1 {
 		return nil, errors.New("not read")
 	}
-	return passWd[:n-1], nil
+	buffer := passWd[:n]
+	buffer = bytes.ReplaceAll(buffer, []byte{13}, []byte{})
+	buffer = bytes.ReplaceAll(buffer, []byte{10}, []byte{})
+	return buffer, nil
 }
 
 var ShowAccountsCmd = &cobra.Command{
@@ -290,7 +294,7 @@ func DerivedAddresses(cmd *cobra.Command, args []string) {
 	if len(args) == 4 && args[3] != "" {
 		passWd = []byte(args[3])
 	} else {
-		fmt.Println("please set address password, cannot exceed 32 bytes：")
+		fmt.Println("please input address password, cannot exceed 32 bytes：")
 		passWd, err = readPassWd()
 		if err != nil {
 			outputError(cmd.Use, fmt.Errorf("read pass word failed! %s", err.Error()))
