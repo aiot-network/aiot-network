@@ -22,6 +22,7 @@ const module = "module"
 
 type Chain struct {
 	mutex         sync.RWMutex
+	insertMutex   sync.RWMutex
 	status        status.IStatus
 	db            IChainDB
 	dPos          dpos.IDPos
@@ -274,12 +275,12 @@ func (c *Chain) GetMessageIndex(hash arry.Hash) (types.IMessageIndex, error) {
 }
 
 func (c *Chain) Insert(block types.IBlock) error {
+	c.insertMutex.Lock()
+	defer c.insertMutex.Unlock()
+
 	if err := c.checkBlock(block); err != nil {
 		return err
 	}
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
 	if c.lastHeight >= block.GetHeight() {
 		return errors.New("wrong block height")
 	}
@@ -375,7 +376,7 @@ func (c *Chain) verifyGenesis(block types.IBlock) error {
 }
 
 func (c *Chain) checkBlock(block types.IBlock) error {
-	lastHeight := c.LastHeight()
+	lastHeight := c.lastHeight
 
 	if block.GetHeight() == lastHeight {
 		lastHeader, err := c.GetHeaderHeight(lastHeight)
