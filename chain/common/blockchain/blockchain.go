@@ -22,6 +22,7 @@ const module = "module"
 
 type Chain struct {
 	mutex         sync.RWMutex
+	insertMutex   sync.RWMutex
 	status        status.IStatus
 	db            IChainDB
 	dPos          dpos.IDPos
@@ -274,8 +275,8 @@ func (c *Chain) GetMessageIndex(hash arry.Hash) (types.IMessageIndex, error) {
 }
 
 func (c *Chain) Insert(block types.IBlock) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.insertMutex.Lock()
+	defer c.insertMutex.Unlock()
 
 	if err := c.checkBlock(block); err != nil {
 		return err
