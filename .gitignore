@@ -30,3 +30,6 @@ repleace.sh
 .idea
 cmd/wallet/testaddress/aiFMEX1cdpAe7G8jMKLua5EY9GW6NgUXvvi.json
 cmd/wallet/mainnetkey.zip
+cmd/chain/config3.toml
+cmd/chain/config2.toml
+cmd/chain/config1.toml

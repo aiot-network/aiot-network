@@ -274,12 +274,12 @@ func (c *Chain) GetMessageIndex(hash arry.Hash) (types.IMessageIndex, error) {
 }
 
 func (c *Chain) Insert(block types.IBlock) error {
-	if err := c.checkBlock(block); err != nil {
-		return err
-	}
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
+	if err := c.checkBlock(block); err != nil {
+		return err
+	}
 	if c.lastHeight >= block.GetHeight() {
 		return errors.New("wrong block height")
 	}
