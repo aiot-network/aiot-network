@@ -376,7 +376,7 @@ func (c *Chain) verifyGenesis(block types.IBlock) error {
 }
 
 func (c *Chain) checkBlock(block types.IBlock) error {
-	lastHeight := c.LastHeight()
+	lastHeight := c.lastHeight
 
 	if block.GetHeight() == lastHeight {
 		lastHeader, err := c.GetHeaderHeight(lastHeight)
